@@ -1,11 +1,6 @@
 const archive = window.CONSOLE_ARCHIVE;
 
 const state = {
-  brand: "全部",
-  type: "全部",
-  query: "",
-  fromYear: 1972,
-  toYear: 2026,
   selectedTimelineId: null,
   timelineBrandVisibility: {},
   imageQueue: new Set()
@@ -16,8 +11,28 @@ const IMAGE_NOT_FOUND = "__not_found__";
 const WIKI_API = "https://en.wikipedia.org/w/api.php";
 const localImages = window.CONSOLE_IMAGES || {};
 const imageSources = window.CONSOLE_IMAGE_SOURCES || {};
+const releaseDates = window.CONSOLE_RELEASE_DATES || {};
 const platformVariants = window.CONSOLE_PLATFORM_VARIANTS || {};
 const curatedGames = window.CONSOLE_CURATED_GAMES || {};
+const BRAND_COLORS = [
+  "#3268b8",
+  "#17805d",
+  "#c63f3f",
+  "#d69a21",
+  "#7b61b8",
+  "#0f8a9d",
+  "#a35f1b",
+  "#5f6f7f",
+  "#b14d7a",
+  "#4f7d2a",
+  "#8f563b",
+  "#2f7f9f",
+  "#9a6f13",
+  "#6e5aa8",
+  "#a84646",
+  "#2f7f68",
+  "#4d6fa3"
+];
 
 const allPlatforms = archive.flatMap((brand) =>
   brand.platforms.map((platform) => ({
@@ -33,21 +48,11 @@ const elements = {
   platformCount: document.querySelector("#platformCount"),
   gameCount: document.querySelector("#gameCount"),
   variantCount: document.querySelector("#variantCount"),
-  brandFilters: document.querySelector("#brandFilters"),
-  typeFilters: document.querySelector("#typeFilters"),
-  searchInput: document.querySelector("#searchInput"),
-  fromYear: document.querySelector("#fromYear"),
-  toYear: document.querySelector("#toYear"),
-  resetButton: document.querySelector("#resetButton"),
   timeline: document.querySelector("#timeline"),
   resultsMeta: document.querySelector("#resultsMeta"),
   platformGrid: document.querySelector("#platformGrid"),
   template: document.querySelector("#platformTemplate")
 };
-
-function unique(values) {
-  return [...new Set(values)].sort((a, b) => a.localeCompare(b, "zh-CN"));
-}
 
 function totalGames() {
   return allPlatforms.reduce((sum, platform) => {
@@ -77,67 +82,14 @@ function gameDataForPlatform(platform) {
   };
 }
 
-function matchesQuery(platform) {
-  const variantText = variantsForPlatform(platform)
-    .flatMap((variant) => [variant.name, variant.year, variant.kind, variant.note])
-    .join(" ");
-  if (!state.query) return true;
-  const haystack = [
-    platform.name,
-    platform.brand,
-    platform.year,
-    platform.type,
-    platform.generation,
-    platform.line,
-    platform.notes,
-    variantText,
-    ...gameDataForPlatform(platform).launchGames,
-    ...gameDataForPlatform(platform).signatureGames
-  ].join(" ").toLowerCase();
-  return haystack.includes(state.query.toLowerCase());
-}
-
 function filteredPlatforms() {
   return allPlatforms
-    .filter((platform) => state.brand === "全部" || platform.brand === state.brand)
-    .filter((platform) => state.type === "全部" || platform.type === state.type)
-    .filter((platform) => platform.year >= state.fromYear && platform.year <= state.toYear)
-    .filter(matchesQuery)
-    .sort((a, b) => a.year - b.year || a.brand.localeCompare(b.brand, "zh-CN"));
-}
-
-function createButton(label, active, onClick) {
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = `filter-button${active ? " active" : ""}`;
-  button.textContent = label;
-  button.addEventListener("click", onClick);
-  return button;
-}
-
-function renderFilters() {
-  const brands = ["全部", ...archive.map((item) => item.brand)];
-  const types = ["全部", ...unique(allPlatforms.map((platform) => platform.type))];
-
-  elements.brandFilters.replaceChildren(
-    ...brands.map((brand) =>
-      createButton(brand, state.brand === brand, () => {
-        state.brand = brand;
-        state.selectedTimelineId = null;
-        render();
-      })
-    )
-  );
-
-  elements.typeFilters.replaceChildren(
-    ...types.map((type) =>
-      createButton(type, state.type === type, () => {
-        state.type = type;
-        state.selectedTimelineId = null;
-        render();
-      })
-    )
-  );
+    .sort(
+      (a, b) =>
+        a.year - b.year ||
+        releaseMonth(a) - releaseMonth(b) ||
+        a.brand.localeCompare(b.brand, "zh-CN")
+    );
 }
 
 function typeClass(platform) {
@@ -145,6 +97,33 @@ function typeClass(platform) {
   if (normalized.includes("handheld")) return "handheld";
   if (normalized.includes("hybrid") || normalized.includes("pc")) return "hybrid";
   return "home";
+}
+
+function brandColor(brand) {
+  const index = archive.findIndex((item) => item.brand === brand);
+  return BRAND_COLORS[(index >= 0 ? index : 0) % BRAND_COLORS.length];
+}
+
+function releaseMonth(platform) {
+  return Number(platform.month || platform.releaseMonth || releaseDates[platformId(platform)]?.month || 6);
+}
+
+function releaseDateLabel(platform) {
+  const month = platform.month || platform.releaseMonth || releaseDates[platformId(platform)]?.month;
+  return month ? `${platform.year}.${String(month).padStart(2, "0")}` : `${platform.year}`;
+}
+
+function releaseMonthOffset(platform) {
+  return 40 + Math.round(((releaseMonth(platform) - 1) / 11) * 190);
+}
+
+function timelineSide(platform) {
+  const key = `${platform.brand}-${platform.line}`;
+  let hash = 0;
+  for (let index = 0; index < key.length; index += 1) {
+    hash = (hash + key.charCodeAt(index) * (index + 1)) % 997;
+  }
+  return hash % 2 === 0 ? "left" : "right";
 }
 
 function renderTimeline(platforms) {
@@ -178,38 +157,71 @@ function renderTimeline(platforms) {
     .forEach(([year, yearPlatforms]) => {
       const row = document.createElement("section");
       row.className = "timeline-year-row";
+      const yearHeight = Math.max(
+        190,
+        Math.max(...yearPlatforms.map((platform) => releaseMonthOffset(platform))) + 132
+      );
+      row.style.setProperty("--year-row-height", `${yearHeight}px`);
 
       const yearRail = document.createElement("div");
       yearRail.className = "timeline-year-rail";
       yearRail.setAttribute("aria-label", `${year} 年`);
+      const yearLabel = document.createElement("span");
+      yearLabel.className = "timeline-axis-year";
+      yearLabel.textContent = year;
+      yearRail.append(yearLabel);
 
-      const yearContent = document.createElement("div");
-      yearContent.className = "timeline-year-content";
+      const leftContent = document.createElement("div");
+      leftContent.className = "timeline-year-content timeline-year-content-left";
+      const rightContent = document.createElement("div");
+      rightContent.className = "timeline-year-content timeline-year-content-right";
 
-      const items = document.createElement("div");
-      items.className = "timeline-year-items";
+      const leftItems = document.createElement("div");
+      leftItems.className = "timeline-year-items";
+      const rightItems = document.createElement("div");
+      rightItems.className = "timeline-year-items";
+      const sideMonthCounts = {};
       yearPlatforms
         .slice()
-        .sort((a, b) => a.brand.localeCompare(b.brand, "zh-CN") || a.name.localeCompare(b.name, "zh-CN"))
-        .forEach((platform, index) => {
+        .sort(
+          (a, b) =>
+            releaseMonth(a) - releaseMonth(b) ||
+            a.brand.localeCompare(b.brand, "zh-CN") ||
+            a.name.localeCompare(b.name, "zh-CN")
+        )
+        .forEach((platform) => {
+          const side = timelineSide(platform);
+          const monthKey = `${side}-${releaseMonth(platform)}`;
+          const branchOffset = sideMonthCounts[monthKey] || 0;
           const branch = document.createElement("div");
-          branch.className = "timeline-branch";
-          branch.style.setProperty("--branch-offset", index);
+          branch.className = `timeline-branch ${side === "left" ? "timeline-branch-left" : "timeline-branch-right"}`;
+          branch.style.setProperty("--branch-offset", branchOffset);
+          branch.style.setProperty("--month-offset", `${releaseMonthOffset(platform)}px`);
           branch.append(createTimelineNode(platform));
-          items.append(branch);
+          if (side === "left") {
+            leftItems.append(branch);
+          } else {
+            rightItems.append(branch);
+          }
+          sideMonthCounts[monthKey] = branchOffset + 1;
         });
-      yearContent.append(items);
+      leftContent.append(leftItems);
+      rightContent.append(rightItems);
 
       const selectedPlatform = yearPlatforms.find((platform) => platformId(platform) === state.selectedTimelineId);
       if (selectedPlatform) {
         const detailPanel = document.createElement("section");
-        detailPanel.className = "timeline-detail-panel timeline-year-detail";
+        detailPanel.className = `timeline-detail-panel timeline-year-detail timeline-year-detail-${timelineSide(selectedPlatform)}`;
         detailPanel.setAttribute("aria-live", "polite");
         detailPanel.append(createTimelineDetail(selectedPlatform));
-        yearContent.append(detailPanel);
+        if (timelineSide(selectedPlatform) === "left") {
+          leftContent.append(detailPanel);
+        } else {
+          rightContent.append(detailPanel);
+        }
       }
 
-      row.append(yearRail, yearContent);
+      row.append(leftContent, yearRail, rightContent);
       axis.append(row);
     });
 
@@ -224,9 +236,36 @@ function createTimelineBrandControls(brands) {
   const controls = document.createElement("div");
   controls.className = "timeline-brand-controls";
 
+  const brandRow = document.createElement("div");
+  brandRow.className = "timeline-brand-row";
+
   const label = document.createElement("span");
   label.textContent = "厂商显示";
-  controls.append(label);
+  brandRow.append(label);
+
+  const selectAll = document.createElement("button");
+  selectAll.type = "button";
+  selectAll.className = "timeline-brand-action";
+  selectAll.textContent = "全选";
+  selectAll.addEventListener("click", () => {
+    brands.forEach((brand) => {
+      state.timelineBrandVisibility[brand] = true;
+    });
+    renderTimeline(filteredPlatforms());
+  });
+  brandRow.append(selectAll);
+
+  const clearAll = document.createElement("button");
+  clearAll.type = "button";
+  clearAll.className = "timeline-brand-action";
+  clearAll.textContent = "全不选";
+  clearAll.addEventListener("click", () => {
+    brands.forEach((brand) => {
+      state.timelineBrandVisibility[brand] = false;
+    });
+    renderTimeline(filteredPlatforms());
+  });
+  brandRow.append(clearAll);
 
   brands.forEach((brand) => {
     const button = document.createElement("button");
@@ -238,9 +277,24 @@ function createTimelineBrandControls(brands) {
       state.timelineBrandVisibility[brand] = !timelineBrandVisible(brand);
       renderTimeline(filteredPlatforms());
     });
-    controls.append(button);
+    brandRow.append(button);
   });
 
+  const legend = document.createElement("div");
+  legend.className = "timeline-type-legend";
+  [
+    ["home", "家用机"],
+    ["handheld", "掌机"],
+    ["hybrid", "混合 / PC 掌机"]
+  ].forEach(([className, labelText]) => {
+    const item = document.createElement("span");
+    const swatch = document.createElement("i");
+    swatch.className = className;
+    item.append(swatch, document.createTextNode(labelText));
+    legend.append(item);
+  });
+
+  controls.append(brandRow, legend);
   return controls;
 }
 
@@ -263,11 +317,16 @@ function createTimelineNode(platform) {
 
   const year = document.createElement("span");
   year.className = "timeline-node-year";
-  year.textContent = platform.year;
+  year.textContent = releaseDateLabel(platform);
+
+  const brandTag = document.createElement("span");
+  brandTag.className = "timeline-brand-tag";
+  brandTag.textContent = platform.brand;
+  brandTag.style.setProperty("--brand-color", brandColor(platform.brand));
 
   const topRow = document.createElement("div");
   topRow.className = "timeline-node-top";
-  topRow.append(year);
+  topRow.append(year, brandTag);
 
   const thumbnail = createTimelineThumbnail(platform);
   if (thumbnail) topRow.append(thumbnail);
@@ -278,7 +337,7 @@ function createTimelineNode(platform) {
   const meta = document.createElement("span");
   meta.className = "timeline-node-meta";
   const variants = variantsForPlatform(platform);
-  meta.textContent = `${platform.brand} · ${platform.type} · ${platform.generation} · ${variants.length} 型号`;
+  meta.textContent = `${platform.type} · ${platform.generation} · ${variants.length} 型号`;
 
   button.append(topRow, name, meta);
   node.append(button);
@@ -310,7 +369,7 @@ function createTimelineDetail(platform) {
   const titleGroup = document.createElement("div");
   const year = document.createElement("span");
   year.className = "timeline-node-year";
-  year.textContent = platform.year;
+  year.textContent = releaseDateLabel(platform);
   const title = document.createElement("h3");
   title.textContent = platform.name;
   const meta = document.createElement("p");
@@ -657,45 +716,10 @@ function renderVariants(container, variants) {
 }
 
 function render() {
-  renderFilters();
   const platforms = filteredPlatforms();
   renderTimeline(platforms);
   renderMeta(platforms);
   renderCards(platforms);
-}
-
-function bindEvents() {
-  elements.searchInput.addEventListener("input", (event) => {
-    state.query = event.target.value.trim();
-    state.selectedTimelineId = null;
-    render();
-  });
-
-  elements.fromYear.addEventListener("input", (event) => {
-    state.fromYear = Number(event.target.value) || 1972;
-    state.selectedTimelineId = null;
-    render();
-  });
-
-  elements.toYear.addEventListener("input", (event) => {
-    state.toYear = Number(event.target.value) || 2026;
-    state.selectedTimelineId = null;
-    render();
-  });
-
-  elements.resetButton.addEventListener("click", () => {
-    state.brand = "全部";
-    state.type = "全部";
-    state.query = "";
-    state.fromYear = 1972;
-    state.toYear = 2026;
-    state.selectedTimelineId = null;
-    state.timelineBrandVisibility = {};
-    elements.searchInput.value = "";
-    elements.fromYear.value = state.fromYear;
-    elements.toYear.value = state.toYear;
-    render();
-  });
 }
 
 function init() {
@@ -703,9 +727,6 @@ function init() {
   elements.platformCount.textContent = allPlatforms.length;
   elements.gameCount.textContent = totalGames();
   if (elements.variantCount) elements.variantCount.textContent = totalVariants();
-  elements.fromYear.value = state.fromYear;
-  elements.toYear.value = state.toYear;
-  bindEvents();
   render();
 }
 
