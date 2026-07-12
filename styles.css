@@ -225,63 +225,121 @@ input {
 
 .timeline {
   display: grid;
-  gap: 12px;
+  gap: 14px;
   margin-bottom: 22px;
 }
 
-.brand-timeline {
+.timeline-brand-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 12px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #ffffff;
-  overflow: hidden;
 }
 
-.brand-timeline > summary {
-  cursor: pointer;
-  color: var(--ink);
-  list-style-position: inside;
-}
-
-.brand-timeline-summary {
-  min-height: 48px;
-  padding: 12px 14px;
-  align-items: center;
-  border-bottom: 1px solid transparent;
-}
-
-.brand-timeline[open] > .brand-timeline-summary {
-  border-bottom-color: var(--line);
-}
-
-.brand-timeline-summary strong {
-  margin-left: 6px;
-  font-weight: 800;
-}
-
-.brand-timeline-summary span {
-  margin-left: 10px;
+.timeline-brand-controls > span {
+  margin-right: 2px;
   color: var(--muted);
   font-size: 13px;
+  font-weight: 700;
 }
 
-.brand-track {
-  padding: 12px 14px;
+.timeline-brand-toggle {
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #f7f9fc;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.timeline-brand-toggle.active {
+  border-color: #9fb8e8;
+  background: #eef4ff;
+  color: #153f81;
+}
+
+.vertical-timeline {
+  display: grid;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.timeline-year-row {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 0;
+  position: relative;
+}
+
+.timeline-year-rail {
+  position: relative;
   display: flex;
+  justify-content: center;
+  padding-top: 18px;
+}
+
+.timeline-year-rail::before {
+  content: "";
+  position: absolute;
+  top: -14px;
+  bottom: -14px;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  background: #d8e0ec;
+}
+
+.timeline-year-rail::after {
+  content: "";
+  position: relative;
+  z-index: 1;
+  width: 11px;
+  height: 11px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  background: var(--red);
+  box-shadow: 0 0 0 2px #d8e0ec;
+}
+
+.timeline-year-content {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.timeline-year-items {
+  display: grid;
   gap: 8px;
-  overflow-x: auto;
-  scrollbar-width: thin;
-  background:
-    linear-gradient(90deg, #ffffff 0, rgba(255, 255, 255, 0) 22px),
-    linear-gradient(270deg, #ffffff 0, rgba(255, 255, 255, 0) 22px);
-  background-position: left center, right center;
-  background-repeat: no-repeat;
-  background-size: 42px 100%;
+  align-items: start;
+}
+
+.timeline-branch {
+  --branch-step: 22px;
+  position: relative;
+  min-width: 0;
+  padding-left: calc(34px + (var(--branch-offset) * var(--branch-step)));
+}
+
+.timeline-branch::before {
+  content: "";
+  position: absolute;
+  top: 18px;
+  left: 0;
+  width: calc(26px + (var(--branch-offset) * var(--branch-step)));
+  height: 2px;
+  background: #d8e0ec;
 }
 
 .timeline-node {
-  flex: 0 0 188px;
+  max-width: 280px;
+  min-width: 0;
   border: 1px solid var(--line);
-  border-left: 4px solid var(--blue);
+  border-left: 9px solid var(--blue);
   border-radius: 6px;
   background: #fbfcff;
   overflow: hidden;
@@ -312,19 +370,29 @@ input {
 
 .timeline-platform-button {
   width: 100%;
-  height: 96px;
+  height: 106px;
   border: 0;
   background: transparent;
   color: var(--ink);
   cursor: pointer;
   display: grid;
+  grid-template-rows: 28px minmax(34px, 1fr) 16px;
   gap: 4px;
   padding: 10px;
   text-align: left;
+  overflow: hidden;
 }
 
 .timeline-platform-button:hover {
   background: #eef4ff;
+}
+
+.timeline-node-top {
+  min-height: 28px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: start;
 }
 
 .timeline-node-year {
@@ -333,18 +401,39 @@ input {
   font-weight: 800;
 }
 
+.timeline-node-thumb {
+  width: 34px;
+  height: 26px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #ffffff;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
 .timeline-platform-button strong {
   font-size: 14px;
   line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .timeline-node-meta {
   color: var(--muted);
   font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .timeline-detail-panel {
   padding: 0 14px 14px;
+}
+
+.timeline-year-detail {
+  padding: 0;
 }
 
 .timeline-detail-panel[hidden] {
@@ -353,7 +442,7 @@ input {
 
 .timeline-detail {
   border: 1px solid var(--line);
-  border-left: 4px solid var(--blue);
+  border-left: 9px solid var(--blue);
   border-radius: 6px;
   background: #f8faff;
   padding: 14px;
@@ -403,28 +492,51 @@ input {
   background: #eef4ff;
 }
 
-.timeline-variant-list {
-  margin: 0;
-  padding-left: 18px;
+.timeline-variant-grid {
   display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 8px;
-  max-height: 180px;
+  max-height: 230px;
   overflow: auto;
 }
 
-.timeline-variant-list li {
-  color: #414957;
+.timeline-variant-card {
+  min-height: 86px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #ffffff;
+  padding: 10px;
+  display: grid;
+  gap: 4px;
+  align-content: start;
+}
+
+.timeline-variant-year {
+  color: var(--red);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.timeline-variant-card strong {
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.timeline-variant-meta {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.timeline-variant-card p {
+  margin: 0;
+  color: var(--muted);
   font-size: 12px;
   line-height: 1.35;
-}
-
-.timeline-variant-list li strong,
-.timeline-variant-list li span {
-  display: block;
-}
-
-.timeline-variant-list li span {
-  color: var(--muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .timeline-chip {
@@ -632,18 +744,36 @@ summary {
 
 .variant-list {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 10px;
   margin-top: 10px;
 }
 
 .variant-item {
-  border-left: 3px solid var(--blue);
-  padding-left: 10px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--blue);
+  border-radius: 6px;
+  background: #ffffff;
+  padding: 10px;
+  display: grid;
+  gap: 5px;
+  align-content: start;
+}
+
+.platform-card[data-type*="Handheld"] .variant-item,
+.platform-card[data-type*="handheld"] .variant-item {
+  border-left-color: var(--green);
+}
+
+.platform-card[data-type*="Hybrid"] .variant-item,
+.platform-card[data-type*="PC"] .variant-item {
+  border-left-color: var(--yellow);
 }
 
 .variant-item h4 {
-  margin: 0 0 4px;
+  margin: 0;
   font-size: 14px;
+  line-height: 1.25;
 }
 
 .variant-item p {
@@ -654,9 +784,9 @@ summary {
 }
 
 .variant-item .variant-meta {
-  margin-bottom: 4px;
   color: var(--muted);
   font-size: 12px;
+  line-height: 1.3;
 }
 
 .game-group h4 {
@@ -666,18 +796,33 @@ summary {
 }
 
 .game-list {
+  counter-reset: game-item;
   margin: 0;
-  padding-left: 24px;
-  columns: 2 150px;
+  padding-left: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 3px 16px;
+  list-style: none;
   color: #303743;
   line-height: 1.55;
   max-height: 360px;
   overflow: auto;
 }
 
-.game-list li::marker {
+.game-list li {
+  counter-increment: game-item;
+  display: grid;
+  grid-template-columns: 3ch minmax(0, 1fr);
+  column-gap: 4px;
+  align-items: start;
+}
+
+.game-list li::before {
+  content: counter(game-item) ".";
   color: var(--blue);
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
 }
 
 .source-note {
@@ -733,13 +878,34 @@ summary {
     grid-template-columns: 1fr;
   }
 
-  .brand-track {
-    padding-left: 12px;
-    padding-right: 12px;
+  .timeline-brand-controls {
+    align-items: flex-start;
+  }
+
+  .timeline-brand-controls > span {
+    flex-basis: 100%;
+  }
+
+  .timeline-year-row {
+    grid-template-columns: 22px minmax(0, 1fr);
+  }
+
+  .timeline-year-items {
+    gap: 8px;
+  }
+
+  .timeline-branch {
+    --branch-step: 10px;
+    padding-left: calc(22px + (var(--branch-offset) * var(--branch-step)));
+  }
+
+  .timeline-branch::before {
+    width: calc(16px + (var(--branch-offset) * var(--branch-step)));
   }
 
   .timeline-node {
-    flex-basis: 172px;
+    max-width: none;
+    width: 100%;
   }
 
   .timeline-detail-panel {

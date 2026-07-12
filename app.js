@@ -7,6 +7,7 @@ const state = {
   fromYear: 1972,
   toYear: 2026,
   selectedTimelineId: null,
+  timelineBrandVisibility: {},
   imageQueue: new Set()
 };
 
@@ -147,48 +148,100 @@ function typeClass(platform) {
 }
 
 function renderTimeline(platforms) {
-  const byBrand = new Map();
-  platforms.forEach((platform) => {
-    if (!byBrand.has(platform.brand)) byBrand.set(platform.brand, []);
-    byBrand.get(platform.brand).push(platform);
+  const availableBrands = archive
+    .map((item) => item.brand)
+    .filter((brand) => platforms.some((platform) => platform.brand === brand));
+  const brandControls = createTimelineBrandControls(availableBrands);
+  const visiblePlatforms = platforms.filter((platform) => timelineBrandVisible(platform.brand));
+  const selectedStillVisible = visiblePlatforms.some((platform) => platformId(platform) === state.selectedTimelineId);
+  if (!selectedStillVisible) state.selectedTimelineId = null;
+
+  if (!visiblePlatforms.length) {
+    const empty = document.createElement("div");
+    empty.className = "empty";
+    empty.textContent = "当前厂商开关下没有可显示的主机。";
+    elements.timeline.replaceChildren(brandControls, empty);
+    return;
+  }
+
+  const byYear = new Map();
+  visiblePlatforms.forEach((platform) => {
+    if (!byYear.has(platform.year)) byYear.set(platform.year, []);
+    byYear.get(platform.year).push(platform);
   });
 
-  const rows = [...byBrand.entries()].map(([brand, brandPlatforms]) => {
-    const brandDetails = document.createElement("details");
-    brandDetails.className = "brand-timeline";
-    brandDetails.open = state.brand !== "全部" || brandPlatforms.length <= 5;
+  const axis = document.createElement("div");
+  axis.className = "vertical-timeline";
 
-    const summary = document.createElement("summary");
-    summary.className = "brand-timeline-summary";
-    const variantTotal = brandPlatforms.reduce((sum, platform) => sum + variantsForPlatform(platform).length, 0);
-    const brandName = document.createElement("strong");
-    brandName.textContent = brand;
-    const brandMeta = document.createElement("span");
-    brandMeta.textContent = `${brandPlatforms.length} 个平台 / ${variantTotal} 个型号`;
-    summary.append(brandName, brandMeta);
+  [...byYear.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .forEach(([year, yearPlatforms]) => {
+      const row = document.createElement("section");
+      row.className = "timeline-year-row";
 
-    const track = document.createElement("div");
-    track.className = "brand-track";
+      const yearRail = document.createElement("div");
+      yearRail.className = "timeline-year-rail";
+      yearRail.setAttribute("aria-label", `${year} 年`);
 
-    brandPlatforms
-      .slice()
-      .sort((a, b) => a.year - b.year || a.name.localeCompare(b.name, "zh-CN"))
-      .forEach((platform) => {
-        track.append(createTimelineNode(platform));
-      });
+      const yearContent = document.createElement("div");
+      yearContent.className = "timeline-year-content";
 
-    const selectedPlatform = brandPlatforms.find((platform) => platformId(platform) === state.selectedTimelineId);
-    const detailPanel = document.createElement("section");
-    detailPanel.className = "timeline-detail-panel";
-    detailPanel.setAttribute("aria-live", "polite");
-    detailPanel.hidden = !selectedPlatform;
-    if (selectedPlatform) detailPanel.append(createTimelineDetail(selectedPlatform));
+      const items = document.createElement("div");
+      items.className = "timeline-year-items";
+      yearPlatforms
+        .slice()
+        .sort((a, b) => a.brand.localeCompare(b.brand, "zh-CN") || a.name.localeCompare(b.name, "zh-CN"))
+        .forEach((platform, index) => {
+          const branch = document.createElement("div");
+          branch.className = "timeline-branch";
+          branch.style.setProperty("--branch-offset", index);
+          branch.append(createTimelineNode(platform));
+          items.append(branch);
+        });
+      yearContent.append(items);
 
-    brandDetails.append(summary, track, detailPanel);
-    return brandDetails;
+      const selectedPlatform = yearPlatforms.find((platform) => platformId(platform) === state.selectedTimelineId);
+      if (selectedPlatform) {
+        const detailPanel = document.createElement("section");
+        detailPanel.className = "timeline-detail-panel timeline-year-detail";
+        detailPanel.setAttribute("aria-live", "polite");
+        detailPanel.append(createTimelineDetail(selectedPlatform));
+        yearContent.append(detailPanel);
+      }
+
+      row.append(yearRail, yearContent);
+      axis.append(row);
+    });
+
+  elements.timeline.replaceChildren(brandControls, axis);
+}
+
+function timelineBrandVisible(brand) {
+  return state.timelineBrandVisibility[brand] ?? true;
+}
+
+function createTimelineBrandControls(brands) {
+  const controls = document.createElement("div");
+  controls.className = "timeline-brand-controls";
+
+  const label = document.createElement("span");
+  label.textContent = "厂商显示";
+  controls.append(label);
+
+  brands.forEach((brand) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = `timeline-brand-toggle${timelineBrandVisible(brand) ? " active" : ""}`;
+    button.textContent = brand;
+    button.setAttribute("aria-pressed", timelineBrandVisible(brand) ? "true" : "false");
+    button.addEventListener("click", () => {
+      state.timelineBrandVisibility[brand] = !timelineBrandVisible(brand);
+      renderTimeline(filteredPlatforms());
+    });
+    controls.append(button);
   });
 
-  elements.timeline.replaceChildren(...rows);
+  return controls;
 }
 
 function createTimelineNode(platform) {
@@ -202,7 +255,8 @@ function createTimelineNode(platform) {
   button.className = "timeline-platform-button";
   button.title = `${platform.year} ${platform.name}`;
   button.setAttribute("aria-pressed", state.selectedTimelineId === id ? "true" : "false");
-  button.addEventListener("click", () => {
+  button.addEventListener("click", (event) => {
+    event.stopPropagation();
     state.selectedTimelineId = state.selectedTimelineId === id ? null : id;
     renderTimeline(filteredPlatforms());
   });
@@ -211,18 +265,39 @@ function createTimelineNode(platform) {
   year.className = "timeline-node-year";
   year.textContent = platform.year;
 
+  const topRow = document.createElement("div");
+  topRow.className = "timeline-node-top";
+  topRow.append(year);
+
+  const thumbnail = createTimelineThumbnail(platform);
+  if (thumbnail) topRow.append(thumbnail);
+
   const name = document.createElement("strong");
   name.textContent = platform.name;
 
   const meta = document.createElement("span");
   meta.className = "timeline-node-meta";
   const variants = variantsForPlatform(platform);
-  meta.textContent = `${platform.type} · ${platform.generation} · ${variants.length} 型号`;
+  meta.textContent = `${platform.brand} · ${platform.type} · ${platform.generation} · ${variants.length} 型号`;
 
-  button.append(year, name, meta);
+  button.append(topRow, name, meta);
   node.append(button);
 
   return node;
+}
+
+function createTimelineThumbnail(platform) {
+  const image = manualImageForPlatform(platform) || localImages[platformId(platform)];
+  const primaryImage = image?.images?.[0] || image;
+  if (!primaryImage?.src) return null;
+
+  const thumbnail = document.createElement("img");
+  thumbnail.className = "timeline-node-thumb";
+  thumbnail.src = primaryImage.src;
+  thumbnail.alt = `${platform.name} 缩略图`;
+  thumbnail.loading = "lazy";
+  thumbnail.decoding = "async";
+  return thumbnail;
 }
 
 function createTimelineDetail(platform) {
@@ -261,24 +336,40 @@ function createTimelineDetail(platform) {
 
   const variants = variantsForPlatform(platform);
   if (variants.length) {
-    const list = document.createElement("ol");
-    list.className = "timeline-variant-list";
+    const variantGrid = document.createElement("div");
+    variantGrid.className = "timeline-variant-grid";
     variants
       .slice()
       .sort((a, b) => (a.year || 9999) - (b.year || 9999) || a.name.localeCompare(b.name, "zh-CN"))
       .forEach((variant) => {
-        const item = document.createElement("li");
+        const item = document.createElement("article");
+        item.className = "timeline-variant-card";
+
+        const itemYear = document.createElement("span");
+        itemYear.className = "timeline-variant-year";
+        itemYear.textContent = variant.year || "年份待补";
+
         const itemTitle = document.createElement("strong");
-        itemTitle.textContent = `${variant.year || "年份待补"} · ${variant.name}`;
-        const itemNote = document.createElement("span");
-        itemNote.textContent = `${variant.kind || "硬件型号"}${variant.note ? `：${variant.note}` : ""}`;
-        item.append(itemTitle, itemNote);
-        list.append(item);
+        itemTitle.textContent = variant.name;
+
+        const itemMeta = document.createElement("span");
+        itemMeta.className = "timeline-variant-meta";
+        itemMeta.textContent = variant.kind || "硬件型号";
+
+        item.append(itemYear, itemTitle, itemMeta);
+
+        if (variant.note) {
+          const itemNote = document.createElement("p");
+          itemNote.textContent = variant.note;
+          item.append(itemNote);
+        }
+
+        variantGrid.append(item);
       });
 
     const variantsTitle = document.createElement("h4");
     variantsTitle.textContent = `型号 / 改版 ${variants.length}`;
-    panel.append(header, note, variantsTitle, list);
+    panel.append(header, note, variantsTitle, variantGrid);
   } else {
     panel.append(header, note);
   }
@@ -599,6 +690,7 @@ function bindEvents() {
     state.fromYear = 1972;
     state.toYear = 2026;
     state.selectedTimelineId = null;
+    state.timelineBrandVisibility = {};
     elements.searchInput.value = "";
     elements.fromYear.value = state.fromYear;
     elements.toYear.value = state.toYear;
