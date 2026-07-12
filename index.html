@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>游戏主机资料库</title>
+    <meta name="description" content="本地使用的游戏主机与掌机时间线资料库。">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Local Console Archive</p>
+        <h1>游戏主机资料库</h1>
+      </div>
+      <div class="summary-strip" aria-label="资料库统计">
+        <span><strong id="brandCount">0</strong> 品牌</span>
+        <span><strong id="platformCount">0</strong> 硬件</span>
+        <span><strong id="variantCount">0</strong> 型号</span>
+        <span><strong id="gameCount">0</strong> 游戏条目</span>
+      </div>
+    </header>
+
+    <main class="app-shell">
+      <aside class="sidebar" aria-label="筛选">
+        <label class="search-label" for="searchInput">搜索主机、品牌、游戏</label>
+        <input id="searchInput" type="search" placeholder="例如：Game Boy / Zelda / 1994">
+
+        <section>
+          <h2>品牌</h2>
+          <div id="brandFilters" class="filter-list"></div>
+        </section>
+
+        <section>
+          <h2>类型</h2>
+          <div id="typeFilters" class="filter-list compact"></div>
+        </section>
+
+        <section>
+          <h2>年份范围</h2>
+          <div class="year-grid">
+            <input id="fromYear" type="number" min="1970" max="2030" step="1" aria-label="起始年份">
+            <input id="toYear" type="number" min="1970" max="2030" step="1" aria-label="结束年份">
+          </div>
+        </section>
+
+        <button id="resetButton" class="reset-button" type="button">重置筛选</button>
+      </aside>
+
+      <section class="content">
+        <section class="insight-panel">
+          <div>
+            <p class="eyebrow">Timeline</p>
+            <h2>按品牌看硬件谱系</h2>
+          </div>
+          <div class="legend">
+            <span><i class="home"></i>家用机</span>
+            <span><i class="handheld"></i>掌机</span>
+            <span><i class="hybrid"></i>混合 / PC 掌机</span>
+          </div>
+        </section>
+
+        <div id="timeline" class="timeline" aria-label="主机年份时间线"></div>
+        <div id="resultsMeta" class="results-meta"></div>
+        <div id="platformGrid" class="platform-grid"></div>
+      </section>
+    </main>
+
+    <template id="platformTemplate">
+      <article class="platform-card">
+        <figure class="platform-media">
+          <div class="image-placeholder" aria-hidden="true">
+            <div class="device-mark"></div>
+          </div>
+          <div class="image-stack"></div>
+          <img class="image-prototype" alt="" loading="lazy">
+          <figcaption></figcaption>
+        </figure>
+        <div class="card-head">
+          <div>
+            <p class="platform-year"></p>
+            <h3></h3>
+            <p class="platform-brand"></p>
+          </div>
+        </div>
+        <p class="platform-notes"></p>
+        <div class="tag-row"></div>
+        <details class="variant-details">
+          <summary></summary>
+          <div class="variant-list"></div>
+        </details>
+        <details class="game-details">
+          <summary></summary>
+          <div class="game-groups"></div>
+        </details>
+      </article>
+    </template>
+
+    <script src="data.js"></script>
+    <script src="images.js"></script>
+    <script src="image-sources.js"></script>
+    <script src="platform-variants.js"></script>
+    <script src="curated-games.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

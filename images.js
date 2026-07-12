@@ -1,0 +1,1 @@
+window.CONSOLE_IMAGES = {};
