@@ -113,17 +113,104 @@ function releaseDateLabel(platform) {
   return month ? `${platform.year}.${String(month).padStart(2, "0")}` : `${platform.year}`;
 }
 
-function releaseMonthOffset(platform) {
-  return 40 + Math.round(((releaseMonth(platform) - 1) / 11) * 190);
+function releaseMonthIndex(platform) {
+  return platform.year * 12 + releaseMonth(platform);
 }
 
-function timelineSide(platform) {
-  const key = `${platform.brand}-${platform.line}`;
-  let hash = 0;
-  for (let index = 0; index < key.length; index += 1) {
-    hash = (hash + key.charCodeAt(index) * (index + 1)) % 997;
-  }
-  return hash % 2 === 0 ? "left" : "right";
+function monthsBetween(a, b) {
+  return Math.abs(releaseMonthIndex(a) - releaseMonthIndex(b));
+}
+
+function assignTimelineSides(platforms) {
+  const assignments = new Map();
+  const lastByBrand = new Map();
+  let previous = null;
+  let fallbackSide = "left";
+
+  platforms
+    .slice()
+    .sort(
+      (a, b) =>
+        releaseMonthIndex(a) - releaseMonthIndex(b) ||
+        a.brand.localeCompare(b.brand, "zh-CN") ||
+        a.name.localeCompare(b.name, "zh-CN")
+    )
+    .forEach((platform) => {
+      const lastBrandPlatform = lastByBrand.get(platform.brand);
+      let side;
+
+      if (lastBrandPlatform && monthsBetween(lastBrandPlatform, platform) <= 18) {
+        side = assignments.get(platformId(lastBrandPlatform));
+      } else if (previous && monthsBetween(previous, platform) <= 18) {
+        const previousSide = assignments.get(platformId(previous));
+        side = previous.brand === platform.brand ? previousSide : oppositeSide(previousSide);
+      } else if (lastBrandPlatform) {
+        side = oppositeSide(assignments.get(platformId(lastBrandPlatform)));
+      } else {
+        side = fallbackSide;
+        fallbackSide = oppositeSide(fallbackSide);
+      }
+
+      assignments.set(platformId(platform), side);
+      lastByBrand.set(platform.brand, platform);
+      previous = platform;
+    });
+
+  return assignments;
+}
+
+function oppositeSide(side) {
+  return side === "left" ? "right" : "left";
+}
+
+function compactTimelineGap(monthsElapsed) {
+  return Math.min(44, Math.max(14, Math.round(monthsElapsed * 0.9)));
+}
+
+function layoutTimelinePlatforms(platforms, sideAssignments, selectedId, reserveDetailSpace) {
+  const cardHeight = 106;
+  const cardGap = 6;
+  const expandedCardHeight = 440;
+  const layouts = new Map();
+  const monthCounts = {};
+  const lastBottomBySide = { left: -Infinity, right: -Infinity };
+  let lastTimelineTop = 0;
+  let lastReleaseIndex = null;
+  let maxBottom = 0;
+
+  platforms
+    .slice()
+    .sort(
+      (a, b) =>
+        releaseMonthIndex(a) - releaseMonthIndex(b) ||
+        a.brand.localeCompare(b.brand, "zh-CN") ||
+        a.name.localeCompare(b.name, "zh-CN")
+    )
+    .forEach((platform) => {
+      const side = sideAssignments.get(platformId(platform)) || "right";
+      const releaseIndex = releaseMonthIndex(platform);
+      const chronologicalTop =
+        lastReleaseIndex === null || releaseIndex === lastReleaseIndex
+          ? lastTimelineTop
+          : lastTimelineTop + compactTimelineGap(releaseIndex - lastReleaseIndex);
+      const collisionTop = Number.isFinite(lastBottomBySide[side]) ? lastBottomBySide[side] + cardGap : 0;
+      const top = Math.max(chronologicalTop, collisionTop);
+      const monthKey = `${side}-${releaseIndex}`;
+      const branchOffset = monthCounts[monthKey] || 0;
+      const occupiedHeight = reserveDetailSpace && platformId(platform) === selectedId ? expandedCardHeight : cardHeight;
+
+      layouts.set(platformId(platform), { side, top, branchOffset });
+      monthCounts[monthKey] = branchOffset + 1;
+      lastBottomBySide[side] = top + occupiedHeight;
+      lastTimelineTop = top;
+      lastReleaseIndex = releaseIndex;
+      maxBottom = Math.max(maxBottom, top + occupiedHeight);
+    });
+
+  return {
+    layouts,
+    height: Math.max(118, maxBottom + 10)
+  };
 }
 
 function renderTimeline(platforms) {
@@ -143,87 +230,61 @@ function renderTimeline(platforms) {
     return;
   }
 
-  const byYear = new Map();
-  visiblePlatforms.forEach((platform) => {
-    if (!byYear.has(platform.year)) byYear.set(platform.year, []);
-    byYear.get(platform.year).push(platform);
-  });
+  const sideAssignments = assignTimelineSides(visiblePlatforms);
+  const reserveDetailSpace = window.matchMedia?.("(max-width: 760px)").matches;
+  const timelineLayout = layoutTimelinePlatforms(visiblePlatforms, sideAssignments, state.selectedTimelineId, reserveDetailSpace);
 
   const axis = document.createElement("div");
   axis.className = "vertical-timeline";
+  const row = document.createElement("section");
+  row.className = "timeline-year-row timeline-canvas";
+  row.style.setProperty("--year-row-height", `${timelineLayout.height}px`);
 
-  [...byYear.entries()]
-    .sort((a, b) => a[0] - b[0])
-    .forEach(([year, yearPlatforms]) => {
-      const row = document.createElement("section");
-      row.className = "timeline-year-row";
-      const yearHeight = Math.max(
-        190,
-        Math.max(...yearPlatforms.map((platform) => releaseMonthOffset(platform))) + 132
-      );
-      row.style.setProperty("--year-row-height", `${yearHeight}px`);
+  const yearRail = document.createElement("div");
+  yearRail.className = "timeline-year-rail";
+  yearRail.setAttribute("aria-label", "硬件时间线");
 
-      const yearRail = document.createElement("div");
-      yearRail.className = "timeline-year-rail";
-      yearRail.setAttribute("aria-label", `${year} 年`);
-      const yearLabel = document.createElement("span");
-      yearLabel.className = "timeline-axis-year";
-      yearLabel.textContent = year;
-      yearRail.append(yearLabel);
+  const leftContent = document.createElement("div");
+  leftContent.className = "timeline-year-content timeline-year-content-left";
+  const rightContent = document.createElement("div");
+  rightContent.className = "timeline-year-content timeline-year-content-right";
 
-      const leftContent = document.createElement("div");
-      leftContent.className = "timeline-year-content timeline-year-content-left";
-      const rightContent = document.createElement("div");
-      rightContent.className = "timeline-year-content timeline-year-content-right";
-
-      const leftItems = document.createElement("div");
-      leftItems.className = "timeline-year-items";
-      const rightItems = document.createElement("div");
-      rightItems.className = "timeline-year-items";
-      const sideMonthCounts = {};
-      yearPlatforms
-        .slice()
-        .sort(
-          (a, b) =>
-            releaseMonth(a) - releaseMonth(b) ||
-            a.brand.localeCompare(b.brand, "zh-CN") ||
-            a.name.localeCompare(b.name, "zh-CN")
-        )
-        .forEach((platform) => {
-          const side = timelineSide(platform);
-          const monthKey = `${side}-${releaseMonth(platform)}`;
-          const branchOffset = sideMonthCounts[monthKey] || 0;
-          const branch = document.createElement("div");
-          branch.className = `timeline-branch ${side === "left" ? "timeline-branch-left" : "timeline-branch-right"}`;
-          branch.style.setProperty("--branch-offset", branchOffset);
-          branch.style.setProperty("--month-offset", `${releaseMonthOffset(platform)}px`);
-          branch.append(createTimelineNode(platform));
-          if (side === "left") {
-            leftItems.append(branch);
-          } else {
-            rightItems.append(branch);
-          }
-          sideMonthCounts[monthKey] = branchOffset + 1;
-        });
-      leftContent.append(leftItems);
-      rightContent.append(rightItems);
-
-      const selectedPlatform = yearPlatforms.find((platform) => platformId(platform) === state.selectedTimelineId);
-      if (selectedPlatform) {
-        const detailPanel = document.createElement("section");
-        detailPanel.className = `timeline-detail-panel timeline-year-detail timeline-year-detail-${timelineSide(selectedPlatform)}`;
-        detailPanel.setAttribute("aria-live", "polite");
-        detailPanel.append(createTimelineDetail(selectedPlatform));
-        if (timelineSide(selectedPlatform) === "left") {
-          leftContent.append(detailPanel);
-        } else {
-          rightContent.append(detailPanel);
-        }
+  const leftItems = document.createElement("div");
+  leftItems.className = "timeline-year-items";
+  const rightItems = document.createElement("div");
+  rightItems.className = "timeline-year-items";
+  visiblePlatforms
+    .slice()
+    .sort(
+      (a, b) =>
+        releaseMonthIndex(a) - releaseMonthIndex(b) ||
+        a.brand.localeCompare(b.brand, "zh-CN") ||
+        a.name.localeCompare(b.name, "zh-CN")
+    )
+    .forEach((platform) => {
+      const layout = timelineLayout.layouts.get(platformId(platform));
+      const branch = document.createElement("div");
+      branch.className = `timeline-branch ${layout.side === "left" ? "timeline-branch-left" : "timeline-branch-right"}`;
+      branch.style.setProperty("--branch-offset", layout.branchOffset);
+      branch.style.setProperty("--month-offset", `${layout.top}px`);
+      const cardAnchor = document.createElement("div");
+      cardAnchor.className = "timeline-card-anchor";
+      cardAnchor.append(createTimelineNode(platform));
+      if (platformId(platform) === state.selectedTimelineId) {
+        cardAnchor.append(createTimelineDetailFlyout(platform, layout.side));
       }
-
-      row.append(leftContent, yearRail, rightContent);
-      axis.append(row);
+      branch.append(cardAnchor);
+      if (layout.side === "left") {
+        leftItems.append(branch);
+      } else {
+        rightItems.append(branch);
+      }
     });
+  leftContent.append(leftItems);
+  rightContent.append(rightItems);
+
+  row.append(leftContent, yearRail, rightContent);
+  axis.append(row);
 
   elements.timeline.replaceChildren(brandControls, axis);
 }
@@ -328,9 +389,6 @@ function createTimelineNode(platform) {
   topRow.className = "timeline-node-top";
   topRow.append(year, brandTag);
 
-  const thumbnail = createTimelineThumbnail(platform);
-  if (thumbnail) topRow.append(thumbnail);
-
   const name = document.createElement("strong");
   name.textContent = platform.name;
 
@@ -345,18 +403,12 @@ function createTimelineNode(platform) {
   return node;
 }
 
-function createTimelineThumbnail(platform) {
-  const image = manualImageForPlatform(platform) || localImages[platformId(platform)];
-  const primaryImage = image?.images?.[0] || image;
-  if (!primaryImage?.src) return null;
-
-  const thumbnail = document.createElement("img");
-  thumbnail.className = "timeline-node-thumb";
-  thumbnail.src = primaryImage.src;
-  thumbnail.alt = `${platform.name} 缩略图`;
-  thumbnail.loading = "lazy";
-  thumbnail.decoding = "async";
-  return thumbnail;
+function createTimelineDetailFlyout(platform, side) {
+  const flyout = document.createElement("section");
+  flyout.className = `timeline-detail-flyout timeline-detail-flyout-${side}`;
+  flyout.setAttribute("aria-live", "polite");
+  flyout.append(createTimelineDetail(platform));
+  return flyout;
 }
 
 function createTimelineDetail(platform) {
