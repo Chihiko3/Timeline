@@ -3,15 +3,15 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>游戏主机资料库</title>
-    <meta name="description" content="本地使用的游戏主机与掌机时间线资料库。">
+    <title>游戏资料库</title>
+    <meta name="description" content="本地使用的游戏资料库。">
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
     <header class="topbar">
       <div>
-        <p class="eyebrow">Local Console Archive</p>
-        <h1>游戏主机资料库</h1>
+        <p class="eyebrow">Local Game Archive</p>
+        <h1>游戏资料库</h1>
       </div>
       <div class="summary-strip" aria-label="资料库统计">
         <span><strong id="brandCount">0</strong> 品牌</span>
@@ -23,16 +23,37 @@
 
     <main class="app-shell">
       <section class="content">
-        <section class="insight-panel">
-          <div>
-            <p class="eyebrow">Timeline</p>
-            <h2>总览硬件时间线</h2>
-          </div>
+        <nav class="library-tabs" aria-label="资料库页面" role="tablist">
+          <button class="library-tab active" type="button" role="tab" aria-selected="true" aria-controls="console-library-panel" data-library-tab="console-library-panel">游戏主机资料库</button>
+          <button class="library-tab" type="button" role="tab" aria-selected="false" aria-controls="series-library-panel" data-library-tab="series-library-panel">游戏系列资料库</button>
+        </nav>
+
+        <section id="console-library-panel" class="library-tab-panel" role="tabpanel">
+          <section class="insight-panel">
+            <div>
+              <p class="eyebrow">Timeline</p>
+              <h2>总览硬件时间线</h2>
+            </div>
+          </section>
+
+          <div id="timeline" class="timeline" aria-label="主机年份时间线"></div>
+          <div id="resultsMeta" class="results-meta"></div>
+          <div id="platformGrid" class="platform-grid"></div>
         </section>
 
-        <div id="timeline" class="timeline" aria-label="主机年份时间线"></div>
-        <div id="resultsMeta" class="results-meta"></div>
-        <div id="platformGrid" class="platform-grid"></div>
+        <section id="series-library-panel" class="library-tab-panel" role="tabpanel" hidden>
+          <nav class="series-tabs" aria-label="游戏系列资料库页面" role="tablist">
+            <button class="series-tab active" type="button" role="tab" aria-selected="true" aria-controls="series-overview-panel" data-series-tab="series-overview-panel">总览</button>
+            <button class="series-tab" type="button" role="tab" aria-selected="false" aria-controls="pokemon-library-panel" data-series-tab="pokemon-library-panel">Pokemon口袋妖怪资料库</button>
+          </nav>
+
+          <section id="series-overview-panel" class="series-tab-panel" role="tabpanel">
+            <h2>总览</h2>
+          </section>
+          <section id="pokemon-library-panel" class="series-tab-panel" role="tabpanel" hidden>
+            <h2>Pokemon口袋妖怪资料库</h2>
+          </section>
+        </section>
       </section>
     </main>
 
@@ -72,6 +93,7 @@
     <script src="release-dates.js"></script>
     <script src="platform-variants.js"></script>
     <script src="curated-games.js"></script>
+    <script src="game-localizations.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

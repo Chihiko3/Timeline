@@ -14,6 +14,7 @@ const imageSources = window.CONSOLE_IMAGE_SOURCES || {};
 const releaseDates = window.CONSOLE_RELEASE_DATES || {};
 const platformVariants = window.CONSOLE_PLATFORM_VARIANTS || {};
 const curatedGames = window.CONSOLE_CURATED_GAMES || {};
+const gameLocalizations = window.CONSOLE_GAME_LOCALIZATIONS || {};
 const BRAND_COLORS = [
   "#3268b8",
   "#17805d",
@@ -82,6 +83,18 @@ function gameDataForPlatform(platform) {
   };
 }
 
+function gameLocalizationFor(game) {
+  const localization = gameLocalizations[game];
+  return {
+    chineseTitle: localization?.chineseTitle || null,
+    url: localization?.url || `https://en.wikipedia.org/w/index.php?search=${encodeURIComponent(game)}`
+  };
+}
+
+function displayChineseGameTitle(title) {
+  return title && !/[A-Za-z]/.test(title) ? title : null;
+}
+
 function filteredPlatforms() {
   return allPlatforms
     .sort(
@@ -97,6 +110,10 @@ function typeClass(platform) {
   if (normalized.includes("handheld")) return "handheld";
   if (normalized.includes("hybrid") || normalized.includes("pc")) return "hybrid";
   return "home";
+}
+
+function displayType(platform) {
+  return platform.type === "Home" ? null : platform.type;
 }
 
 function brandColor(brand) {
@@ -170,7 +187,7 @@ function compactTimelineGap(monthsElapsed) {
 function layoutTimelinePlatforms(platforms, sideAssignments, selectedId, reserveDetailSpace) {
   const cardHeight = 106;
   const cardGap = 6;
-  const expandedCardHeight = 440;
+  const expandedCardHeight = 1300;
   const layouts = new Map();
   const monthCounts = {};
   const lastBottomBySide = { left: -Infinity, right: -Infinity };
@@ -395,7 +412,7 @@ function createTimelineNode(platform) {
   const meta = document.createElement("span");
   meta.className = "timeline-node-meta";
   const variants = variantsForPlatform(platform);
-  meta.textContent = `${platform.type} · ${platform.generation} · ${variants.length} 型号`;
+  meta.textContent = `${variants.length} 个型号`;
 
   button.append(topRow, name, meta);
   node.append(button);
@@ -407,8 +424,65 @@ function createTimelineDetailFlyout(platform, side) {
   const flyout = document.createElement("section");
   flyout.className = `timeline-detail-flyout timeline-detail-flyout-${side}`;
   flyout.setAttribute("aria-live", "polite");
-  flyout.append(createTimelineDetail(platform));
+  flyout.append(createTimelineDetail(platform), createTimelineGamesFlyout(platform, side));
   return flyout;
+}
+
+function createTimelineGamesFlyout(platform, side) {
+  const flyout = document.createElement("section");
+  flyout.className = `timeline-games-flyout timeline-games-flyout-${side}`;
+
+  const panel = document.createElement("div");
+  panel.className = "timeline-games-panel";
+  const title = document.createElement("h3");
+  title.textContent = "游戏";
+  const groups = document.createElement("div");
+  groups.className = "timeline-games-groups";
+  const games = gameDataForPlatform(platform);
+  appendTimelineGameGroup(groups, "护航 / 首发", games.launchGames);
+  appendTimelineGameGroup(groups, "特色 / 高讨论", games.signatureGames);
+  panel.append(title, groups);
+  flyout.append(panel);
+  return flyout;
+}
+
+function appendTimelineGameGroup(container, title, games) {
+  const group = document.createElement("section");
+  group.className = "timeline-games-group";
+  const heading = document.createElement("h4");
+  heading.textContent = `${title} ${games.length}`;
+  group.append(heading);
+
+  if (!games.length) {
+    const empty = document.createElement("p");
+    empty.textContent = "暂未整理。";
+    group.append(empty);
+  } else {
+    const list = document.createElement("ol");
+    list.className = "timeline-games-list";
+    games.forEach((game) => {
+      const item = document.createElement("li");
+      const localization = gameLocalizationFor(game);
+      const link = document.createElement("a");
+      link.href = localization.url;
+      link.target = "_blank";
+      link.rel = "noreferrer";
+      link.textContent = game;
+      link.title = `打开 ${game} 的资料页`;
+      item.append(link);
+      const chineseTitle = displayChineseGameTitle(localization.chineseTitle);
+      if (chineseTitle) {
+        const chineseName = document.createElement("span");
+        chineseName.className = "timeline-game-chinese-name";
+        chineseName.textContent = chineseTitle;
+        item.append(document.createTextNode(" - "), chineseName);
+      }
+      list.append(item);
+    });
+    group.append(list);
+  }
+
+  container.append(group);
 }
 
 function createTimelineDetail(platform) {
@@ -424,22 +498,8 @@ function createTimelineDetail(platform) {
   year.textContent = releaseDateLabel(platform);
   const title = document.createElement("h3");
   title.textContent = platform.name;
-  const meta = document.createElement("p");
-  meta.textContent = `${platform.type} · ${platform.generation} · ${platform.line}`;
-  titleGroup.append(year, title, meta);
-
-  const jumpButton = document.createElement("button");
-  jumpButton.type = "button";
-  jumpButton.className = "timeline-jump-button";
-  jumpButton.textContent = "查看卡片";
-  jumpButton.addEventListener("click", () => {
-    document.querySelector(`[data-platform-id="${platformId(platform)}"]`)?.scrollIntoView({
-      behavior: "smooth",
-      block: "center"
-    });
-  });
-
-  header.append(titleGroup, jumpButton);
+  titleGroup.append(year, title);
+  header.append(titleGroup);
 
   const note = document.createElement("p");
   note.className = "timeline-detail-note";
@@ -449,6 +509,7 @@ function createTimelineDetail(platform) {
   if (variants.length) {
     const variantGrid = document.createElement("div");
     variantGrid.className = "timeline-variant-grid";
+    if (variants.length <= 5) variantGrid.classList.add("timeline-variant-grid-expanded");
     variants
       .slice()
       .sort((a, b) => (a.year || 9999) - (b.year || 9999) || a.name.localeCompare(b.name, "zh-CN"))
@@ -467,7 +528,10 @@ function createTimelineDetail(platform) {
         itemMeta.className = "timeline-variant-meta";
         itemMeta.textContent = variant.kind || "硬件型号";
 
-        item.append(itemYear, itemTitle, itemMeta);
+        const itemHeader = document.createElement("div");
+        itemHeader.className = "timeline-variant-header";
+        itemHeader.append(itemYear, itemMeta);
+        item.append(itemHeader, itemTitle);
 
         if (variant.note) {
           const itemNote = document.createElement("p");
@@ -670,7 +734,7 @@ function renderCards(platforms) {
     fragment.querySelector(".platform-notes").textContent = platform.notes;
 
     const tagRow = fragment.querySelector(".tag-row");
-    [platform.type, platform.generation, platform.line].forEach((tag) => {
+    [displayType(platform), platform.generation, platform.line].filter(Boolean).forEach((tag) => {
       const node = document.createElement("span");
       node.className = "tag";
       node.textContent = tag;
@@ -774,11 +838,29 @@ function render() {
   renderCards(platforms);
 }
 
+function bindTabs(buttonSelector, panelAttribute) {
+  const buttons = [...document.querySelectorAll(buttonSelector)];
+  buttons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const panelId = button.dataset[panelAttribute];
+      buttons.forEach((item) => {
+        const active = item === button;
+        item.classList.toggle("active", active);
+        item.setAttribute("aria-selected", String(active));
+        document.querySelector(`#${item.dataset[panelAttribute]}`).hidden = !active;
+      });
+      document.querySelector(`#${panelId}`).hidden = false;
+    });
+  });
+}
+
 function init() {
   elements.brandCount.textContent = archive.length;
   elements.platformCount.textContent = allPlatforms.length;
   elements.gameCount.textContent = totalGames();
   if (elements.variantCount) elements.variantCount.textContent = totalVariants();
+  bindTabs("[data-library-tab]", "libraryTab");
+  bindTabs("[data-series-tab]", "seriesTab");
   render();
 }
 
