@@ -15,6 +15,38 @@ const releaseDates = window.CONSOLE_RELEASE_DATES || {};
 const platformVariants = window.CONSOLE_PLATFORM_VARIANTS || {};
 const curatedGames = window.CONSOLE_CURATED_GAMES || {};
 const gameLocalizations = window.CONSOLE_GAME_LOCALIZATIONS || {};
+const pokemonReleases = window.POKEMON_CORE_RELEASES || [];
+const POKEMON_STARTERS_BY_GENERATION = {
+  "世代 1": [["Bulbasaur", "妙蛙种子"], ["Charmander", "小火龙"], ["Squirtle", "杰尼龟"]],
+  "世代 2": [["Chikorita", "菊草叶"], ["Cyndaquil", "火球鼠"], ["Totodile", "小锯鳄"]],
+  "世代 3": [["Treecko", "木守宫"], ["Torchic", "火稚鸡"], ["Mudkip", "水跃鱼"]],
+  "世代 4": [["Turtwig", "草苗龟"], ["Chimchar", "小火焰猴"], ["Piplup", "波加曼"]],
+  "世代 5": [["Snivy", "藤藤蛇"], ["Tepig", "暖暖猪"], ["Oshawott", "水水獭"]],
+  "世代 6": [["Chespin", "哈力栗"], ["Fennekin", "火狐狸"], ["Froakie", "呱呱泡蛙"]],
+  "世代 7": [["Rowlet", "木木枭"], ["Litten", "火斑喵"], ["Popplio", "球球海狮"]],
+  "世代 8": [["Grookey", "敲音猴"], ["Scorbunny", "炎兔儿"], ["Sobble", "泪眼蜥"]],
+  "世代 9": [["Sprigatito", "新叶喵"], ["Fuecoco", "呆火鳄"], ["Quaxly", "润水鸭"]]
+};
+const POKEMON_STARTER_OVERRIDES = {
+  yellow: [["Pikachu", "皮卡丘"]],
+  "lets-go": [["Pikachu", "皮卡丘"], ["Eevee", "伊布"]],
+  "legends-arceus": [["Rowlet", "木木枭"], ["Cyndaquil", "火球鼠"], ["Oshawott", "水水獭"]],
+  "legends-za": [["Chikorita", "菊草叶"], ["Tepig", "暖暖猪"], ["Totodile", "小锯鳄"]]
+};
+const POKEMON_SPRITE_IDS = {
+  Bulbasaur: 1, Charmander: 4, Squirtle: 7, Pikachu: 25, Eevee: 133,
+  Chikorita: 152, Cyndaquil: 155, Totodile: 158, Treecko: 252, Torchic: 255, Mudkip: 258,
+  Turtwig: 387, Chimchar: 390, Piplup: 393, Snivy: 495, Tepig: 498, Oshawott: 501,
+  Chespin: 650, Fennekin: 653, Froakie: 656, Rowlet: 722, Litten: 725, Popplio: 728,
+  Grookey: 810, Scorbunny: 813, Sobble: 816, Sprigatito: 906, Fuecoco: 909, Quaxly: 912
+};
+const POKEMON_RELEASE_DAYS = {
+  "red-green-blue": 27, yellow: 12, "gold-silver": 21, crystal: 14, "ruby-sapphire": 21,
+  "firered-leafgreen": 29, emerald: 16, "diamond-pearl": 28, platinum: 13, "heartgold-soulsilver": 12,
+  "black-white": 18, "black2-white2": 23, "x-y": 12, oras: 21, "sun-moon": 18,
+  "ultra-sun-moon": 17, "lets-go": 16, "sword-shield": 15, bdsp: 19, "legends-arceus": 28,
+  "scarlet-violet": 18, "legends-za": 16, uranium: 6, "black-shadow": 24, prism: 25
+};
 const BRAND_COLORS = [
   "#3268b8",
   "#17805d",
@@ -52,8 +84,11 @@ const elements = {
   timeline: document.querySelector("#timeline"),
   resultsMeta: document.querySelector("#resultsMeta"),
   platformGrid: document.querySelector("#platformGrid"),
+  pokemonTimeline: document.querySelector("#pokemonTimeline"),
   template: document.querySelector("#platformTemplate")
 };
+
+let selectedPokemonReleaseId = null;
 
 function totalGames() {
   return allPlatforms.reduce((sum, platform) => {
@@ -127,7 +162,7 @@ function releaseMonth(platform) {
 
 function releaseDateLabel(platform) {
   const month = platform.month || platform.releaseMonth || releaseDates[platformId(platform)]?.month;
-  return month ? `${platform.year}.${String(month).padStart(2, "0")}` : `${platform.year}`;
+  return `${platform.year}.${month ? String(month).padStart(2, "0") : "--"}`;
 }
 
 function releaseMonthIndex(platform) {
@@ -185,7 +220,7 @@ function compactTimelineGap(monthsElapsed) {
 }
 
 function layoutTimelinePlatforms(platforms, sideAssignments, selectedId, reserveDetailSpace) {
-  const cardHeight = 106;
+  const cardHeight = 132;
   const cardGap = 6;
   const expandedCardHeight = 1300;
   const layouts = new Map();
@@ -400,6 +435,7 @@ function createTimelineNode(platform) {
   const brandTag = document.createElement("span");
   brandTag.className = "timeline-brand-tag";
   brandTag.textContent = platform.brand;
+  brandTag.title = platform.brand;
   brandTag.style.setProperty("--brand-color", brandColor(platform.brand));
 
   const topRow = document.createElement("div");
@@ -836,22 +872,256 @@ function render() {
   renderTimeline(platforms);
   renderMeta(platforms);
   renderCards(platforms);
+  renderPokemonTimeline();
+}
+
+function pokemonPlatformCard(entry) {
+  return `<article class="pokemon-platform-card">
+    <div class="pokemon-platform-head"><strong>${entry.year}</strong></div>
+    <p>${entry.platform}</p>
+  </article>`;
+}
+
+function renderPokemonTimeline() {
+  if (!elements.pokemonTimeline) return;
+  elements.pokemonTimeline.textContent = "";
+
+  const releases = [...pokemonReleases].sort((a, b) => a.date.localeCompare(b.date) || a.name.localeCompare(b.name));
+  const reserveDetailSpace = window.matchMedia?.("(max-width: 760px)").matches;
+  const layout = layoutPokemonReleases(releases, reserveDetailSpace);
+  const axis = document.createElement("div");
+  axis.className = "vertical-timeline pokemon-vertical-timeline";
+  const canvas = document.createElement("section");
+  canvas.className = "timeline-year-row pokemon-timeline-canvas";
+  canvas.style.setProperty("--year-row-height", `${layout.height}px`);
+  const leftContent = document.createElement("div");
+  leftContent.className = "timeline-year-content timeline-year-content-left";
+  const rightContent = document.createElement("div");
+  rightContent.className = "timeline-year-content timeline-year-content-right";
+  const yearRail = document.createElement("div");
+  yearRail.className = "timeline-year-rail";
+  const leftItems = document.createElement("div");
+  leftItems.className = "timeline-year-items";
+  const rightItems = document.createElement("div");
+  rightItems.className = "timeline-year-items";
+
+  releases.forEach((release) => {
+    const itemLayout = layout.items.get(release.id);
+    const branch = document.createElement("div");
+    branch.className = `timeline-branch pokemon-branch ${itemLayout.side === "left" ? "timeline-branch-left" : "timeline-branch-right"}${selectedPokemonReleaseId === release.id ? " selected" : ""}`;
+    branch.style.setProperty("--branch-offset", itemLayout.branchOffset);
+    branch.style.setProperty("--month-offset", `${itemLayout.top}px`);
+    branch.style.setProperty("--pokemon-color", release.official === false ? "var(--pokemon-fan)" : "var(--pokemon-official)");
+
+    const stack = document.createElement("div");
+    stack.className = "timeline-card-anchor pokemon-release-stack";
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "pokemon-release-card";
+    card.setAttribute("aria-expanded", String(selectedPokemonReleaseId === release.id));
+    const releaseLabel = release.official === false
+      ? `${release.workType || "同人作品"}・${release.creator || "未知制作者"}`
+      : release.generation;
+    const platformTotal = release.first.length + release.later.length;
+    const cardLineage = release.remakeOf
+      ? `<span class="pokemon-card-lineage">重制：${release.remakeOf.chineseName}</span>`
+      : release.modOf
+        ? `<span class="pokemon-card-lineage">改版：${release.modOf}</span>`
+        : "";
+    card.innerHTML = `<div class="pokemon-release-head"><time>${pokemonReleaseDateLabel(release)}</time><span class="pokemon-release-tag" title="${releaseLabel}">${releaseLabel}</span></div>
+      <div class="pokemon-release-title"><strong>${release.name}</strong><p>${release.chineseName}</p>${cardLineage}</div>
+      <div class="pokemon-release-foot"><small>${platformTotal} 个平台</small></div>`;
+    card.addEventListener("click", () => {
+      selectedPokemonReleaseId = selectedPokemonReleaseId === release.id ? null : release.id;
+      renderPokemonTimeline();
+    });
+    stack.append(card);
+
+    if (selectedPokemonReleaseId === release.id) {
+      const flyout = document.createElement("section");
+      flyout.className = `timeline-detail-flyout timeline-detail-flyout-${itemLayout.side} pokemon-detail-flyout`;
+      flyout.append(createPokemonStartersPanel(release));
+
+      const platformsFlyout = document.createElement("section");
+      platformsFlyout.className = `pokemon-platforms-flyout pokemon-platforms-flyout-${itemLayout.side}`;
+      const detail = document.createElement("section");
+      detail.className = "pokemon-release-detail";
+      const first = release.first.map((entry) => pokemonPlatformCard(entry)).join("");
+      const later = release.later.length
+        ? release.later.map((entry) => pokemonPlatformCard(entry)).join("")
+        : '<p class="pokemon-empty">暂无后续独立版本</p>';
+      detail.innerHTML = `<div class="pokemon-platform-group"><h4>首次登陆</h4><div class="pokemon-platform-list">${first}</div></div>
+        <div class="pokemon-platform-group"><h4>后续登陆</h4><div class="pokemon-platform-list">${later}</div></div>`;
+      platformsFlyout.append(detail);
+      flyout.append(platformsFlyout);
+      stack.append(flyout);
+    }
+
+    branch.append(stack);
+    if (itemLayout.side === "left") leftItems.append(branch);
+    else rightItems.append(branch);
+  });
+
+  leftContent.append(leftItems);
+  rightContent.append(rightItems);
+  canvas.append(leftContent, yearRail, rightContent);
+  axis.append(canvas);
+  elements.pokemonTimeline.append(axis);
+}
+
+function pokemonStartersForRelease(release) {
+  if (release.official === false) return [];
+  return POKEMON_STARTER_OVERRIDES[release.id] || POKEMON_STARTERS_BY_GENERATION[release.generation.split("・")[0]] || [];
+}
+
+function createPokemonStartersPanel(release) {
+  const panel = document.createElement("section");
+  panel.className = "pokemon-starters-panel";
+  const starters = pokemonStartersForRelease(release);
+  const title = document.createElement("h3");
+  title.textContent = "御三家";
+  panel.append(title);
+
+  if (!starters.length) {
+    const empty = document.createElement("p");
+    empty.textContent = "非官方作品，初始伙伴资料不适用。";
+    panel.append(empty);
+    return panel;
+  }
+
+  const list = document.createElement("div");
+  list.className = "pokemon-starter-list";
+  starters.forEach(([englishName, chineseName]) => {
+    const item = document.createElement("article");
+    item.className = "pokemon-starter-card";
+    const names = document.createElement("div");
+    names.className = "pokemon-starter-names";
+    names.innerHTML = `<strong>${englishName}</strong><span>${chineseName}</span>`;
+    const sprite = document.createElement("img");
+    sprite.className = "pokemon-starter-sprite";
+    sprite.src = `assets/pokemon-sprites/${POKEMON_SPRITE_IDS[englishName]}.png`;
+    sprite.alt = `${englishName} 像素图`;
+    sprite.loading = "lazy";
+    item.append(names, sprite);
+    list.append(item);
+  });
+  panel.append(list);
+  return panel;
+}
+
+function pokemonReleaseMonthIndex(release) {
+  const [year, month = "1"] = release.date.split(".");
+  return Number(year) * 12 + Number(month);
+}
+
+function pokemonReleaseDateLabel(release) {
+  const [year, month = "--", day] = release.date.split(".");
+  const resolvedDay = day || POKEMON_RELEASE_DAYS[release.id];
+  return `${year}.${month}.${resolvedDay ? String(resolvedDay).padStart(2, "0") : "--"}`;
+}
+
+function layoutPokemonReleases(releases, reserveDetailSpace) {
+  const items = new Map();
+  const lastByLine = new Map();
+  const lastBottomBySide = { left: -Infinity, right: -Infinity };
+  const monthCounts = {};
+  let previous = null;
+  let fallbackSide = "left";
+  let lastTimelineTop = 0;
+  let lastReleaseIndex = null;
+  let maxBottom = 0;
+
+  releases.forEach((release) => {
+    const releaseIndex = pokemonReleaseMonthIndex(release);
+    const line = release.official === false ? "fan" : "official";
+    const priorOnLine = lastByLine.get(line);
+    let side;
+
+    if (priorOnLine && Math.abs(releaseIndex - pokemonReleaseMonthIndex(priorOnLine)) <= 18) {
+      side = items.get(priorOnLine.id).side;
+    } else if (previous && Math.abs(releaseIndex - pokemonReleaseMonthIndex(previous)) <= 18) {
+      side = previous.official === release.official ? items.get(previous.id).side : oppositeSide(items.get(previous.id).side);
+    } else if (priorOnLine) {
+      side = oppositeSide(items.get(priorOnLine.id).side);
+    } else {
+      side = fallbackSide;
+      fallbackSide = oppositeSide(fallbackSide);
+    }
+
+    const chronologicalTop = lastReleaseIndex === null || releaseIndex === lastReleaseIndex
+      ? lastTimelineTop
+      : lastTimelineTop + compactTimelineGap(releaseIndex - lastReleaseIndex);
+    const collisionTop = Number.isFinite(lastBottomBySide[side]) ? lastBottomBySide[side] + 6 : 0;
+    const top = Math.max(chronologicalTop, collisionTop);
+    const monthKey = `${side}-${releaseIndex}`;
+    const branchOffset = monthCounts[monthKey] || 0;
+    const occupiedHeight = reserveDetailSpace && selectedPokemonReleaseId === release.id ? 760 : 132;
+
+    items.set(release.id, { side, top, branchOffset });
+    monthCounts[monthKey] = branchOffset + 1;
+    lastBottomBySide[side] = top + occupiedHeight;
+    lastByLine.set(line, release);
+    previous = release;
+    lastTimelineTop = top;
+    lastReleaseIndex = releaseIndex;
+    maxBottom = Math.max(maxBottom, top + occupiedHeight);
+  });
+
+  return { items, height: Math.max(118, maxBottom + 10) };
 }
 
 function bindTabs(buttonSelector, panelAttribute) {
   const buttons = [...document.querySelectorAll(buttonSelector)];
   buttons.forEach((button) => {
     button.addEventListener("click", () => {
-      const panelId = button.dataset[panelAttribute];
-      buttons.forEach((item) => {
-        const active = item === button;
-        item.classList.toggle("active", active);
-        item.setAttribute("aria-selected", String(active));
-        document.querySelector(`#${item.dataset[panelAttribute]}`).hidden = !active;
-      });
-      document.querySelector(`#${panelId}`).hidden = false;
+      activateTab(buttons, panelAttribute, button);
+      saveArchiveLocation();
     });
   });
+
+  return buttons;
+}
+
+function activateTab(buttons, panelAttribute, button) {
+  buttons.forEach((item) => {
+    const active = item === button;
+    item.classList.toggle("active", active);
+    item.setAttribute("aria-selected", String(active));
+    document.querySelector(`#${item.dataset[panelAttribute]}`).hidden = !active;
+  });
+}
+
+function currentArchiveLocation() {
+  const activeLibrary = document.querySelector("[data-library-tab].active")?.dataset.libraryTab;
+  if (activeLibrary === "console-library-panel") return "console";
+
+  const activeSeries = document.querySelector("[data-series-tab].active")?.dataset.seriesTab;
+  return activeSeries === "pokemon-library-panel" ? "pokemon" : "series-overview";
+}
+
+function saveArchiveLocation() {
+  const location = currentArchiveLocation();
+  history.replaceState(null, "", `${window.location.pathname}${window.location.search}#${location}`);
+}
+
+function restoreArchiveLocation(libraryTabs, seriesTabs) {
+  const location = window.location.hash.slice(1);
+  if (location === "pokemon") {
+    activateTab(libraryTabs, "libraryTab", libraryTabs.find((button) => button.dataset.libraryTab === "series-library-panel"));
+    activateTab(seriesTabs, "seriesTab", seriesTabs.find((button) => button.dataset.seriesTab === "pokemon-library-panel"));
+    return;
+  }
+
+  if (location === "series-overview") {
+    activateTab(libraryTabs, "libraryTab", libraryTabs.find((button) => button.dataset.libraryTab === "series-library-panel"));
+    activateTab(seriesTabs, "seriesTab", seriesTabs.find((button) => button.dataset.seriesTab === "series-overview-panel"));
+  }
+}
+
+function restoreScrollPosition() {
+  const savedState = JSON.parse(sessionStorage.getItem("game-archive-scroll-state") || "null");
+  if (!savedState || savedState.location !== currentArchiveLocation() || !Number.isFinite(savedState.y) || savedState.y <= 0) return;
+  requestAnimationFrame(() => window.scrollTo(0, savedState.y));
 }
 
 function init() {
@@ -859,9 +1129,18 @@ function init() {
   elements.platformCount.textContent = allPlatforms.length;
   elements.gameCount.textContent = totalGames();
   if (elements.variantCount) elements.variantCount.textContent = totalVariants();
-  bindTabs("[data-library-tab]", "libraryTab");
-  bindTabs("[data-series-tab]", "seriesTab");
+  const libraryTabs = bindTabs("[data-library-tab]", "libraryTab");
+  const seriesTabs = bindTabs("[data-series-tab]", "seriesTab");
+  restoreArchiveLocation(libraryTabs, seriesTabs);
   render();
+  restoreScrollPosition();
 }
+
+window.addEventListener("beforeunload", () => {
+  sessionStorage.setItem("game-archive-scroll-state", JSON.stringify({
+    location: currentArchiveLocation(),
+    y: window.scrollY
+  }));
+});
 
 init();
