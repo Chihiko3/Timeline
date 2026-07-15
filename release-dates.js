@@ -1,3 +1,4 @@
+// Each month is the earliest confirmed public retail release month worldwide.
 window.CONSOLE_RELEASE_DATES = {
   "Magnavox-Philips-Magnavox-Odyssey-1972": { month: 9 },
   "Magnavox-Philips-Odyssey-2-Philips-Videopac-G7000-1978": { month: 12 },

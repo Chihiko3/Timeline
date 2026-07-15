@@ -1,3 +1,4 @@
+// date is the earliest public retail release date in any region, not a region-specific launch date.
 window.POKEMON_CORE_RELEASES = [
   { id: "red-green-blue", date: "1996.02", generation: "世代 1", name: "Pokémon Red / Green / Blue", chineseName: "宝可梦 红／绿／蓝", first: [{ year: 1996, platform: "Game Boy" }], later: [{ year: 2016, platform: "Nintendo 3DS Virtual Console" }, { year: 2024, platform: "Nintendo Switch Online + Expansion Pack" }] },
   { id: "yellow", date: "1998.09", generation: "世代 1", name: "Pokémon Yellow", chineseName: "宝可梦 黄", first: [{ year: 1998, platform: "Game Boy" }], later: [{ year: 2016, platform: "Nintendo 3DS Virtual Console" }, { year: 2024, platform: "Nintendo Switch Online + Expansion Pack" }] },
