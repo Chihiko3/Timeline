@@ -19,6 +19,9 @@ const gameLocalizations = window.CONSOLE_GAME_LOCALIZATIONS || {};
 const pokemonReleases = window.POKEMON_CORE_RELEASES || [];
 const finalFantasyReleases = window.FINAL_FANTASY_RELEASES || [];
 const finalFantasyCovers = window.FINAL_FANTASY_RELEASE_COVERS || {};
+const finalFantasyLogos = window.FINAL_FANTASY_RELEASE_LOGOS || {};
+const timelineImageStore = window.timelineImageStore;
+let managedTimelineImages = {};
 const POKEMON_STARTERS_BY_GENERATION = {
   "世代 1": [["Bulbasaur", "妙蛙种子"], ["Charmander", "小火龙"], ["Squirtle", "杰尼龟"]],
   "世代 2": [["Chikorita", "菊草叶"], ["Cyndaquil", "火球鼠"], ["Totodile", "小锯鳄"]],
@@ -124,6 +127,7 @@ const elements = {
   platformGrid: document.querySelector("#platformGrid"),
   pokemonTimeline: document.querySelector("#pokemonTimeline"),
   finalFantasyTimeline: document.querySelector("#finalFantasyTimeline"),
+  imageManager: document.querySelector("#imageManager"),
   template: document.querySelector("#platformTemplate")
 };
 
@@ -131,6 +135,8 @@ let selectedPokemonReleaseId = null;
 let selectedFinalFantasyReleaseId = null;
 const pokemonArtworkIndices = new Map();
 let pokemonCoverPreview = null;
+let imageManagerCategory = "hardware";
+let imageManagerSearch = "";
 
 function totalGames() {
   return allPlatforms.reduce((sum, platform) => {
@@ -497,6 +503,11 @@ function createTimelineNode(platform) {
   meta.textContent = `${variants.length} 个型号`;
 
   button.append(topRow, name, meta);
+  const artworkKey = `hardware:${id}`;
+  if (managedImagesFor(artworkKey).length) {
+    node.classList.add("timeline-primary-card-has-artwork");
+    appendReleaseArtwork(button, { id }, {}, "", artworkKey, "timeline-hardware-artwork");
+  }
   node.append(button);
 
   return node;
@@ -660,6 +671,8 @@ function imageQueries(platform) {
 }
 
 async function fetchPlatformImage(platform) {
+  const managedImages = managedTimelineImages[`hardware:${platformId(platform)}`] || [];
+  if (managedImages.length) return { images: managedImages, title: platform.name };
   const manualImage = manualImageForPlatform(platform);
   if (manualImage) return manualImage;
 
@@ -787,7 +800,7 @@ async function hydratePlatformImage(platform, card) {
 
   caption.replaceChildren();
   const source = document.createElement("a");
-  source.href = images[0].page || image.page;
+  source.href = images[0].page || image.page || images[0].src;
   source.target = "_blank";
   source.rel = "noreferrer";
   source.textContent = `图片来源：${image.title || images.map((item) => item.title).join(" / ")}`;
@@ -938,11 +951,15 @@ function appendPokemonReleaseArtwork(card, release) {
 }
 
 function appendFinalFantasyReleaseArtwork(card, release) {
-  appendReleaseArtwork(card, release, finalFantasyCovers, "assets/final-fantasy-covers", `final-fantasy:${release.id}`);
+  const hasLogo = Boolean(finalFantasyLogos[release.id]?.length);
+  const artworkMap = hasLogo ? finalFantasyLogos : finalFantasyCovers;
+  const directory = hasLogo ? "assets/final-fantasy-logos" : "assets/final-fantasy-covers";
+  appendReleaseArtwork(card, release, artworkMap, directory, `final-fantasy:${release.id}`, hasLogo ? "final-fantasy-release-logo" : "");
 }
 
-function appendReleaseArtwork(card, release, coverMap, assetDirectory, artworkKey) {
-  const rawArtworks = coverMap[release.id] || [];
+function appendReleaseArtwork(card, release, coverMap, assetDirectory, artworkKey, artworkClass = "") {
+  const managed = managedImagesFor(artworkKey);
+  const rawArtworks = managed.length ? managed : coverMap[release.id] || [];
   const artworks = rawArtworks.length && typeof rawArtworks[0] === "string" ? [rawArtworks] : rawArtworks;
   if (!artworks.length) return;
 
@@ -950,6 +967,7 @@ function appendReleaseArtwork(card, release, coverMap, assetDirectory, artworkKe
   artworkIndex %= artworks.length;
   const frame = document.createElement("div");
   frame.className = "pokemon-release-artwork";
+  if (artworkClass) frame.classList.add(artworkClass);
   const image = document.createElement("img");
   image.alt = "";
   image.decoding = "async";
@@ -964,7 +982,7 @@ function appendReleaseArtwork(card, release, coverMap, assetDirectory, artworkKe
 
   const updateArtwork = () => {
     const [filename, label] = artworks[artworkIndex];
-    image.src = `${assetDirectory}/${filename}`;
+    image.src = resolveArtworkSource(filename, assetDirectory);
     image.alt = label;
     image.title = label;
     pokemonArtworkIndices.set(artworkKey, artworkIndex);
@@ -990,6 +1008,15 @@ function appendReleaseArtwork(card, release, coverMap, assetDirectory, artworkKe
   card.append(frame);
 }
 
+function managedImagesFor(key) {
+  return (managedTimelineImages[key] || []).map((image) => [image.src, image.name]);
+}
+
+function resolveArtworkSource(source, assetDirectory) {
+  if (/^(?:https?:|blob:|data:|\/)/.test(source)) return source;
+  return `${assetDirectory}/${source}`;
+}
+
 function bindPokemonCoverPreview(image, artworks, assetDirectory) {
   const showPreview = (event) => {
     const preview = pokemonCoverPreview || document.createElement("div");
@@ -1008,7 +1035,7 @@ function bindPokemonCoverPreview(image, artworks, assetDirectory) {
     );
     preview.replaceChildren(...previewArtworks.map(([source, label]) => {
       const previewImage = document.createElement("img");
-      previewImage.src = source.includes("/") ? source : `${assetDirectory}/${source}`;
+      previewImage.src = resolveArtworkSource(source, assetDirectory);
       previewImage.alt = label;
       return previewImage;
     }));
@@ -1037,6 +1064,228 @@ function positionPokemonCoverPreview(preview, event) {
   const top = Math.min(Math.max(gap, event.clientY - 36), window.innerHeight - previewBounds.height - gap);
   preview.style.left = `${left}px`;
   preview.style.top = `${top}px`;
+}
+
+function staticArtworkEntries(rawArtworks, directory) {
+  const artworks = rawArtworks?.length && typeof rawArtworks[0] === "string" ? [rawArtworks] : rawArtworks || [];
+  return artworks.map(([filename, name]) => ({ src: resolveArtworkSource(filename, directory), name }));
+}
+
+function consoleFallbackImages(platform) {
+  const manual = manualImageForPlatform(platform);
+  if (manual?.images?.length) return manual.images.map((image) => ({ src: image.src, name: image.title || platform.name }));
+  if (manual?.src) return [{ src: manual.src, name: manual.title || platform.name }];
+  const local = localImages[platformId(platform)];
+  if (local?.images?.length) return local.images.map((image) => ({ src: image.src, name: image.title || platform.name }));
+  if (local?.src) return [{ src: local.src, name: local.title || platform.name }];
+  try {
+    const cached = JSON.parse(localStorage.getItem(imageKey(platform)) || "null");
+    if (cached?.images?.length) return cached.images.map((image) => ({ src: image.src, name: image.title || platform.name }));
+    if (cached?.src) return [{ src: cached.src, name: cached.title || platform.name }];
+  } catch {
+    return [];
+  }
+  return [];
+}
+
+function imageManagerGroups() {
+  return [
+    {
+      id: "hardware",
+      label: "游戏主机",
+      entries: allPlatforms.map((platform) => ({
+        key: `hardware:${platformId(platform)}`,
+        title: platform.name,
+        meta: `${platform.brand} · ${releaseDateLabel(platform)}`,
+        fallback: consoleFallbackImages(platform)
+      }))
+    },
+    {
+      id: "pokemon",
+      label: "Pokémon",
+      entries: pokemonReleases.map((release) => ({
+        key: `pokemon:${release.id}`,
+        title: release.name,
+        meta: pokemonSubtitle(release.chineseName),
+        fallback: staticArtworkEntries(POKEMON_RELEASE_COVERS[release.id], "assets/pokemon-covers")
+      }))
+    },
+    {
+      id: "final-fantasy",
+      label: "Final Fantasy",
+      entries: finalFantasyReleases.map((release) => {
+        const hasLogo = Boolean(finalFantasyLogos[release.id]?.length);
+        return {
+          key: `final-fantasy:${release.id}`,
+          title: release.name,
+          meta: release.chineseName,
+          fallback: staticArtworkEntries(
+            hasLogo ? finalFantasyLogos[release.id] : finalFantasyCovers[release.id],
+            hasLogo ? "assets/final-fantasy-logos" : "assets/final-fantasy-covers"
+          )
+        };
+      })
+    }
+  ];
+}
+
+function renderImageManager() {
+  if (!elements.imageManager) return;
+  const groups = imageManagerGroups();
+  const activeGroup = groups.find((group) => group.id === imageManagerCategory) || groups[0];
+  const search = imageManagerSearch.trim().toLocaleLowerCase();
+  const entries = activeGroup.entries
+    .filter((entry) => !search || `${entry.title} ${entry.meta}`.toLocaleLowerCase().includes(search))
+    .sort((a, b) => a.title.localeCompare(b.title, "en"));
+
+  const header = document.createElement("header");
+  header.className = "image-manager-header";
+  const heading = document.createElement("div");
+  const eyebrow = document.createElement("p");
+  eyebrow.className = "eyebrow";
+  eyebrow.textContent = "Timeline Media";
+  const title = document.createElement("h2");
+  title.textContent = "时间线图片";
+  heading.append(eyebrow, title);
+  const searchInput = document.createElement("input");
+  searchInput.type = "search";
+  searchInput.placeholder = "搜索卡片";
+  searchInput.value = imageManagerSearch;
+  searchInput.addEventListener("input", () => {
+    imageManagerSearch = searchInput.value;
+    renderImageManager();
+  });
+  header.append(heading, searchInput);
+
+  const tabs = document.createElement("div");
+  tabs.className = "image-manager-tabs";
+  groups.forEach((group) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = `image-manager-tab${group.id === activeGroup.id ? " active" : ""}`;
+    button.textContent = `${group.label} ${group.entries.length}`;
+    button.addEventListener("click", () => {
+      imageManagerCategory = group.id;
+      imageManagerSearch = "";
+      renderImageManager();
+    });
+    tabs.append(button);
+  });
+
+  const grid = document.createElement("div");
+  grid.className = "image-manager-grid";
+  entries.forEach((entry) => grid.append(createImageManagerEntry(entry)));
+  if (!entries.length) {
+    const empty = document.createElement("p");
+    empty.className = "image-manager-empty";
+    empty.textContent = "没有匹配的卡片";
+    grid.append(empty);
+  }
+  elements.imageManager.replaceChildren(header, tabs, grid);
+}
+
+function createImageManagerEntry(entry) {
+  const card = document.createElement("article");
+  card.className = "image-manager-card";
+  const header = document.createElement("div");
+  header.className = "image-manager-card-head";
+  const text = document.createElement("div");
+  const title = document.createElement("h3");
+  title.textContent = entry.title;
+  title.title = entry.title;
+  const meta = document.createElement("p");
+  meta.textContent = entry.meta;
+  text.append(title, meta);
+  const managed = managedTimelineImages[entry.key] || [];
+  const status = document.createElement("span");
+  status.className = `image-manager-status${managed.length ? " managed" : ""}`;
+  status.textContent = managed.length ? `已管理 ${managed.length}` : `默认 ${entry.fallback.length}`;
+  header.append(text, status);
+
+  const images = managed.length ? managed : entry.fallback;
+  const strip = document.createElement("div");
+  strip.className = "image-manager-strip";
+  if (images.length) {
+    images.forEach((image, index) => {
+      const item = document.createElement("figure");
+      item.className = "image-manager-thumbnail";
+      const preview = document.createElement("img");
+      preview.src = image.src;
+      preview.alt = image.name || "";
+      preview.loading = "lazy";
+      preview.title = image.name || "";
+      const caption = document.createElement("figcaption");
+      caption.textContent = `${index + 1}`;
+      item.append(preview, caption);
+      if (managed.length) {
+        const controls = document.createElement("div");
+        controls.className = "image-manager-image-actions";
+        controls.append(
+          imageManagerIconButton("←", "前移", () => updateManagedImage(() => timelineImageStore.moveImage(entry.key, image.id, -1))),
+          imageManagerIconButton("→", "后移", () => updateManagedImage(() => timelineImageStore.moveImage(entry.key, image.id, 1))),
+          imageManagerIconButton("×", "删除", () => updateManagedImage(() => timelineImageStore.removeImage(entry.key, image.id)))
+        );
+        item.append(controls);
+      }
+      strip.append(item);
+    });
+  } else {
+    const empty = document.createElement("span");
+    empty.textContent = "暂无图片";
+    strip.append(empty);
+  }
+
+  const actions = document.createElement("div");
+  actions.className = "image-manager-actions";
+  actions.append(
+    imageManagerFileAction("替换", (files) => updateManagedImage(() => timelineImageStore.replace(entry.key, files))),
+    imageManagerFileAction("添加", (files) => updateManagedImage(() => timelineImageStore.append(entry.key, files, entry.fallback)))
+  );
+  if (managed.length) {
+    const reset = document.createElement("button");
+    reset.type = "button";
+    reset.className = "image-manager-reset";
+    reset.textContent = "恢复默认";
+    reset.addEventListener("click", () => updateManagedImage(() => timelineImageStore.deleteRecord(entry.key)));
+    actions.append(reset);
+  }
+  card.append(header, strip, actions);
+  return card;
+}
+
+function imageManagerIconButton(icon, title, handler) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "image-manager-icon-button";
+  button.textContent = icon;
+  button.title = title;
+  button.setAttribute("aria-label", title);
+  button.addEventListener("click", handler);
+  return button;
+}
+
+function imageManagerFileAction(label, handler) {
+  const labelElement = document.createElement("label");
+  labelElement.className = "image-manager-file-action";
+  labelElement.textContent = label;
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+  input.multiple = true;
+  input.addEventListener("change", () => {
+    if (input.files?.length) handler(input.files);
+    input.value = "";
+  });
+  labelElement.append(input);
+  return labelElement;
+}
+
+async function updateManagedImage(update) {
+  if (!timelineImageStore) return;
+  await update();
+  managedTimelineImages = await timelineImageStore.loadAll();
+  render();
+  renderImageManager();
 }
 
 function renderPokemonTimeline() {
@@ -1074,7 +1323,7 @@ function renderPokemonTimeline() {
     stack.className = "timeline-card-anchor pokemon-release-stack";
     const card = document.createElement("article");
     card.className = "pokemon-release-card";
-    if (POKEMON_RELEASE_COVERS[release.id]?.length) {
+    if (managedImagesFor(`pokemon:${release.id}`).length || POKEMON_RELEASE_COVERS[release.id]?.length) {
       card.classList.add("pokemon-release-card-has-artwork", "timeline-primary-card-has-artwork");
     }
     card.tabIndex = 0;
@@ -1282,7 +1531,7 @@ function renderFinalFantasyTimeline() {
     stack.className = "timeline-card-anchor pokemon-release-stack";
     const card = document.createElement("article");
     card.className = "pokemon-release-card final-fantasy-release-card";
-    if (finalFantasyCovers[release.id]?.length) {
+    if (managedImagesFor(`final-fantasy:${release.id}`).length || finalFantasyLogos[release.id]?.length || finalFantasyCovers[release.id]?.length) {
       card.classList.add("timeline-primary-card-has-artwork");
     }
     card.tabIndex = 0;
@@ -1410,6 +1659,7 @@ function activateTab(buttons, panelAttribute, button) {
 function currentArchiveLocation() {
   const activeLibrary = document.querySelector("[data-library-tab].active")?.dataset.libraryTab;
   if (activeLibrary === "console-library-panel") return "console";
+  if (activeLibrary === "image-manager-panel") return "image-manager";
 
   const activeSeries = document.querySelector("[data-series-tab].active")?.dataset.seriesTab;
   if (activeSeries === "pokemon-library-panel") return "pokemon";
@@ -1440,6 +1690,10 @@ function restoreArchiveLocation(libraryTabs, seriesTabs) {
     activateTab(libraryTabs, "libraryTab", libraryTabs.find((button) => button.dataset.libraryTab === "series-library-panel"));
     activateTab(seriesTabs, "seriesTab", seriesTabs.find((button) => button.dataset.seriesTab === "series-overview-panel"));
   }
+
+  if (location === "image-manager") {
+    activateTab(libraryTabs, "libraryTab", libraryTabs.find((button) => button.dataset.libraryTab === "image-manager-panel"));
+  }
 }
 
 function restoreScrollPosition() {
@@ -1448,7 +1702,7 @@ function restoreScrollPosition() {
   requestAnimationFrame(() => window.scrollTo(0, savedState.y));
 }
 
-function init() {
+async function init() {
   if (elements.brandCount) elements.brandCount.textContent = archive.length;
   if (elements.platformCount) elements.platformCount.textContent = allPlatforms.length;
   if (elements.gameCount) elements.gameCount.textContent = totalGames();
@@ -1456,7 +1710,9 @@ function init() {
   const libraryTabs = bindTabs("[data-library-tab]", "libraryTab");
   const seriesTabs = bindTabs("[data-series-tab]", "seriesTab");
   restoreArchiveLocation(libraryTabs, seriesTabs);
+  if (timelineImageStore) managedTimelineImages = await timelineImageStore.loadAll();
   render();
+  renderImageManager();
   restoreScrollPosition();
 }
 

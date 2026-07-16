@@ -10,16 +10,41 @@ New-Item -ItemType Directory -Path $assetDirectory -Force | Out-Null
 $source = Get-Content -Raw -LiteralPath $dataPath
 $matches = [regex]::Matches($source, '\{ id: "(?<id>[^"]+)", date: "[^"]+", category: "[^"]+", name: "(?<name>[^"]+)"')
 $covers = [ordered]@{}
+if (Test-Path -LiteralPath $mapPath) {
+  $existingSource = Get-Content -Raw -LiteralPath $mapPath
+  $existingJson = $existingSource -replace '(?s)^.*?=\s*', '' -replace ';\s*$', ''
+  $existing = $existingJson | ConvertFrom-Json
+  foreach ($property in $existing.PSObject.Properties) {
+    $covers[$property.Name] = @($property.Value)
+  }
+}
+$covers.Remove('ff7-snowboarding')
 $missing = [System.Collections.Generic.List[string]]::new()
+$pageTitleOverrides = @{
+  'ff1' = 'Final Fantasy (video game)'
+  'ff3d' = 'Final Fantasy III (3D remake)'
+  'ff4-3d-remake' = 'Final Fantasy IV (2007 video game)'
+  'ff14-arr' = 'Final Fantasy XIV: A Realm Reborn'
+}
 $releases = foreach ($match in $matches) {
-  [pscustomobject]@{ Id = $match.Groups['id'].Value; Name = $match.Groups['name'].Value }
+  $id = $match.Groups['id'].Value
+  $name = $match.Groups['name'].Value
+  [pscustomobject]@{
+    Id = $id
+    Name = $name
+    LookupTitle = if ($pageTitleOverrides.ContainsKey($id)) { $pageTitleOverrides[$id] } else { $name }
+  }
 }
 $byTitle = @{}
-foreach ($release in $releases) { $byTitle[$release.Name.ToLowerInvariant()] = $release }
+foreach ($release in $releases) {
+  $byTitle[$release.Name.ToLowerInvariant()] = $release
+  $byTitle[$release.LookupTitle.ToLowerInvariant()] = $release
+}
+$pending = @($releases | Where-Object { -not $covers.Contains($_.Id) })
 
-for ($index = 0; $index -lt $releases.Count; $index += 20) {
-  $batch = @($releases | Select-Object -Skip $index -First 20)
-  $titles = [uri]::EscapeDataString(($batch.Name -join '|'))
+for ($index = 0; $index -lt $pending.Count; $index += 12) {
+  $batch = @($pending | Select-Object -Skip $index -First 12)
+  $titles = [uri]::EscapeDataString(($batch.LookupTitle -join '|'))
   $queryUrl = "https://en.wikipedia.org/w/api.php?action=query&format=json&redirects=1&prop=pageimages&pithumbsize=700&pilicense=any&titles=$titles"
 
   try {
@@ -32,16 +57,18 @@ for ($index = 0; $index -lt $releases.Count; $index += 20) {
 
   $resolvedTitles = @{}
   foreach ($redirect in @($query.query.redirects)) {
+    if (-not $redirect -or -not $redirect.from -or -not $redirect.to) { continue }
     $sourceRelease = $byTitle[$redirect.from.ToLowerInvariant()]
     if ($sourceRelease) { $resolvedTitles[$redirect.to.ToLowerInvariant()] = $sourceRelease }
   }
 
   foreach ($page in $query.query.pages.PSObject.Properties.Value) {
-    $release = $byTitle[$page.title.ToLowerInvariant()]
-    if (-not $release) { $release = $resolvedTitles[$page.title.ToLowerInvariant()] }
+    $release = $resolvedTitles[$page.title.ToLowerInvariant()]
+    if (-not $release) { $release = $byTitle[$page.title.ToLowerInvariant()] }
     $imageUrl = $page.original.source
     if (-not $imageUrl) { $imageUrl = $page.thumbnail.source }
-    if (-not $release -or -not $imageUrl) { continue }
+    if (-not $release -or -not $imageUrl -or $page.pageimage -match 'logo') { continue }
+    if ($release.Id -eq 'ff7-snowboarding' -and $page.title -eq 'Final Fantasy VII') { continue }
 
     try {
       $extension = [IO.Path]::GetExtension(([uri]$imageUrl).AbsolutePath).ToLowerInvariant()
@@ -51,14 +78,14 @@ for ($index = 0; $index -lt $releases.Count; $index += 20) {
       $target = Join-Path $assetDirectory $filename
       if (-not (Test-Path -LiteralPath $target)) {
         Invoke-WebRequest -Uri $imageUrl -Headers $headers -OutFile $target -TimeoutSec 45
-        Start-Sleep -Milliseconds 1400
+        Start-Sleep -Seconds 4
       }
       $covers[$release.Id] = @(@($filename, $release.Name))
     } catch {
       $missing.Add($release.Id)
     }
   }
-  Start-Sleep -Seconds 3
+  Start-Sleep -Seconds 8
 }
 
 foreach ($release in $releases) {

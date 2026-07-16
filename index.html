@@ -20,6 +20,7 @@
         <nav class="library-tabs" aria-label="资料库页面" role="tablist">
           <button class="library-tab active" type="button" role="tab" aria-selected="true" aria-controls="console-library-panel" data-library-tab="console-library-panel">游戏主机</button>
           <button class="library-tab" type="button" role="tab" aria-selected="false" aria-controls="series-library-panel" data-library-tab="series-library-panel">游戏系列</button>
+          <button class="library-tab" type="button" role="tab" aria-selected="false" aria-controls="image-manager-panel" data-library-tab="image-manager-panel">图片管理</button>
         </nav>
 
         <section id="console-library-panel" class="library-tab-panel" role="tabpanel">
@@ -49,6 +50,10 @@
           <section id="final-fantasy-library-panel" class="series-tab-panel" role="tabpanel" hidden>
             <div id="finalFantasyTimeline" class="final-fantasy-timeline" aria-label="Final Fantasy 游戏时间线"></div>
           </section>
+        </section>
+
+        <section id="image-manager-panel" class="library-tab-panel image-manager-panel" role="tabpanel" hidden>
+          <div id="imageManager" aria-label="时间线图片管理"></div>
         </section>
       </section>
     </main>
@@ -93,6 +98,8 @@
     <script src="pokemon-releases.js"></script>
     <script src="final-fantasy-releases.js"></script>
     <script src="final-fantasy-covers.js"></script>
+    <script src="final-fantasy-logos.js"></script>
+    <script src="timeline-image-store.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

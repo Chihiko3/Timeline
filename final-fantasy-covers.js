@@ -75,6 +75,50 @@ window.FINAL_FANTASY_RELEASE_COVERS = {
     "ff7-rebirth":  [
                         "ff7-rebirth.png",
                         "Final Fantasy VII Rebirth"
-                    ]
+                    ],
+    "ff1":  [
+                "ff1.jpg",
+                "Final Fantasy"
+            ],
+    "ff3":  [
+                "ff3.jpg",
+                "Final Fantasy III"
+            ],
+    "ff4-after-years":  [
+                            "ff4-after-years.png",
+                            "Final Fantasy IV: The After Years"
+                        ],
+    "mystic-quest":  [
+                         "mystic-quest.jpg",
+                         "Final Fantasy Mystic Quest"
+                     ],
+    "ff5":  [
+                "ff5.jpg",
+                "Final Fantasy V"
+            ],
+    "ff7-first-soldier":  [
+                              "ff7-first-soldier.png",
+                              "Final Fantasy VII: The First Soldier"
+                          ],
+    "ff13-2":  [
+                   "ff13-2.jpg",
+                   "Final Fantasy XIII-2"
+               ],
+    "ff15":  [
+                 "ff15.jpg",
+                 "Final Fantasy XV"
+             ],
+    "ff16":  [
+                 "ff16.png",
+                 "Final Fantasy XVI"
+             ],
+    "lightning-returns":  [
+                              "lightning-returns.png",
+                              "Lightning Returns: Final Fantasy XIII"
+                          ],
+    "ff14-arr":  [
+                     "ff14-arr.jpg",
+                     "Final Fantasy XIV: A Realm Reborn"
+                 ]
 };
 
