@@ -17,6 +17,12 @@ if (Test-Path -LiteralPath $mapPath) {
   foreach ($property in $existing.PSObject.Properties) {
     $covers[$property.Name] = @($property.Value)
   }
+  foreach ($id in @($covers.Keys)) {
+    $filename = @($covers[$id])[0]
+    if (-not (Test-Path -LiteralPath (Join-Path $assetDirectory $filename))) {
+      $covers.Remove($id)
+    }
+  }
 }
 $covers.Remove('ff7-snowboarding')
 $missing = [System.Collections.Generic.List[string]]::new()

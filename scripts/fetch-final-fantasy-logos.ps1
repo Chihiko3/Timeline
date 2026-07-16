@@ -2,7 +2,7 @@ $ErrorActionPreference = 'Continue'
 
 $root = Split-Path -Parent $PSScriptRoot
 $dataPath = Join-Path $root 'final-fantasy-releases.js'
-$assetDirectory = Join-Path $root 'assets\final-fantasy-logos'
+$assetDirectory = Join-Path $root 'assets\final-fantasy-covers'
 $mapPath = Join-Path $root 'final-fantasy-logos.js'
 $headers = @{ 'User-Agent' = 'GameArchiveLocal/1.0 (personal archival project)' }
 $api = 'https://finalfantasywiki.com/w/api.php'
@@ -24,6 +24,12 @@ if (Test-Path -LiteralPath $mapPath) {
   } catch {
     # A previous interrupted run may leave an incomplete generated map.
     $logos.Clear()
+  }
+  foreach ($id in @($logos.Keys)) {
+    $filename = @($logos[$id])[0]
+    if (-not (Test-Path -LiteralPath (Join-Path $assetDirectory $filename))) {
+      $logos.Remove($id)
+    }
   }
 }
 

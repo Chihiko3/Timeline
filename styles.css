@@ -37,6 +37,8 @@ input {
   padding: 22px 32px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 20px;
   background: #ffffff;
   border-top: 3px solid #20242c;
   border-bottom: 1px solid var(--line);
@@ -63,6 +65,25 @@ h1 {
   margin-bottom: 0;
   font-size: 36px;
   line-height: 1.05;
+}
+
+.timeline-artwork-debug {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+}
+
+.timeline-artwork-debug input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--blue);
 }
 
 .app-shell {
@@ -173,8 +194,34 @@ input {
   font-size: 24px;
 }
 
+.image-manager-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  gap: 8px;
+}
+
 .image-manager-header input {
   width: min(100%, 280px);
+}
+
+.image-manager-open-folder {
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid #c8d3e2;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #314159;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.image-manager-open-folder:hover {
+  border-color: #7194cb;
+  color: #17498f;
 }
 
 .image-manager-tabs {
@@ -204,15 +251,15 @@ input {
 
 .image-manager-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 9px;
 }
 
 .image-manager-card {
   display: grid;
   gap: 10px;
-  min-height: 206px;
-  padding: 12px;
+  min-height: 160px;
+  padding: 9px;
   border: 1px solid var(--line);
   border-radius: 6px;
   background: var(--panel);
@@ -235,7 +282,8 @@ input {
 
 .image-manager-card-head h3 {
   margin: 0;
-  font-size: 14px;
+  font-size: 12px;
+  line-height: 1.25;
 }
 
 .image-manager-card-head p {
@@ -263,8 +311,8 @@ input {
 
 .image-manager-strip {
   display: flex;
-  min-height: 102px;
-  gap: 8px;
+  min-height: 82px;
+  gap: 6px;
   overflow-x: auto;
   padding-bottom: 2px;
 }
@@ -277,14 +325,15 @@ input {
 
 .image-manager-thumbnail {
   position: relative;
-  flex: 0 0 88px;
-  width: 88px;
-  height: 100px;
+  flex: 0 0 72px;
+  width: 72px;
+  height: 80px;
   margin: 0;
   border: 1px solid #d8e0ec;
   border-radius: 4px;
   background: #f8fafc;
   overflow: hidden;
+  cursor: pointer;
 }
 
 .image-manager-thumbnail img {
@@ -294,7 +343,7 @@ input {
   object-fit: contain;
 }
 
-.image-manager-thumbnail figcaption {
+.image-manager-thumbnail > span {
   position: absolute;
   right: 3px;
   bottom: 3px;
@@ -307,12 +356,38 @@ input {
   text-align: center;
 }
 
+.image-manager-thumbnail input {
+  display: none;
+}
+
 .image-manager-image-actions {
   position: absolute;
   top: 3px;
   left: 3px;
   display: flex;
   gap: 2px;
+}
+
+.image-manager-delete-button {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  z-index: 1;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid #d8a9ae;
+  border-radius: 3px;
+  background: #ffffff;
+  color: #b32935;
+  font-size: 16px;
+  line-height: 16px;
+  cursor: pointer;
+}
+
+.image-manager-delete-button:hover {
+  border-color: #b32935;
+  background: #fff0f1;
 }
 
 .image-manager-icon-button {
@@ -492,7 +567,17 @@ input {
 .pokemon-release-card-has-artwork .pokemon-card-lineage,
 .timeline-primary-card-has-artwork .pokemon-release-title p,
 .timeline-primary-card-has-artwork .pokemon-card-lineage {
-  padding-right: 78px;
+  padding-right: 144px;
+}
+
+/* Subtitles reserve the artwork area, then truncate rather than wrap. */
+.pokemon-release-card-has-artwork .pokemon-release-title p,
+.timeline-primary-card-has-artwork .pokemon-release-title p {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  -webkit-line-clamp: unset;
 }
 
 .pokemon-release-title strong {
@@ -532,11 +617,11 @@ input {
 }
 
 .pokemon-release-artwork {
-  --cover-display-width: 70px;
+  --cover-display-width: 140px;
   position: absolute;
   right: 5px;
   bottom: 2px;
-  width: 78px;
+  width: 140px;
   height: 70px;
   pointer-events: none;
 }
@@ -546,9 +631,15 @@ input {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  object-position: right bottom;
+  object-position: right center;
   cursor: zoom-in;
   pointer-events: auto;
+}
+
+body.show-timeline-artwork-bounds .pokemon-release-artwork {
+  outline: 1px dashed #a847b4;
+  outline-offset: 1px;
+  background: rgba(168, 71, 180, 0.08);
 }
 
 .pokemon-release-artwork-switchable {
@@ -562,13 +653,13 @@ input {
 .final-fantasy-release-logo {
   right: 4px;
   bottom: 5px;
-  width: 96px;
+  width: 140px;
   height: 46px;
 }
 
 .final-fantasy-release-card.timeline-primary-card-has-artwork .pokemon-release-title p,
 .final-fantasy-release-card.timeline-primary-card-has-artwork .final-fantasy-card-lineage {
-  padding-right: 100px;
+  padding-right: 144px;
 }
 
 .pokemon-cover-preview {
@@ -1139,11 +1230,11 @@ input {
 
 .timeline-node.timeline-primary-card-has-artwork .timeline-platform-button strong,
 .timeline-node.timeline-primary-card-has-artwork .timeline-node-meta {
-  padding-right: 78px;
+  padding-right: 144px;
 }
 
 .timeline-hardware-artwork {
-  width: 72px;
+  width: 140px;
   height: 62px;
 }
 

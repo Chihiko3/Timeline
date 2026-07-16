@@ -22,6 +22,30 @@ const finalFantasyCovers = window.FINAL_FANTASY_RELEASE_COVERS || {};
 const finalFantasyLogos = window.FINAL_FANTASY_RELEASE_LOGOS || {};
 const timelineImageStore = window.timelineImageStore;
 let managedTimelineImages = {};
+const FINAL_FANTASY_DISPLAY_TAGS = {
+  ff1: ["正传", "RPG"], ff2: ["正传", "RPG"], ff3: ["正传", "RPG"], ff4: ["正传", "RPG"],
+  ff5: ["正传", "RPG"], ff6: ["正传", "RPG"], ff7: ["正传", "RPG"], ff8: ["正传", "RPG"],
+  ff9: ["正传", "RPG"], ffx: ["正传", "RPG"], ff12: ["正传", "RPG"], ff13: ["正传", "RPG"],
+  ff15: ["正传", "动作 RPG"], ff16: ["正传", "动作 RPG"], ff11: ["正传", "MMO"], "ff14-1": ["正传", "MMO"],
+  "ff14-arr": ["正传", "MMO"],
+  "mystic-quest": ["外传", "RPG"], "four-heroes": ["外传", "RPG"], "ff-explorers": ["外传", "动作 RPG"],
+  "stranger-of-paradise": ["外传", "动作 RPG"],
+  "ff-tactics": ["战略版", "战棋"], "ff-tactics-advance": ["战略版", "战棋"], "ff-tactics-a2": ["战略版", "战棋"],
+  "chocobo-no-fushigi": ["陆行鸟", "迷宫探索"], "chocobo-no-fushigi-2": ["陆行鸟", "迷宫探索"],
+  "chocobo-racing": ["陆行鸟", "赛车"], "chocobo-tales": ["陆行鸟", "卡牌"],
+  "chocobos-dungeon": ["陆行鸟", "迷宫探索"], "chocobo-gp": ["陆行鸟", "赛车"],
+  "crystal-chronicles": ["水晶编年史", "动作 RPG"], "ring-of-fates": ["水晶编年史", "动作 RPG"],
+  "echoes-of-time": ["水晶编年史", "动作 RPG"], "crystal-bearers": ["水晶编年史", "动作冒险"],
+  "my-life-as-king": ["水晶编年史", "城市建设"], "my-life-as-darklord": ["水晶编年史", "塔防"],
+  "ff7-snowboarding": ["VII", "竞速"], "before-crisis": ["VII", "动作 RPG"], "dirge-cerberus": ["VII", "第三人称射击"],
+  "crisis-core": ["VII", "动作 RPG"], "ff7-g-bike": ["VII", "竞速"], "ff7-first-soldier": ["VII", "大逃杀"],
+  "ff7-ever-crisis": ["VII", "RPG"], "ff7-remake": ["VII 重制", "动作 RPG"], "ff7-rebirth": ["VII 重制", "动作 RPG"],
+  ff3d: ["重制", "RPG"], "ff4-3d-remake": ["重制", "RPG"],
+  "ffx-2": ["正传续作", "RPG"], "ff4-after-years": ["正传续作", "RPG"], "ff13-2": ["正传续作", "RPG"],
+  "lightning-returns": ["正传续作", "动作 RPG"],
+  "ff12-rw": ["伊瓦利斯", "战略 RPG"], "type-0": ["零式", "动作 RPG"], "ff-agito": ["零式", "RPG"],
+  "ff-dimensions": ["移动端", "RPG"], "ff-dimensions-2": ["移动端", "RPG"], "mobius-ff": ["移动端", "RPG"]
+};
 const POKEMON_STARTERS_BY_GENERATION = {
   "世代 1": [["Bulbasaur", "妙蛙种子"], ["Charmander", "小火龙"], ["Squirtle", "杰尼龟"]],
   "世代 2": [["Chikorita", "菊草叶"], ["Cyndaquil", "火球鼠"], ["Totodile", "小锯鳄"]],
@@ -127,6 +151,7 @@ const elements = {
   platformGrid: document.querySelector("#platformGrid"),
   pokemonTimeline: document.querySelector("#pokemonTimeline"),
   finalFantasyTimeline: document.querySelector("#finalFantasyTimeline"),
+  timelineArtworkDebug: document.querySelector("#timelineArtworkDebug"),
   imageManager: document.querySelector("#imageManager"),
   template: document.querySelector("#platformTemplate")
 };
@@ -137,6 +162,8 @@ const pokemonArtworkIndices = new Map();
 let pokemonCoverPreview = null;
 let imageManagerCategory = "hardware";
 let imageManagerSearch = "";
+let gmImageManagerOpen = false;
+let imageManagerRefreshTimer = null;
 
 function totalGames() {
   return allPlatforms.reduce((sum, platform) => {
@@ -671,8 +698,8 @@ function imageQueries(platform) {
 }
 
 async function fetchPlatformImage(platform) {
-  const managedImages = managedTimelineImages[`hardware:${platformId(platform)}`] || [];
-  if (managedImages.length) return { images: managedImages, title: platform.name };
+  const managedKey = `hardware:${platformId(platform)}`;
+  if (managedTimelineImages[managedKey]?.length) return { images: managedTimelineImages[managedKey], title: platform.name };
   const manualImage = manualImageForPlatform(platform);
   if (manualImage) return manualImage;
 
@@ -806,6 +833,12 @@ async function hydratePlatformImage(platform, card) {
   source.textContent = `图片来源：${image.title || images.map((item) => item.title).join(" / ")}`;
   caption.append(source);
   media.classList.add("loaded");
+  if (gmImageManagerOpen) scheduleImageManagerRefresh();
+}
+
+function scheduleImageManagerRefresh() {
+  window.clearTimeout(imageManagerRefreshTimer);
+  imageManagerRefreshTimer = window.setTimeout(() => renderImageManager(), 250);
 }
 
 function renderCards(platforms) {
@@ -947,19 +980,16 @@ function pokemonSubtitle(chineseName) {
 }
 
 function appendPokemonReleaseArtwork(card, release) {
-  appendReleaseArtwork(card, release, POKEMON_RELEASE_COVERS, "assets/pokemon-covers", `pokemon:${release.id}`);
+  appendReleaseArtwork(card, release, {}, "", `pokemon:${release.id}`);
 }
 
 function appendFinalFantasyReleaseArtwork(card, release) {
-  const hasLogo = Boolean(finalFantasyLogos[release.id]?.length);
-  const artworkMap = hasLogo ? finalFantasyLogos : finalFantasyCovers;
-  const directory = hasLogo ? "assets/final-fantasy-logos" : "assets/final-fantasy-covers";
-  appendReleaseArtwork(card, release, artworkMap, directory, `final-fantasy:${release.id}`, hasLogo ? "final-fantasy-release-logo" : "");
+  appendReleaseArtwork(card, release, {}, "", `final-fantasy:${release.id}`);
 }
 
 function appendReleaseArtwork(card, release, coverMap, assetDirectory, artworkKey, artworkClass = "") {
   const managed = managedImagesFor(artworkKey);
-  const rawArtworks = managed.length ? managed : coverMap[release.id] || [];
+  const rawArtworks = managed;
   const artworks = rawArtworks.length && typeof rawArtworks[0] === "string" ? [rawArtworks] : rawArtworks;
   if (!artworks.length) return;
 
@@ -1012,9 +1042,13 @@ function managedImagesFor(key) {
   return (managedTimelineImages[key] || []).map((image) => [image.src, image.name]);
 }
 
+function hasManagedImages(key) {
+  return Object.prototype.hasOwnProperty.call(managedTimelineImages, key);
+}
+
 function resolveArtworkSource(source, assetDirectory) {
   if (/^(?:https?:|blob:|data:|\/)/.test(source)) return source;
-  return `${assetDirectory}/${source}`;
+  return assetDirectory ? `${assetDirectory}/${source}` : source;
 }
 
 function bindPokemonCoverPreview(image, artworks, assetDirectory) {
@@ -1028,10 +1062,14 @@ function bindPokemonCoverPreview(image, artworks, assetDirectory) {
 
     const previewArtworks = artworks.length > 1 ? artworks : [[image.currentSrc || image.src, image.alt]];
     const gap = 8;
+    const frameChrome = 14;
+    const viewportMargin = 16;
+    const availableWidth = window.innerWidth - viewportMargin * 2 - frameChrome - gap * (previewArtworks.length - 1);
+    const availableHeight = window.innerHeight - viewportMargin * 2 - frameChrome;
     const previewSize = Math.min(
       320,
-      Math.floor((window.innerWidth - 32 - gap * (previewArtworks.length - 1)) / previewArtworks.length),
-      window.innerHeight - 32
+      Math.max(1, Math.floor(availableWidth / previewArtworks.length)),
+      Math.max(1, availableHeight)
     );
     preview.replaceChildren(...previewArtworks.map(([source, label]) => {
       const previewImage = document.createElement("img");
@@ -1058,10 +1096,13 @@ function bindPokemonCoverPreview(image, artworks, assetDirectory) {
 function positionPokemonCoverPreview(preview, event) {
   const gap = 16;
   const previewBounds = preview.getBoundingClientRect();
-  const left = event.clientX + gap + previewBounds.width > window.innerWidth
+  const preferredLeft = event.clientX + gap + previewBounds.width > window.innerWidth
     ? event.clientX - previewBounds.width - gap
     : event.clientX + gap;
-  const top = Math.min(Math.max(gap, event.clientY - 36), window.innerHeight - previewBounds.height - gap);
+  const maximumLeft = Math.max(gap, window.innerWidth - previewBounds.width - gap);
+  const maximumTop = Math.max(gap, window.innerHeight - previewBounds.height - gap);
+  const left = Math.min(Math.max(gap, preferredLeft), maximumLeft);
+  const top = Math.min(Math.max(gap, event.clientY - 36), maximumTop);
   preview.style.left = `${left}px`;
   preview.style.top = `${top}px`;
 }
@@ -1096,8 +1137,7 @@ function imageManagerGroups() {
       entries: allPlatforms.map((platform) => ({
         key: `hardware:${platformId(platform)}`,
         title: platform.name,
-        meta: `${platform.brand} · ${releaseDateLabel(platform)}`,
-        fallback: consoleFallbackImages(platform)
+        meta: `${platform.brand} · ${releaseDateLabel(platform)}`
       }))
     },
     {
@@ -1106,25 +1146,17 @@ function imageManagerGroups() {
       entries: pokemonReleases.map((release) => ({
         key: `pokemon:${release.id}`,
         title: release.name,
-        meta: pokemonSubtitle(release.chineseName),
-        fallback: staticArtworkEntries(POKEMON_RELEASE_COVERS[release.id], "assets/pokemon-covers")
+        meta: pokemonSubtitle(release.chineseName)
       }))
     },
     {
       id: "final-fantasy",
       label: "Final Fantasy",
-      entries: finalFantasyReleases.map((release) => {
-        const hasLogo = Boolean(finalFantasyLogos[release.id]?.length);
-        return {
-          key: `final-fantasy:${release.id}`,
-          title: release.name,
-          meta: release.chineseName,
-          fallback: staticArtworkEntries(
-            hasLogo ? finalFantasyLogos[release.id] : finalFantasyCovers[release.id],
-            hasLogo ? "assets/final-fantasy-logos" : "assets/final-fantasy-covers"
-          )
-        };
-      })
+      entries: finalFantasyReleases.map((release) => ({
+        key: `final-fantasy:${release.id}`,
+        title: release.name,
+        meta: release.chineseName
+      }))
     }
   ];
 }
@@ -1155,7 +1187,23 @@ function renderImageManager() {
     imageManagerSearch = searchInput.value;
     renderImageManager();
   });
-  header.append(heading, searchInput);
+  const headerActions = document.createElement("div");
+  headerActions.className = "image-manager-header-actions";
+  const openFolderButton = document.createElement("button");
+  openFolderButton.type = "button";
+  openFolderButton.className = "image-manager-open-folder";
+  openFolderButton.textContent = "打开仓库图片目录";
+  openFolderButton.title = "在资源管理器中打开 assets 文件夹";
+  openFolderButton.addEventListener("click", async () => {
+    if (!timelineImageStore) return;
+    try {
+      await timelineImageStore.openAssetsFolder();
+    } catch {
+      window.alert("无法打开本地图片目录。请确认正在使用本地 GM 服务。");
+    }
+  });
+  headerActions.append(openFolderButton, searchInput);
+  header.append(heading, headerActions);
 
   const tabs = document.createElement("div");
   tabs.className = "image-manager-tabs";
@@ -1197,36 +1245,40 @@ function createImageManagerEntry(entry) {
   meta.textContent = entry.meta;
   text.append(title, meta);
   const managed = managedTimelineImages[entry.key] || [];
-  const status = document.createElement("span");
-  status.className = `image-manager-status${managed.length ? " managed" : ""}`;
-  status.textContent = managed.length ? `已管理 ${managed.length}` : `默认 ${entry.fallback.length}`;
-  header.append(text, status);
+  header.append(text);
 
-  const images = managed.length ? managed : entry.fallback;
+  const images = managed;
   const strip = document.createElement("div");
   strip.className = "image-manager-strip";
   if (images.length) {
     images.forEach((image, index) => {
-      const item = document.createElement("figure");
+      const item = document.createElement("label");
       item.className = "image-manager-thumbnail";
       const preview = document.createElement("img");
       preview.src = image.src;
       preview.alt = image.name || "";
       preview.loading = "lazy";
       preview.title = image.name || "";
-      const caption = document.createElement("figcaption");
+      const caption = document.createElement("span");
       caption.textContent = `${index + 1}`;
-      item.append(preview, caption);
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "image/*";
+      input.addEventListener("change", () => {
+        if (input.files?.[0]) updateManagedImage(() => timelineImageStore.replaceImage(entry.key, image.id, input.files[0]));
+        input.value = "";
+      });
+      item.append(preview, caption, input);
       if (managed.length) {
         const controls = document.createElement("div");
         controls.className = "image-manager-image-actions";
         controls.append(
           imageManagerIconButton("←", "前移", () => updateManagedImage(() => timelineImageStore.moveImage(entry.key, image.id, -1))),
-          imageManagerIconButton("→", "后移", () => updateManagedImage(() => timelineImageStore.moveImage(entry.key, image.id, 1))),
-          imageManagerIconButton("×", "删除", () => updateManagedImage(() => timelineImageStore.removeImage(entry.key, image.id)))
+          imageManagerIconButton("→", "后移", () => updateManagedImage(() => timelineImageStore.moveImage(entry.key, image.id, 1)))
         );
         item.append(controls);
       }
+      item.append(imageManagerDeleteButton(entry.key, image.id));
       strip.append(item);
     });
   } else {
@@ -1238,17 +1290,8 @@ function createImageManagerEntry(entry) {
   const actions = document.createElement("div");
   actions.className = "image-manager-actions";
   actions.append(
-    imageManagerFileAction("替换", (files) => updateManagedImage(() => timelineImageStore.replace(entry.key, files))),
-    imageManagerFileAction("添加", (files) => updateManagedImage(() => timelineImageStore.append(entry.key, files, entry.fallback)))
+    imageManagerFileAction("添加", (files) => updateManagedImage(() => timelineImageStore.append(entry.key, files)))
   );
-  if (managed.length) {
-    const reset = document.createElement("button");
-    reset.type = "button";
-    reset.className = "image-manager-reset";
-    reset.textContent = "恢复默认";
-    reset.addEventListener("click", () => updateManagedImage(() => timelineImageStore.deleteRecord(entry.key)));
-    actions.append(reset);
-  }
   card.append(header, strip, actions);
   return card;
 }
@@ -1260,7 +1303,27 @@ function imageManagerIconButton(icon, title, handler) {
   button.textContent = icon;
   button.title = title;
   button.setAttribute("aria-label", title);
-  button.addEventListener("click", handler);
+  button.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    handler();
+  });
+  return button;
+}
+
+function imageManagerDeleteButton(key, imageId) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "image-manager-delete-button";
+  button.textContent = "×";
+  button.title = "删除图片";
+  button.setAttribute("aria-label", "删除图片");
+  button.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (!window.confirm("确认删除这张图片吗？")) return;
+    updateManagedImage(() => timelineImageStore.removeImage(key, imageId));
+  });
   return button;
 }
 
@@ -1323,7 +1386,7 @@ function renderPokemonTimeline() {
     stack.className = "timeline-card-anchor pokemon-release-stack";
     const card = document.createElement("article");
     card.className = "pokemon-release-card";
-    if (managedImagesFor(`pokemon:${release.id}`).length || POKEMON_RELEASE_COVERS[release.id]?.length) {
+    if (managedImagesFor(`pokemon:${release.id}`).length) {
       card.classList.add("pokemon-release-card-has-artwork", "timeline-primary-card-has-artwork");
     }
     card.tabIndex = 0;
@@ -1339,7 +1402,7 @@ function renderPokemonTimeline() {
         ? `<span class="pokemon-card-lineage">改版：${pokemonSubtitle(release.modOf)}</span>`
         : "";
     card.innerHTML = `<div class="pokemon-release-head"><time>${pokemonReleaseDateLabel(release)}</time><span class="pokemon-release-tag" title="${releaseLabel}">${releaseLabel}</span></div>
-      <div class="pokemon-release-title"><strong title="${release.name}">${release.name}</strong><p>${pokemonSubtitle(release.chineseName)}</p>${cardLineage}</div>
+      <div class="pokemon-release-title"><strong title="${release.name}">${release.name}</strong><p title="${pokemonSubtitle(release.chineseName)}">${pokemonSubtitle(release.chineseName)}</p>${cardLineage}</div>
       <div class="pokemon-release-foot"><small>${platformTotal} 个平台</small></div>`;
     appendPokemonReleaseArtwork(card, release);
     const toggleRelease = () => {
@@ -1496,6 +1559,11 @@ function finalFantasyDateLabel(release) {
   return `${year}.${month}.${day}`;
 }
 
+function finalFantasyDisplayTag(release) {
+  const tag = FINAL_FANTASY_DISPLAY_TAGS[release.id];
+  return tag ? `${tag[0]} · ${tag[1]}` : release.category;
+}
+
 function renderFinalFantasyTimeline() {
   if (!elements.finalFantasyTimeline) return;
   elements.finalFantasyTimeline.textContent = "";
@@ -1531,7 +1599,8 @@ function renderFinalFantasyTimeline() {
     stack.className = "timeline-card-anchor pokemon-release-stack";
     const card = document.createElement("article");
     card.className = "pokemon-release-card final-fantasy-release-card";
-    if (managedImagesFor(`final-fantasy:${release.id}`).length || finalFantasyLogos[release.id]?.length || finalFantasyCovers[release.id]?.length) {
+    const managedKey = `final-fantasy:${release.id}`;
+    if (managedImagesFor(managedKey).length) {
       card.classList.add("timeline-primary-card-has-artwork");
     }
     card.tabIndex = 0;
@@ -1541,8 +1610,9 @@ function renderFinalFantasyTimeline() {
     const cardLineage = release.lineage
       ? `<span class="final-fantasy-card-lineage" title="${release.lineage}">${release.lineage}</span>`
       : "";
-    card.innerHTML = `<div class="pokemon-release-head"><time>${finalFantasyDateLabel(release)}</time><span class="pokemon-release-tag" title="${release.category}">${release.category}</span></div>
-      <div class="pokemon-release-title"><strong title="${release.name}">${release.name}</strong><p>${release.chineseName}</p>${cardLineage}</div>
+    const displayTag = finalFantasyDisplayTag(release);
+    card.innerHTML = `<div class="pokemon-release-head"><time>${finalFantasyDateLabel(release)}</time><span class="pokemon-release-tag" title="${displayTag}">${displayTag}</span></div>
+      <div class="pokemon-release-title"><strong title="${release.name}">${release.name}</strong><p title="${release.chineseName}">${release.chineseName}</p>${cardLineage}</div>
       <div class="pokemon-release-foot"><small>${platformTotal} 个平台</small></div>`;
     appendFinalFantasyReleaseArtwork(card, release);
     const toggleRelease = () => {
@@ -1639,6 +1709,9 @@ function bindTabs(buttonSelector, panelAttribute) {
   const buttons = [...document.querySelectorAll(buttonSelector)];
   buttons.forEach((button) => {
     button.addEventListener("click", () => {
+      gmImageManagerOpen = false;
+      const managerPanel = document.querySelector("#image-manager-panel");
+      if (managerPanel) managerPanel.hidden = true;
       activateTab(buttons, panelAttribute, button);
       saveArchiveLocation();
     });
@@ -1657,9 +1730,9 @@ function activateTab(buttons, panelAttribute, button) {
 }
 
 function currentArchiveLocation() {
+  if (gmImageManagerOpen) return "gm-images";
   const activeLibrary = document.querySelector("[data-library-tab].active")?.dataset.libraryTab;
   if (activeLibrary === "console-library-panel") return "console";
-  if (activeLibrary === "image-manager-panel") return "image-manager";
 
   const activeSeries = document.querySelector("[data-series-tab].active")?.dataset.seriesTab;
   if (activeSeries === "pokemon-library-panel") return "pokemon";
@@ -1669,10 +1742,24 @@ function currentArchiveLocation() {
 
 function saveArchiveLocation() {
   const location = currentArchiveLocation();
-  history.replaceState(null, "", `${window.location.pathname}${window.location.search}#${location}`);
+  const url = new URL(window.location.href);
+  url.searchParams.delete("gm");
+  history.replaceState(null, "", `${url.pathname}${url.search}#${location}`);
 }
 
 function restoreArchiveLocation(libraryTabs, seriesTabs) {
+  if (new URLSearchParams(window.location.search).get("gm") === "images") {
+    gmImageManagerOpen = true;
+    libraryTabs.forEach((button) => {
+      button.classList.remove("active");
+      button.setAttribute("aria-selected", "false");
+      document.querySelector(`#${button.dataset.libraryTab}`).hidden = true;
+    });
+    const managerPanel = document.querySelector("#image-manager-panel");
+    if (managerPanel) managerPanel.hidden = false;
+    return;
+  }
+
   const location = window.location.hash.slice(1);
   if (location === "pokemon") {
     activateTab(libraryTabs, "libraryTab", libraryTabs.find((button) => button.dataset.libraryTab === "series-library-panel"));
@@ -1691,9 +1778,6 @@ function restoreArchiveLocation(libraryTabs, seriesTabs) {
     activateTab(seriesTabs, "seriesTab", seriesTabs.find((button) => button.dataset.seriesTab === "series-overview-panel"));
   }
 
-  if (location === "image-manager") {
-    activateTab(libraryTabs, "libraryTab", libraryTabs.find((button) => button.dataset.libraryTab === "image-manager-panel"));
-  }
 }
 
 function restoreScrollPosition() {
@@ -1709,6 +1793,9 @@ async function init() {
   if (elements.variantCount) elements.variantCount.textContent = totalVariants();
   const libraryTabs = bindTabs("[data-library-tab]", "libraryTab");
   const seriesTabs = bindTabs("[data-series-tab]", "seriesTab");
+  elements.timelineArtworkDebug?.addEventListener("change", () => {
+    document.body.classList.toggle("show-timeline-artwork-bounds", elements.timelineArtworkDebug.checked);
+  });
   restoreArchiveLocation(libraryTabs, seriesTabs);
   if (timelineImageStore) managedTimelineImages = await timelineImageStore.loadAll();
   render();

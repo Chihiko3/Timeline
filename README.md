@@ -1,5 +1,11 @@
 # GameConsole
 
+## Local GM image service
+
+The hidden GM image manager requires the local service. Double-click
+`start-gm-server.cmd`, keep its command window open, then visit
+`http://127.0.0.1:5173/?gm=images`.
+
 一个本地使用的游戏主机与掌机资料库网站。
 
 打开 `index.html` 即可使用。当前第一版按品牌、年份、硬件类型和代表游戏整理，可搜索主机、品牌和游戏，并能在每台硬件下写本地备注。
