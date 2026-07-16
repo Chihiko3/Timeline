@@ -1,9 +1,9 @@
 $ErrorActionPreference = 'Continue'
 
 $root = Split-Path -Parent $PSScriptRoot
-$dataPath = Join-Path $root 'final-fantasy-releases.js'
-$assetDirectory = Join-Path $root 'assets\final-fantasy-covers'
-$mapPath = Join-Path $root 'final-fantasy-covers.js'
+$dataPath = Join-Path $root 'timelines\final-fantasy\final-fantasy-releases.js'
+$assetDirectory = Join-Path $root 'timelines\final-fantasy\assets\covers'
+$mapPath = Join-Path $root 'timelines\final-fantasy\final-fantasy-covers.js'
 $headers = @{ 'User-Agent' = 'GameArchiveLocal/1.0 (personal archival project)' }
 
 New-Item -ItemType Directory -Path $assetDirectory -Force | Out-Null

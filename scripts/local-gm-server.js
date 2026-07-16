@@ -6,24 +6,48 @@ const { spawn } = require("child_process");
 
 const root = path.resolve(__dirname, "..");
 const port = Number(process.env.PORT || 5173);
-const assetsDirectory = path.join(root, "assets");
-const manifestPath = path.join(root, "timeline-image-overrides.js");
+const timelinesDirectory = path.join(root, "timelines");
+const manifestDefinitions = {
+  hardware: {
+    path: path.join(timelinesDirectory, "hardware", "timeline-images.js"),
+    globalName: "HARDWARE_TIMELINE_IMAGES"
+  },
+  pokemon: {
+    path: path.join(timelinesDirectory, "pokemon", "timeline-images.js"),
+    globalName: "POKEMON_TIMELINE_IMAGES"
+  },
+  "final-fantasy": {
+    path: path.join(timelinesDirectory, "final-fantasy", "timeline-images.js"),
+    globalName: "FINAL_FANTASY_TIMELINE_IMAGES"
+  }
+};
 const mimeTypes = {
   ".css": "text/css; charset=utf-8", ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8",
   ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp", ".gif": "image/gif", ".svg": "image/svg+xml"
 };
 
-function readManifest() {
-  if (!fs.existsSync(manifestPath)) return {};
-  const source = fs.readFileSync(manifestPath, "utf8");
+function collectionFromKey(key) {
+  return key.split(":", 1)[0];
+}
+
+function readManifest(collection) {
+  const definition = manifestDefinitions[collection];
+  if (!definition || !fs.existsSync(definition.path)) return {};
+  const source = fs.readFileSync(definition.path, "utf8");
   const match = source.match(/=\s*([\s\S]*);\s*$/);
   if (!match) return {};
   try { return JSON.parse(match[1]); } catch { return {}; }
 }
 
-function writeManifest(images) {
-  const source = `window.TIMELINE_MANAGED_IMAGES = ${JSON.stringify(images, null, 2)};\n`;
-  fs.writeFileSync(manifestPath, source, "utf8");
+function readAllManifests() {
+  return Object.assign({}, ...Object.keys(manifestDefinitions).map(readManifest));
+}
+
+function writeManifest(collection, images) {
+  const definition = manifestDefinitions[collection];
+  if (!definition) throw new Error("Unsupported timeline collection");
+  const source = `window.${definition.globalName} = ${JSON.stringify(images, null, 2)};\n`;
+  fs.writeFileSync(definition.path, source, "utf8");
 }
 
 function sendJson(response, status, payload) {
@@ -71,11 +95,11 @@ function parseMultipart(buffer, boundary) {
 }
 
 function collectionDirectoryForKey(key) {
-  const collection = key.split(":", 1)[0];
-  if (collection === "hardware") return path.join(assetsDirectory, "consoles");
-  if (collection === "pokemon") return path.join(assetsDirectory, "pokemon-covers");
-  if (collection === "final-fantasy") return path.join(assetsDirectory, "final-fantasy-covers");
-  return path.join(assetsDirectory, `${collection.replace(/[^a-z0-9_-]/gi, "-")}-covers`);
+  const collection = collectionFromKey(key);
+  if (collection === "hardware") return path.join(timelinesDirectory, "hardware", "assets", "consoles");
+  if (collection === "pokemon") return path.join(timelinesDirectory, "pokemon", "assets", "covers");
+  if (collection === "final-fantasy") return path.join(timelinesDirectory, "final-fantasy", "assets", "covers");
+  throw new Error("Unsupported timeline collection");
 }
 
 function indexedFilename(directory, key, extension) {
@@ -93,20 +117,19 @@ function saveUpload(file, key) {
   const extension = path.extname(file.filename).toLowerCase();
   if (!mimeTypes[extension] || extension === ".svg") throw new Error("只支持 PNG、JPG、WEBP 或 GIF 图片");
   const directory = collectionDirectoryForKey(key);
-  if (!directory.startsWith(assetsDirectory)) throw new Error("无效的图片目录");
+  if (!directory.startsWith(timelinesDirectory)) throw new Error("无效的图片目录");
   fs.mkdirSync(directory, { recursive: true });
   const filename = indexedFilename(directory, key, extension);
   fs.writeFileSync(path.join(directory, filename), file.content);
-  return { id: randomUUID(), name: file.filename, src: `assets/${path.relative(assetsDirectory, directory).replaceAll(path.sep, "/")}/${filename}` };
+  return { id: randomUUID(), name: file.filename, src: `${path.relative(root, directory).replaceAll(path.sep, "/")}/${filename}` };
 }
 
 function removeUnreferencedImageFile(image, images) {
-  if (!image?.src?.startsWith("assets/")) return;
+  if (!image?.src?.startsWith("timelines/")) return;
   const stillReferenced = Object.values(images).some((entries) => entries.some((entry) => entry.src === image.src));
   if (stillReferenced) return;
   const target = path.resolve(root, image.src);
-  const assetsRoot = path.join(root, "assets");
-  if (target.startsWith(assetsRoot) && fs.existsSync(target)) fs.unlinkSync(target);
+  if (target.startsWith(timelinesDirectory) && fs.existsSync(target)) fs.unlinkSync(target);
 }
 
 async function handleUpload(request, response) {
@@ -114,7 +137,8 @@ async function handleUpload(request, response) {
   if (!boundary) return sendJson(response, 400, { error: "缺少上传边界" });
   const { fields, files } = parseMultipart(await readBody(request), boundary);
   if (!fields.key || !files.length) return sendJson(response, 400, { error: "缺少图片或卡片标识" });
-  const images = readManifest();
+  const collection = collectionFromKey(fields.key);
+  const images = readManifest(collection);
   const current = images[fields.key] || [];
   const uploaded = files.map((file) => saveUpload(file, fields.key));
   if (fields.replaceId) {
@@ -131,13 +155,14 @@ async function handleUpload(request, response) {
     current.push(...uploaded);
   }
   images[fields.key] = current;
-  writeManifest(images);
+  writeManifest(collection, images);
   sendJson(response, 200, { images });
 }
 
 async function handleJsonMutation(request, response, action) {
   const payload = JSON.parse((await readBody(request)).toString("utf8") || "{}");
-  const images = readManifest();
+  const collection = collectionFromKey(payload.key);
+  const images = readManifest(collection);
   const current = images[payload.key] || [];
   if (action === "remove") {
     const removed = current.find((image) => image.id === payload.imageId);
@@ -155,13 +180,13 @@ async function handleJsonMutation(request, response, action) {
     delete images[payload.key];
     current.forEach((image) => removeUnreferencedImageFile(image, images));
   }
-  writeManifest(images);
+  writeManifest(collection, images);
   sendJson(response, 200, { images });
 }
 
 function openAssetsFolder(response) {
   // This server only binds to localhost and deliberately exposes no path input.
-  const explorer = spawn("explorer.exe", [assetsDirectory], { detached: true, stdio: "ignore" });
+  const explorer = spawn("explorer.exe", [timelinesDirectory], { detached: true, stdio: "ignore" });
   explorer.unref();
   sendJson(response, 200, { opened: true });
 }
@@ -179,7 +204,7 @@ function serveStatic(request, response) {
 
 http.createServer(async (request, response) => {
   try {
-    if (request.method === "GET" && request.url === "/api/timeline-images") return sendJson(response, 200, { images: readManifest() });
+    if (request.method === "GET" && request.url === "/api/timeline-images") return sendJson(response, 200, { images: readAllManifests() });
     if (request.method === "POST" && request.url === "/api/timeline-images/upload") return handleUpload(request, response);
     if (request.method === "POST" && request.url === "/api/timeline-images/remove") return handleJsonMutation(request, response, "remove");
     if (request.method === "POST" && request.url === "/api/timeline-images/move") return handleJsonMutation(request, response, "move");

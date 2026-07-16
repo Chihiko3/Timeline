@@ -3,10 +3,10 @@ const path = require("path");
 const vm = require("vm");
 
 const root = path.resolve(__dirname, "..");
-const dataPath = path.join(root, "data.js");
-const imageSourcesPath = path.join(root, "image-sources.js");
-const outputDir = path.join(root, "assets", "consoles");
-const imagesPath = path.join(root, "images.js");
+const dataPath = path.join(root, "timelines", "hardware", "data.js");
+const imageSourcesPath = path.join(root, "timelines", "hardware", "image-sources.js");
+const outputDir = path.join(root, "timelines", "hardware", "assets", "consoles");
+const imagesPath = path.join(root, "timelines", "hardware", "images.js");
 const wikiApi = "https://en.wikipedia.org/w/api.php";
 
 const context = { window: {} };
@@ -166,7 +166,7 @@ async function downloadImage(platform) {
   return [
     id,
     {
-      src: `assets/consoles/${filename}`,
+      src: `timelines/hardware/assets/consoles/${filename}`,
       page: found.page,
       title: found.title
     }

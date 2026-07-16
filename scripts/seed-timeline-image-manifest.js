@@ -21,36 +21,41 @@ const normalize = (raw, directory, key) => {
     .map(([filename, name], index) => ({ id: id(key, index), name, src: `${directory}/${filename}` }));
 };
 
-const archive = runDataFile("data.js").CONSOLE_ARCHIVE;
-const pokemon = runDataFile("pokemon-releases.js").POKEMON_CORE_RELEASES;
-const finalFantasy = runDataFile("final-fantasy-releases.js").FINAL_FANTASY_RELEASES;
-const covers = runDataFile("final-fantasy-covers.js").FINAL_FANTASY_RELEASE_COVERS;
-const logos = runDataFile("final-fantasy-logos.js").FINAL_FANTASY_RELEASE_LOGOS;
-const appSource = fs.readFileSync(path.join(root, "app.js"), "utf8");
+const archive = runDataFile("timelines/hardware/data.js").CONSOLE_ARCHIVE;
+const pokemon = runDataFile("timelines/pokemon/releases.js").POKEMON_CORE_RELEASES;
+const finalFantasy = runDataFile("timelines/final-fantasy/final-fantasy-releases.js").FINAL_FANTASY_RELEASES;
+const covers = runDataFile("timelines/final-fantasy/final-fantasy-covers.js").FINAL_FANTASY_RELEASE_COVERS;
+const logos = runDataFile("timelines/final-fantasy/final-fantasy-logos.js").FINAL_FANTASY_RELEASE_LOGOS;
+const appSource = fs.readFileSync(path.join(root, "common/app.js"), "utf8");
 const pokemonCovers = extractObject(appSource, "POKEMON_RELEASE_COVERS", "POKEMON_RELEASE_DAYS");
-const manifest = {};
+const hardwareManifest = {};
+const pokemonManifest = {};
+const finalFantasyManifest = {};
 
 archive.forEach((brand) => brand.platforms.forEach((platform) => {
   const key = `hardware:${`${brand.brand}-${platform.name}-${platform.year}`.replace(/[^a-z0-9]+/gi, "-")}`;
-  manifest[key] = [];
+  hardwareManifest[key] = [];
 }));
 pokemon.forEach((release) => {
   const key = `pokemon:${release.id}`;
-  manifest[key] = normalize(pokemonCovers[release.id], "assets/pokemon-covers", key);
+  pokemonManifest[key] = normalize(pokemonCovers[release.id], "timelines/pokemon/assets/covers", key);
 });
 finalFantasy.forEach((release) => {
   const key = `final-fantasy:${release.id}`;
   const hasLogo = Boolean(logos[release.id]?.length);
-  manifest[key] = normalize(
+  finalFantasyManifest[key] = normalize(
     hasLogo ? logos[release.id] : covers[release.id],
-    "assets/final-fantasy-covers",
+    "timelines/final-fantasy/assets/covers",
     key
   );
 });
 
-fs.writeFileSync(
-  path.join(root, "timeline-image-overrides.js"),
-  `window.TIMELINE_MANAGED_IMAGES = ${JSON.stringify(manifest, null, 2)};\n`,
+const writeManifest = (file, globalName, manifest) => fs.writeFileSync(
+  path.join(root, file),
+  `window.${globalName} = ${JSON.stringify(manifest, null, 2)};\n`,
   "utf8"
 );
-console.log(`Seeded ${Object.keys(manifest).length} timeline image records.`);
+writeManifest("timelines/hardware/timeline-images.js", "HARDWARE_TIMELINE_IMAGES", hardwareManifest);
+writeManifest("timelines/pokemon/timeline-images.js", "POKEMON_TIMELINE_IMAGES", pokemonManifest);
+writeManifest("timelines/final-fantasy/timeline-images.js", "FINAL_FANTASY_TIMELINE_IMAGES", finalFantasyManifest);
+console.log(`Seeded ${Object.keys(hardwareManifest).length + Object.keys(pokemonManifest).length + Object.keys(finalFantasyManifest).length} timeline image records.`);

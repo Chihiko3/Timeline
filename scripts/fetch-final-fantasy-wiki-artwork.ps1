@@ -4,9 +4,9 @@ $ErrorActionPreference = 'Continue'
 # timeline card. The image becomes a managed asset immediately, so the GM panel
 # remains the single source of truth for ordering and future replacement.
 $root = Split-Path -Parent $PSScriptRoot
-$dataPath = Join-Path $root 'final-fantasy-releases.js'
-$manifestPath = Join-Path $root 'timeline-image-overrides.js'
-$assetRoot = Join-Path $root 'assets\final-fantasy-covers'
+$dataPath = Join-Path $root 'timelines\final-fantasy\final-fantasy-releases.js'
+$manifestPath = Join-Path $root 'timelines\final-fantasy\timeline-images.js'
+$assetRoot = Join-Path $root 'timelines\final-fantasy\assets\covers'
 $headers = @{ 'User-Agent' = 'GameArchiveLocal/1.0 (personal archival project)' }
 $api = 'https://finalfantasywiki.com/w/api.php'
 
@@ -27,7 +27,7 @@ function Read-Manifest {
 function Write-Manifest($manifest) {
   if (-not $manifest) { throw 'Image manifest could not be read; refusing to overwrite it.' }
   $json = $manifest | ConvertTo-Json -Depth 8
-  "window.TIMELINE_MANAGED_IMAGES = $json;`n" | Set-Content -LiteralPath $manifestPath -Encoding utf8
+  "window.FINAL_FANTASY_TIMELINE_IMAGES = $json;`n" | Set-Content -LiteralPath $manifestPath -Encoding utf8
 }
 
 function Get-ImageInfo($fileTitle) {
@@ -100,7 +100,7 @@ foreach ($match in $matches) {
     $manifest[$key] = @(@{
       id = "wiki-final-fantasy-$id"
       name = "$name - Final Fantasy Wiki"
-      src = "assets/final-fantasy-covers/$filename"
+      src = "timelines/final-fantasy/assets/covers/$filename"
     })
     $added.Add($id)
   } catch {

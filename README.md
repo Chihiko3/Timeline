@@ -1,28 +1,100 @@
-# GameConsole
+# Game Archive
 
-## Local GM image service
+一个面向个人长期维护的本地游戏资料库。当前网站以统一的纵向时间线整理游戏硬件与游戏系列，重点是方便查阅、补充和管理资料，而不是面向公开用户的内容平台。
 
-The hidden GM image manager requires the local service. Double-click
-`start-gm-server.cmd`, keep its command window open, then visit
-`http://127.0.0.1:5173/?gm=images`.
+## 当前内容
 
-一个本地使用的游戏主机与掌机资料库网站。
+### 游戏主机资料库
 
-打开 `index.html` 即可使用。当前第一版按品牌、年份、硬件类型和代表游戏整理，可搜索主机、品牌和游戏，并能在每台硬件下写本地备注。
+- 按最早公开发售时间排列游戏主机、掌机、混合机与 PC 掌机。
+- 收录厂商、硬件型号、改版、代表性首发游戏与特色高讨论游戏。
+- 点击时间线一级卡片可查看型号/改版、护航作与代表作等补充资料。
 
-页面会优先使用 `assets/consoles` 里的本地图片；如果本地图片不存在，会尝试从 Wikipedia 自动匹配缩略图，并把匹配结果缓存在本机浏览器里。没有网络或没匹配到时会显示本地占位图。
+### 游戏系列资料库
 
-图片匹配优先使用 `image-sources.js` 里为每台主机指定的精确 Wikipedia 页面，避免不同主机共用同一张系列图。
+- **Pokemon**：官方作品与代表性同人/ROM 改版，包含首发及后续登陆平台、御三家、重制/改版关系和封面图。
+- **Final Fantasy**：不含跨界作品的最终幻想相关作品，包含正传、续作、战略版、水晶编年史、陆行鸟等分支，以及首发及后续登陆平台和封面/Logo 图。
 
-如需批量保存图片到本地，可运行：
+所有时间线的一级卡片遵循同一套规则：左上角日期、右上角分类标签、标题、副标题、补充文本、二级菜单提示，以及可选的右下角图片区域。不同时间线的二级、三级详情内容可以不同。
 
-```powershell
-node scripts/download-images.js
+## 项目结构
+
+```text
+GameConsole/
+  index.html                         网站入口
+  common/                            所有时间线共用的逻辑与样式
+    app.js                            页面框架、统一时间线排布、卡片交互
+    styles.css                        统一视觉样式、尺寸、间距和响应式规则
+    timeline-image-store.js           GM 图片管理接口
+  timelines/
+    hardware/                         游戏主机时间线
+      data.js                         硬件与厂商资料
+      platform-variants.js            型号、改版、扩展与衍生硬件
+      curated-games.js                护航/主推与特色/高讨论游戏
+      game-localizations.js           游戏中文名资料
+      timeline-images.js              主机卡片图片清单
+      assets/consoles/                主机图片
+    pokemon/                          Pokemon 时间线
+      releases.js                     版本、发售日期与平台资料
+      timeline-images.js              卡片封面清单
+      assets/covers/                  游戏封面
+      assets/sprites/                 御三家像素图
+    final-fantasy/                    Final Fantasy 时间线
+      final-fantasy-releases.js       作品、发售日期与平台资料
+      final-fantasy-covers.js         采集到的封面映射
+      final-fantasy-logos.js          采集到的 Logo 映射
+      timeline-images.js              卡片图片清单
+      assets/covers/                  封面与 Logo 文件
+  scripts/                            本地服务、资源采集与维护脚本
+  start-gm-server.cmd                 启动本地 GM 图片管理服务
 ```
 
-游戏资料现在分成两类：`护航 / 早期主推` 和 `特色 / 高讨论`。这部分内容维护在 `curated-games.js`，方便按策划视角继续调整。
+每条时间线都拥有自己的数据、图片清单和资源目录；不要再把某条时间线的资源放到其他时间线目录或根目录。通用的页面结构、时间线尺寸和交互逻辑只放在 `common/`。
 
-硬件资料现在分成两层：`data.js` 记录平台世代，`platform-variants.js` 记录每个平台下的型号、改版、扩展和衍生机。页面搜索会同时覆盖平台名、型号名和游戏名。
+## 日常使用
 
-时间线按品牌分组显示；每个品牌下按年份排列平台，平台下面的同谱系型号默认收起，可展开查看。
-Console collection
+### 浏览资料库
+
+直接打开 `index.html` 即可浏览本地资料库。若需要使用 GM 图片管理、上传图片或删除图片，请使用下面的本地服务方式打开。
+
+### 使用 GM 图片管理
+
+1. 双击 `start-gm-server.cmd`。
+2. 保持弹出的命令窗口运行。
+3. 在浏览器打开 `http://127.0.0.1:5173/?gm=images`。
+4. 在 GM 页面选择对应时间线和卡片，添加、替换、排序或删除图片。
+
+GM 图片管理仅供本地维护使用。上传的图片会被复制到对应时间线的 `assets` 目录；删除图片会同时删除清单记录和未被其他卡片引用的本地文件。
+
+## 图片规则
+
+- 时间线图片的唯一清单是各时间线目录下的 `timeline-images.js`。
+- 一张卡片配置一张图时，卡片只展示该图；配置多张图时，卡片支持循环切换，悬浮时展示全部图片。
+- 图片应放在所属时间线的资源目录中：主机放入 `hardware/assets/consoles`，Pokemon 放入 `pokemon/assets/covers`，Final Fantasy 放入 `final-fantasy/assets/covers`。
+- 新增或调整图片优先使用 GM 图片管理工具，避免手动改清单与文件路径产生不一致。
+
+## 资料维护约定
+
+- 时间线日期使用作品或硬件在全球范围内**最早公开发售**的日期；若日期无法可靠确认，可按资料需要只显示到年月。
+- 一级卡片是全站统一组件。涉及一级卡片的尺寸、字体、间距、图片区域、悬浮和展开逻辑的修改，应同步考虑所有时间线。
+- 二级、三级卡片为具体时间线的详情层，可根据资料类型单独设计。
+- 分类标签用于帮助识别作品归属和类型。例如 Final Fantasy 使用“正传 · RPG”“战略版 · 战棋”“水晶编年史 · 动作冒险”等格式。
+- 游戏与硬件资料可从官方资料、可靠 Wiki、模拟器资料站、游戏数据库等来源交叉验证后补充。
+
+## 维护脚本
+
+`scripts/` 中的脚本用于批量采集与维护。常用脚本包括：
+
+- `local-gm-server.js`：GM 图片管理服务。
+- `download-images.js`：下载主机图片。
+- `fetch-game-localizations.js` / `.ps1`：补充硬件代表游戏的中文名。
+- `fetch-final-fantasy-covers.ps1`：补充 Final Fantasy 封面。
+- `fetch-final-fantasy-logos.ps1`：补充 Final Fantasy 横向 Logo。
+- `fetch-final-fantasy-wiki-artwork.ps1`：从 Final Fantasy Wiki 补充可供 GM 筛选的图片。
+- `seed-timeline-image-manifest.js`：根据现有资源重建三个时间线的图片清单。该脚本会重写清单，通常只在明确需要重建时使用。
+
+## 新增时间线
+
+新增一个游戏系列或产品线时，应先建立 `timelines/<timeline-id>/`，并至少包含作品/产品数据文件、`timeline-images.js` 和 `assets/`。随后在 `index.html` 注册数据脚本与页面页签，并在 `common/app.js` 中接入该时间线特有的二级、三级详情内容。
+
+一级卡片仍应复用 `common` 的统一时间线样式和布局逻辑。这样可以保证后续增加更多资料库时，页面仍像同一个网站，而不是多个独立页面的拼接。

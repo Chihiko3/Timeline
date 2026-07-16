@@ -4,7 +4,7 @@ const path = require("path");
 
 const root = path.resolve(__dirname, "..");
 global.window = {};
-require(path.join(root, "curated-games.js"));
+require(path.join(root, "timelines", "hardware", "curated-games.js"));
 
 const curatedGames = global.window.CONSOLE_CURATED_GAMES || {};
 const gameNames = [
@@ -84,7 +84,7 @@ async function main() {
   }
 
   const output = `window.CONSOLE_GAME_LOCALIZATIONS = ${JSON.stringify(localizations, null, 2)};\n`;
-  fs.writeFileSync(path.join(root, "game-localizations.js"), output, "utf8");
+  fs.writeFileSync(path.join(root, "timelines", "hardware", "game-localizations.js"), output, "utf8");
   const chineseCount = Object.values(localizations).filter((entry) => entry.url.startsWith("https://zh.wikipedia.org/")).length;
   console.log(`Wrote ${Object.keys(localizations).length} links (${chineseCount} Chinese Wikipedia entries).`);
 }

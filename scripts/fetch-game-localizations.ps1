@@ -4,7 +4,7 @@ $root = Split-Path -Parent $PSScriptRoot
 $node = 'C:\Users\LiuMa\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe'
 $namesScript = @"
 global.window={};
-require('./curated-games.js');
+require('./timelines/hardware/curated-games.js');
 const names=[...new Set(Object.values(window.CONSOLE_CURATED_GAMES).flatMap(x=>[...(x.launchGames||[]),...(x.signatureGames||[])]))].sort((a,b)=>a.localeCompare(b,'en'));
 process.stdout.write(JSON.stringify(names));
 "@
@@ -93,6 +93,6 @@ foreach ($game in $gameNames) {
 
 $json = $localizations | ConvertTo-Json -Depth 5
 $output = "window.CONSOLE_GAME_LOCALIZATIONS = $json;`n"
-[System.IO.File]::WriteAllText((Join-Path $root 'game-localizations.js'), $output, [System.Text.UTF8Encoding]::new($false))
+[System.IO.File]::WriteAllText((Join-Path $root 'timelines\hardware\game-localizations.js'), $output, [System.Text.UTF8Encoding]::new($false))
 $chineseCount = @($localizations.Values | Where-Object { $_.chineseTitle }).Count
 Write-Output "Wrote $($localizations.Count) verified game links ($chineseCount Chinese names)."

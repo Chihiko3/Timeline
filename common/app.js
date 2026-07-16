@@ -1014,7 +1014,6 @@ function appendReleaseArtwork(card, release, coverMap, assetDirectory, artworkKe
     const [filename, label] = artworks[artworkIndex];
     image.src = resolveArtworkSource(filename, assetDirectory);
     image.alt = label;
-    image.title = label;
     pokemonArtworkIndices.set(artworkKey, artworkIndex);
   };
 
@@ -1480,7 +1479,7 @@ function createPokemonStartersPanel(release) {
     const sprite = document.createElement("img");
     sprite.className = "pokemon-starter-sprite";
     const spriteId = POKEMON_SPRITE_IDS[englishName];
-    sprite.src = spriteId ? `assets/pokemon-sprites/${spriteId}.png` : "";
+    sprite.src = spriteId ? `timelines/pokemon/assets/sprites/${spriteId}.png` : "";
     sprite.alt = `${englishName} 像素图`;
     sprite.loading = "lazy";
     item.append(names);
