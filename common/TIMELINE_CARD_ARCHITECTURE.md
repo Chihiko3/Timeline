@@ -10,28 +10,39 @@ Answers: when did it appear, what is it, and where does it belong?
 Required structure: date, category tag, title, subtitle, short lineage note,
 and a concise hint about the next level. Artwork is optional.
 
-## Level 2: Snapshot Card
+## Level 2: Series Reading Card
 
-Answers: what is the most important thing to remember in 30 seconds?
+Answers: how should a player or developer understand this entry within its
+series?
 
-Show a small number of high-signal fields: positioning in the series, core
-experience or hardware proposition, relationship to adjacent entries, and the
-most meaningful change.
+Show these categories in a compact, high-signal form: series positioning, core
+experience and player motivation, changes from adjacent entries, long-term
+effect on the series, broader industry/cultural impact, and research guidance.
+Do not treat this level as an encyclopedia summary.
 
-## Level 3: Record Card
+## Level 3: Detail Cards
 
-Answers: how did it work and how did it reach players?
+Answers: what detailed information supports the interpretation?
 
-Show structured evidence such as platforms, model/version history, signature
-content, starters, system changes, or ecosystem information.
+Use separate compact cards as appropriate. For game timelines, the default
+cards are `剧情解读` and `客观记录`.
 
-## Level 4: Research Card
+`剧情解读` always includes a plot summary. RPGs and narrative-heavy games may
+use a longer summary; gameplay-led entries remain concise. Add `叙事创新` only
+when the work has a meaningful innovation in story structure, subject matter,
+or narrative delivery.
 
-Answers: what should be studied further and why?
+`客观记录` contains structured facts such as first and later platforms,
+version/model history, release-specific changes, and other comparable records.
+Keep labels compact and preserve the full value in a hover tip when a row must
+truncate.
 
-Show planning observations, long-term inheritance, notable trade-offs, source
-links, and deeper development or market research. It is optional when no
-reliable research note exists; do not fill it with generic encyclopedia text.
+## Level 4: Timeline-Specific Supplement Card
+
+Answers: what compact information matters uniquely to this timeline?
+
+Use this only for a timeline-specific extra, such as Pokemon starters. It is
+optional; do not create one merely to make every timeline have four levels.
 
 ## Data Rule
 

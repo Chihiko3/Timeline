@@ -20,6 +20,16 @@ const pokemonReleases = window.POKEMON_CORE_RELEASES || [];
 const finalFantasyReleases = window.FINAL_FANTASY_RELEASES || [];
 const pokemonReleaseInsights = window.POKEMON_RELEASE_INSIGHTS || {};
 const finalFantasyReleaseInsights = window.FINAL_FANTASY_RELEASE_INSIGHTS || {};
+const pokemonEditorialReading = window.POKEMON_EDITORIAL_READING || {};
+const finalFantasyEditorialReading = window.FINAL_FANTASY_EDITORIAL_READING || {};
+const pokemonSeriesImpact = window.POKEMON_SERIES_IMPACT || {};
+const finalFantasySeriesImpact = window.FINAL_FANTASY_SERIES_IMPACT || {};
+const pokemonDesignLogic = window.POKEMON_DESIGN_LOGIC || {};
+const finalFantasyDesignLogic = window.FINAL_FANTASY_DESIGN_LOGIC || {};
+const pokemonExternalImpactResearch = window.POKEMON_EXTERNAL_IMPACT_RESEARCH || {};
+const finalFantasyExternalImpactResearch = window.FINAL_FANTASY_EXTERNAL_IMPACT_RESEARCH || {};
+const pokemonPlotSummaries = window.POKEMON_PLOT_SUMMARIES || {};
+const finalFantasyPlotSummaries = window.FINAL_FANTASY_PLOT_SUMMARIES || {};
 const finalFantasyCovers = window.FINAL_FANTASY_RELEASE_COVERS || {};
 const finalFantasyLogos = window.FINAL_FANTASY_RELEASE_LOGOS || {};
 const timelineImageStore = window.timelineImageStore;
@@ -95,13 +105,6 @@ const POKEMON_RELEASE_COVERS = {
   "legends-arceus": [["legends-arceus.png", "Pokémon Legends: Arceus"]],
   "scarlet-violet": [["scarlet.png", "Pokémon Scarlet"], ["violet.png", "Pokémon Violet"]],
   "legends-za": [["legends-za.png", "Pokémon Legends: Z-A"]]
-};
-const POKEMON_RELEASE_DAYS = {
-  "red-green-blue": 27, yellow: 12, "gold-silver": 21, crystal: 14, "ruby-sapphire": 21,
-  "firered-leafgreen": 29, emerald: 16, "diamond-pearl": 28, platinum: 13, "heartgold-soulsilver": 12,
-  "black-white": 18, "black2-white2": 23, "x-y": 12, oras: 21, "sun-moon": 18,
-  "ultra-sun-moon": 17, "lets-go": 16, "sword-shield": 15, bdsp: 19, "legends-arceus": 28,
-  "scarlet-violet": 18, "legends-za": 16, uranium: 6, "black-shadow": 24, prism: 25
 };
 const BRAND_COLORS = [
   "#3268b8",
@@ -971,11 +974,19 @@ function render() {
 }
 
 function pokemonPlatformCard(entry) {
-  const displayPlatform = platformDisplayName(entry.platform);
+  const { platform, change } = platformRecordDisplay(entry.platform);
+  const displayPlatform = change ? `${platform} · ${change}` : platform;
   return `<article class="pokemon-platform-card">
     <strong>${entry.year}</strong>
     <p title="${entry.platform}">${displayPlatform}</p>
   </article>`;
+}
+
+function platformRecordDisplay(platform) {
+  const match = platform.match(/^(.*?)(?:（([^）]+)）|\(([^)]+)\))$/);
+  const name = match ? match[1].trim() : platform;
+  const change = match?.[2] || match?.[3] || "";
+  return { platform: platformDisplayName(name), change };
 }
 
 function platformDisplayName(platform) {
@@ -1005,13 +1016,22 @@ function informationCard(level, title, fields, extra = null) {
   card.className = `timeline-information-card timeline-information-card-level-${level}`;
   const fieldMarkup = fields.map(({ label, value }) => `
     <div class="timeline-information-field"><span>${label}</span><p>${value}</p></div>`).join("");
-  card.innerHTML = `<header><h3>${title}</h3></header><div class="timeline-information-fields">${fieldMarkup}</div>`;
+  const headingMarkup = title ? `<header><h3>${title}</h3></header>` : "";
+  card.innerHTML = `${headingMarkup}<div class="timeline-information-fields">${fieldMarkup}</div>`;
   if (extra) card.append(extra);
   return card;
 }
 
+function plotSummaryCard(plot) {
+  const fields = [{ label: "剧情概要", value: plot.summary }];
+  if (plot.innovation) fields.push({ label: "叙事创新", value: plot.innovation });
+  return informationCard(3, "剧情解读", fields);
+}
+
 function pokemonInsightFor(release) {
   const insight = pokemonReleaseInsights[release.id] || {};
+  const editorial = pokemonEditorialReading[release.id] || {};
+  const externalImpact = pokemonExternalImpactResearch[release.id];
   const relation = release.remakeOf
     ? `重制自 ${pokemonSubtitle(release.remakeOf.chineseName)}`
     : release.modOf
@@ -1021,35 +1041,27 @@ function pokemonInsightFor(release) {
         : release.generation;
   return {
     position: insight.position || relation,
-    loop: insight.loop || (release.official === false ? "基于宝可梦框架的探索、培养与对战" : "捕捉、队伍培养、回合制对战与地区探索"),
-    change: insight.change || (release.remakeOf ? "以当代系统重构原作体验" : release.modOf ? "在原作框架上扩展内容和挑战" : "补充该世代的版本内容与游玩差异"),
-    legacy: insight.legacy || "作为该阶段的系列条目，适合结合前后作品继续比较。",
-    note: insight.note || "后续补充可靠的开发、市场或玩家社群资料。"
+    loop: editorial.loop || null,
+    change: editorial.change || null,
+    designLogic: pokemonDesignLogic[release.id] || null,
+    legacy: pokemonSeriesImpact[release.id] || null,
+    industryImpact: externalImpact?.status === "verified" ? externalImpact.summary : null,
+    note: editorial.note || null
   };
 }
 
 function finalFantasyInsightFor(release) {
   const insight = finalFantasyReleaseInsights[release.id] || {};
-  const [, genre = "RPG"] = (FINAL_FANTASY_DISPLAY_TAGS[release.id] || [release.category, "RPG"]);
-  const loopByGenre = {
-    "RPG": "队伍养成、剧情推进、探索与战斗",
-    "动作 RPG": "实时战斗、成长构筑、探索与剧情推进",
-    "动作冒险": "场景探索、即时动作与叙事事件",
-    "战棋": "职业构筑、地图策略与回合制战术",
-    "MMO": "职业协作、持续任务、团队副本与长期运营",
-    "赛车": "角色能力、赛道竞速与道具对抗",
-    "迷宫探索": "随机迷宫、资源管理与重复挑战",
-    "卡牌": "卡组构筑、收集与规则对战",
-    "战略 RPG": "队伍编成、战术推进与地图管理",
-    "城市建设": "资源管理、城镇建设与任务循环",
-    "塔防": "单位部署、路线防守与资源决策"
-  };
+  const editorial = finalFantasyEditorialReading[release.id] || {};
+  const externalImpact = finalFantasyExternalImpactResearch[release.id];
   return {
     position: finalFantasyDisplayTag(release),
-    loop: loopByGenre[genre] || "围绕该分支定位组织的冒险与成长体验",
-    change: insight.change || release.lineage || `以 ${genre} 形式扩展 Final Fantasy 品牌与世界观。`,
-    legacy: insight.legacy || `适合与同一 ${release.category} 分支的前后作品比较。`,
-    note: insight.note || "后续补充可靠的开发、市场和玩家社群研究资料。"
+    loop: editorial.loop || null,
+    change: editorial.change || null,
+    designLogic: finalFantasyDesignLogic[release.id] || null,
+    legacy: finalFantasySeriesImpact[release.id] || null,
+    industryImpact: externalImpact?.status === "verified" ? externalImpact.summary : null,
+    note: editorial.note || null
   };
 }
 
@@ -1062,7 +1074,14 @@ function platformRecordCard(release, extra = null) {
   record.innerHTML = `<div class="pokemon-platform-group"><h4>首次登陆</h4><div class="pokemon-platform-list">${first}</div></div>
     <div class="pokemon-platform-group"><h4>后续登陆</h4><div class="pokemon-platform-list">${later}</div></div>`;
   if (extra) record.append(extra);
-  return informationCard(3, "资料记录", [], record);
+  return informationCard(3, "", [], record);
+}
+
+function releasePlatformCount(release) {
+  return [...release.first, ...release.later].reduce((total, entry) => {
+    const platformNames = entry.platform.replace(/（.*?）/g, "").split(/\s*\/\s*/).filter(Boolean);
+    return total + platformNames.length;
+  }, 0);
 }
 
 function appendFinalFantasyReleaseArtwork(card, release) {
@@ -1476,7 +1495,7 @@ function renderPokemonTimeline() {
     const releaseLabel = release.official === false
       ? `${release.workType || "同人作品"}・${release.creator || "未知制作者"}`
       : release.generation;
-    const platformTotal = release.first.length + release.later.length;
+    const platformTotal = releasePlatformCount(release);
     const cardLineage = release.remakeOf
       ? `<span class="pokemon-card-lineage">重制：${pokemonSubtitle(release.remakeOf.chineseName)}</span>`
       : release.modOf
@@ -1504,17 +1523,21 @@ function renderPokemonTimeline() {
       const detail = document.createElement("section");
       detail.className = "pokemon-release-detail timeline-information-stack";
       const insight = pokemonInsightFor(release);
-      const snapshot = informationCard(2, "作品快照", [
-        { label: "系列定位", value: insight.position },
-        { label: "核心体验", value: insight.loop },
-        { label: "本作变化", value: insight.change }
-      ]);
-      const record = platformRecordCard(release, createPokemonStartersPanel(release));
-      const research = informationCard(4, "策划观察", [
-        { label: "长期影响", value: insight.legacy },
-        { label: "研究线索", value: insight.note }
-      ]);
-      detail.append(snapshot, record, research);
+      const snapshotFields = [
+        ...(insight.loop ? [{ label: "核心体验", value: insight.loop }] : []),
+        ...(insight.change ? [{ label: "本作变化", value: insight.change }] : []),
+        ...(insight.designLogic ? [{ label: "机制逻辑", value: insight.designLogic }] : []),
+        ...(insight.legacy ? [{ label: "系列影响", value: insight.legacy }] : []),
+        ...(insight.industryImpact ? [{ label: "行业影响", value: insight.industryImpact }] : []),
+        ...(insight.note ? [{ label: "研究线索", value: insight.note }] : [])
+      ];
+      const snapshot = informationCard(2, "系列解读", snapshotFields);
+      const plot = plotSummaryCard(pokemonPlotSummaries[release.id] || {
+        summary: "当前版本尚未整理该作品的剧情概要。"
+      });
+      const record = platformRecordCard(release);
+      const supplement = informationCard(4, "补充信息", [], createPokemonStartersPanel(release));
+      detail.append(snapshot, plot, record, supplement);
       flyout.append(detail);
       stack.append(flyout);
     }
@@ -1573,15 +1596,15 @@ function createPokemonStartersPanel(release) {
   return panel;
 }
 
-function pokemonReleaseMonthIndex(release) {
-  const [year, month = "1"] = release.date.split(".");
-  return Number(year) * 12 + Number(month);
+function releaseTimeIndex(release) {
+  const [year, month = 1, day = 1] = release.date.split(".").map(Number);
+  const utcDay = Date.UTC(year, month - 1, day) / 86400000;
+  return utcDay / (365.2425 / 12);
 }
 
 function pokemonReleaseDateLabel(release) {
-  const [year, month = "--", day] = release.date.split(".");
-  const resolvedDay = day || POKEMON_RELEASE_DAYS[release.id];
-  return `${year}.${month}.${resolvedDay ? String(resolvedDay).padStart(2, "0") : "--"}`;
+  const [year, month = "--", day = "--"] = release.date.split(".");
+  return `${year}.${month}.${day}`;
 }
 
 function layoutPokemonReleases(releases, reserveDetailSpace) {
@@ -1596,14 +1619,14 @@ function layoutPokemonReleases(releases, reserveDetailSpace) {
   let maxBottom = 0;
 
   releases.forEach((release) => {
-    const releaseIndex = pokemonReleaseMonthIndex(release);
+    const releaseIndex = releaseTimeIndex(release);
     const line = release.official === false ? "fan" : "official";
     const priorOnLine = lastByLine.get(line);
     let side;
 
-    if (priorOnLine && Math.abs(releaseIndex - pokemonReleaseMonthIndex(priorOnLine)) <= 18) {
+    if (priorOnLine && Math.abs(releaseIndex - releaseTimeIndex(priorOnLine)) <= 18) {
       side = items.get(priorOnLine.id).side;
-    } else if (previous && Math.abs(releaseIndex - pokemonReleaseMonthIndex(previous)) <= 18) {
+    } else if (previous && Math.abs(releaseIndex - releaseTimeIndex(previous)) <= 18) {
       side = previous.official === release.official ? items.get(previous.id).side : oppositeSide(items.get(previous.id).side);
     } else if (priorOnLine) {
       side = oppositeSide(items.get(priorOnLine.id).side);
@@ -1688,7 +1711,7 @@ function renderFinalFantasyTimeline() {
     card.tabIndex = 0;
     card.setAttribute("role", "button");
     card.setAttribute("aria-expanded", String(selectedFinalFantasyReleaseId === release.id));
-    const platformTotal = release.first.length + release.later.length;
+    const platformTotal = releasePlatformCount(release);
     const cardLineage = release.lineage
       ? `<span class="final-fantasy-card-lineage" title="${release.lineage}">${release.lineage}</span>`
       : "";
@@ -1715,20 +1738,23 @@ function renderFinalFantasyTimeline() {
       const detail = document.createElement("section");
       detail.className = "pokemon-release-detail timeline-information-stack";
       const insight = finalFantasyInsightFor(release);
-      const snapshot = informationCard(2, "作品快照", [
-        { label: "系列定位", value: insight.position },
-        { label: "核心体验", value: insight.loop },
-        { label: "本作变化", value: insight.change }
-      ]);
+      const snapshotFields = [
+        ...(insight.loop ? [{ label: "核心体验", value: insight.loop }] : []),
+        ...(insight.change ? [{ label: "本作变化", value: insight.change }] : []),
+        ...(insight.designLogic ? [{ label: "机制逻辑", value: insight.designLogic }] : []),
+        ...(insight.legacy ? [{ label: "系列影响", value: insight.legacy }] : []),
+        ...(insight.industryImpact ? [{ label: "行业影响", value: insight.industryImpact }] : []),
+        ...(insight.note ? [{ label: "研究线索", value: insight.note }] : [])
+      ];
+      const snapshot = informationCard(2, "系列解读", snapshotFields);
+      const plot = plotSummaryCard(finalFantasyPlotSummaries[release.id] || {
+        summary: "当前版本尚未整理该作品的剧情概要。"
+      });
       const lineage = release.lineage
         ? Object.assign(document.createElement("div"), { className: "timeline-related-note", textContent: `谱系关系：${release.lineage}` })
         : null;
       const record = platformRecordCard(release, lineage);
-      const research = informationCard(4, "策划观察", [
-        { label: "长期影响", value: insight.legacy },
-        { label: "研究线索", value: insight.note }
-      ]);
-      detail.append(snapshot, record, research);
+      detail.append(snapshot, plot, record);
       flyout.append(detail);
       stack.append(flyout);
     }
@@ -1757,11 +1783,11 @@ function layoutFinalFantasyReleases(releases, reserveDetailSpace) {
   let maxBottom = 0;
 
   releases.forEach((release) => {
-    const releaseIndex = pokemonReleaseMonthIndex(release);
+    const releaseIndex = releaseTimeIndex(release);
     const priorInCategory = lastByCategory.get(release.category);
     let side;
 
-    if (previous && Math.abs(releaseIndex - pokemonReleaseMonthIndex(previous)) <= 18) {
+    if (previous && Math.abs(releaseIndex - releaseTimeIndex(previous)) <= 18) {
       side = previous.category === release.category
         ? items.get(previous.id).side
         : oppositeSide(items.get(previous.id).side);
