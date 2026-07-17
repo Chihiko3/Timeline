@@ -18,6 +18,8 @@ const curatedGames = window.CONSOLE_CURATED_GAMES || {};
 const gameLocalizations = window.CONSOLE_GAME_LOCALIZATIONS || {};
 const pokemonReleases = window.POKEMON_CORE_RELEASES || [];
 const finalFantasyReleases = window.FINAL_FANTASY_RELEASES || [];
+const pokemonReleaseInsights = window.POKEMON_RELEASE_INSIGHTS || {};
+const finalFantasyReleaseInsights = window.FINAL_FANTASY_RELEASE_INSIGHTS || {};
 const finalFantasyCovers = window.FINAL_FANTASY_RELEASE_COVERS || {};
 const finalFantasyLogos = window.FINAL_FANTASY_RELEASE_LOGOS || {};
 const timelineImageStore = window.timelineImageStore;
@@ -969,10 +971,25 @@ function render() {
 }
 
 function pokemonPlatformCard(entry) {
+  const displayPlatform = platformDisplayName(entry.platform);
   return `<article class="pokemon-platform-card">
-    <div class="pokemon-platform-head"><strong>${entry.year}</strong></div>
-    <p>${entry.platform}</p>
+    <strong>${entry.year}</strong>
+    <p title="${entry.platform}">${displayPlatform}</p>
   </article>`;
+}
+
+function platformDisplayName(platform) {
+  return platform
+    .replace(/PlayStation Network/g, "PSN")
+    .replace(/PlayStation Portable/g, "PSP")
+    .replace(/PlayStation Vita/g, "PS Vita")
+    .replace(/PlayStation 5/g, "PS5")
+    .replace(/PlayStation 4/g, "PS4")
+    .replace(/PlayStation 3/g, "PS3")
+    .replace(/PlayStation 2/g, "PS2")
+    .replace(/PlayStation/g, "PS")
+    .replace(/Nintendo Switch 2/g, "NS2")
+    .replace(/Nintendo Switch/g, "NS");
 }
 
 function pokemonSubtitle(chineseName) {
@@ -981,6 +998,71 @@ function pokemonSubtitle(chineseName) {
 
 function appendPokemonReleaseArtwork(card, release) {
   appendReleaseArtwork(card, release, {}, "", `pokemon:${release.id}`);
+}
+
+function informationCard(level, title, fields, extra = null) {
+  const card = document.createElement("section");
+  card.className = `timeline-information-card timeline-information-card-level-${level}`;
+  const fieldMarkup = fields.map(({ label, value }) => `
+    <div class="timeline-information-field"><span>${label}</span><p>${value}</p></div>`).join("");
+  card.innerHTML = `<header><h3>${title}</h3></header><div class="timeline-information-fields">${fieldMarkup}</div>`;
+  if (extra) card.append(extra);
+  return card;
+}
+
+function pokemonInsightFor(release) {
+  const insight = pokemonReleaseInsights[release.id] || {};
+  const relation = release.remakeOf
+    ? `重制自 ${pokemonSubtitle(release.remakeOf.chineseName)}`
+    : release.modOf
+      ? `改版自 ${pokemonSubtitle(release.modOf)}`
+      : release.official === false
+        ? `${release.workType || "同人作品"} · ${release.creator || "未知制作者"}`
+        : release.generation;
+  return {
+    position: insight.position || relation,
+    loop: insight.loop || (release.official === false ? "基于宝可梦框架的探索、培养与对战" : "捕捉、队伍培养、回合制对战与地区探索"),
+    change: insight.change || (release.remakeOf ? "以当代系统重构原作体验" : release.modOf ? "在原作框架上扩展内容和挑战" : "补充该世代的版本内容与游玩差异"),
+    legacy: insight.legacy || "作为该阶段的系列条目，适合结合前后作品继续比较。",
+    note: insight.note || "后续补充可靠的开发、市场或玩家社群资料。"
+  };
+}
+
+function finalFantasyInsightFor(release) {
+  const insight = finalFantasyReleaseInsights[release.id] || {};
+  const [, genre = "RPG"] = (FINAL_FANTASY_DISPLAY_TAGS[release.id] || [release.category, "RPG"]);
+  const loopByGenre = {
+    "RPG": "队伍养成、剧情推进、探索与战斗",
+    "动作 RPG": "实时战斗、成长构筑、探索与剧情推进",
+    "动作冒险": "场景探索、即时动作与叙事事件",
+    "战棋": "职业构筑、地图策略与回合制战术",
+    "MMO": "职业协作、持续任务、团队副本与长期运营",
+    "赛车": "角色能力、赛道竞速与道具对抗",
+    "迷宫探索": "随机迷宫、资源管理与重复挑战",
+    "卡牌": "卡组构筑、收集与规则对战",
+    "战略 RPG": "队伍编成、战术推进与地图管理",
+    "城市建设": "资源管理、城镇建设与任务循环",
+    "塔防": "单位部署、路线防守与资源决策"
+  };
+  return {
+    position: finalFantasyDisplayTag(release),
+    loop: loopByGenre[genre] || "围绕该分支定位组织的冒险与成长体验",
+    change: insight.change || release.lineage || `以 ${genre} 形式扩展 Final Fantasy 品牌与世界观。`,
+    legacy: insight.legacy || `适合与同一 ${release.category} 分支的前后作品比较。`,
+    note: insight.note || "后续补充可靠的开发、市场和玩家社群研究资料。"
+  };
+}
+
+function platformRecordCard(release, extra = null) {
+  const first = release.first.map((entry) => pokemonPlatformCard(entry)).join("");
+  const later = release.later.length
+    ? release.later.map((entry) => pokemonPlatformCard(entry)).join("")
+    : '<p class="pokemon-empty">暂无后续独立版本</p>';
+  const record = document.createElement("div");
+  record.innerHTML = `<div class="pokemon-platform-group"><h4>首次登陆</h4><div class="pokemon-platform-list">${first}</div></div>
+    <div class="pokemon-platform-group"><h4>后续登陆</h4><div class="pokemon-platform-list">${later}</div></div>`;
+  if (extra) record.append(extra);
+  return informationCard(3, "资料记录", [], record);
 }
 
 function appendFinalFantasyReleaseArtwork(card, release) {
@@ -1420,19 +1502,20 @@ function renderPokemonTimeline() {
       const flyout = document.createElement("section");
       flyout.className = `timeline-detail-flyout timeline-detail-flyout-${itemLayout.side} pokemon-detail-flyout`;
       const detail = document.createElement("section");
-      detail.className = "pokemon-release-detail";
-      const first = release.first.map((entry) => pokemonPlatformCard(entry)).join("");
-      const later = release.later.length
-        ? release.later.map((entry) => pokemonPlatformCard(entry)).join("")
-        : '<p class="pokemon-empty">暂无后续独立版本</p>';
-      detail.innerHTML = `<div class="pokemon-platform-group"><h4>首次登陆</h4><div class="pokemon-platform-list">${first}</div></div>
-        <div class="pokemon-platform-group"><h4>后续登陆</h4><div class="pokemon-platform-list">${later}</div></div>`;
+      detail.className = "pokemon-release-detail timeline-information-stack";
+      const insight = pokemonInsightFor(release);
+      const snapshot = informationCard(2, "作品快照", [
+        { label: "系列定位", value: insight.position },
+        { label: "核心体验", value: insight.loop },
+        { label: "本作变化", value: insight.change }
+      ]);
+      const record = platformRecordCard(release, createPokemonStartersPanel(release));
+      const research = informationCard(4, "策划观察", [
+        { label: "长期影响", value: insight.legacy },
+        { label: "研究线索", value: insight.note }
+      ]);
+      detail.append(snapshot, record, research);
       flyout.append(detail);
-
-      const startersFlyout = document.createElement("section");
-      startersFlyout.className = `pokemon-starters-flyout pokemon-starters-flyout-${itemLayout.side}`;
-      startersFlyout.append(createPokemonStartersPanel(release));
-      flyout.append(startersFlyout);
       stack.append(flyout);
     }
 
@@ -1630,13 +1713,22 @@ function renderFinalFantasyTimeline() {
       const flyout = document.createElement("section");
       flyout.className = `timeline-detail-flyout timeline-detail-flyout-${itemLayout.side} pokemon-detail-flyout final-fantasy-detail-flyout`;
       const detail = document.createElement("section");
-      detail.className = "pokemon-release-detail";
-      const first = release.first.map((entry) => pokemonPlatformCard(entry)).join("");
-      const later = release.later.length
-        ? release.later.map((entry) => pokemonPlatformCard(entry)).join("")
-        : '<p class="pokemon-empty">暂无后续独立版本</p>';
-      detail.innerHTML = `<div class="pokemon-platform-group"><h4>首次登陆</h4><div class="pokemon-platform-list">${first}</div></div>
-        <div class="pokemon-platform-group"><h4>后续登陆</h4><div class="pokemon-platform-list">${later}</div></div>`;
+      detail.className = "pokemon-release-detail timeline-information-stack";
+      const insight = finalFantasyInsightFor(release);
+      const snapshot = informationCard(2, "作品快照", [
+        { label: "系列定位", value: insight.position },
+        { label: "核心体验", value: insight.loop },
+        { label: "本作变化", value: insight.change }
+      ]);
+      const lineage = release.lineage
+        ? Object.assign(document.createElement("div"), { className: "timeline-related-note", textContent: `谱系关系：${release.lineage}` })
+        : null;
+      const record = platformRecordCard(release, lineage);
+      const research = informationCard(4, "策划观察", [
+        { label: "长期影响", value: insight.legacy },
+        { label: "研究线索", value: insight.note }
+      ]);
+      detail.append(snapshot, record, research);
       flyout.append(detail);
       stack.append(flyout);
     }

@@ -493,7 +493,6 @@ input {
   box-shadow: 0 5px 14px color-mix(in srgb, var(--pokemon-color, #c8333a) 14%, transparent);
 }
 
-.pokemon-platform-head,
 .pokemon-detail-title {
   display: flex;
   align-items: center;
@@ -520,8 +519,7 @@ input {
   line-height: 20px;
 }
 
-.pokemon-release-tag,
-.pokemon-platform-head span {
+.pokemon-release-tag {
   max-width: 70%;
   overflow: hidden;
   border: 1px solid var(--pokemon-color, #df99a0);
@@ -720,7 +718,108 @@ body.show-timeline-artwork-bounds .pokemon-release-artwork {
   padding: 13px;
   border: 1px solid #cfd9e7;
   border-radius: 6px;
-  background: #f8fbff;
+  background: #f7f9fc;
+}
+
+.timeline-information-stack {
+  display: grid;
+  gap: 9px;
+  max-height: 720px;
+  overflow-y: auto;
+}
+
+.timeline-information-card {
+  padding: 9px 10px;
+  border: 1px solid #d8e0ea;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.timeline-information-card > header {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  margin-bottom: 8px;
+}
+
+.timeline-information-card > header h3 {
+  margin: 0;
+  color: #24364f;
+  font-size: 13px;
+}
+
+.timeline-information-fields {
+  display: grid;
+  gap: 7px;
+}
+
+.timeline-information-fields:empty {
+  display: none;
+}
+
+.timeline-information-field {
+  display: grid;
+  grid-template-columns: 62px minmax(0, 1fr);
+  gap: 7px;
+  align-items: start;
+}
+
+.timeline-information-field span {
+  color: #687b93;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.timeline-information-field p {
+  margin: 0;
+  color: #334967;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.timeline-information-card-level-2,
+.timeline-information-card-level-3,
+.timeline-information-card-level-4 {
+  border-color: #d8e0ea;
+  background: #fff;
+}
+
+.timeline-information-card .pokemon-starters-panel {
+  margin-top: 10px;
+  padding: 9px;
+  border: 0;
+  border-top: 1px solid #e0e6ee;
+  border-radius: 0;
+  background: transparent;
+}
+
+.timeline-information-card .pokemon-starters-panel h3 {
+  margin: 0 0 7px;
+  font-size: 14px;
+}
+
+.timeline-information-card .pokemon-starter-list {
+  gap: 5px;
+}
+
+.timeline-information-card .pokemon-starter-card {
+  min-height: 45px;
+  padding: 6px 78px 6px 7px;
+  border-color: #dfe5ed;
+}
+
+.timeline-information-card .pokemon-starter-card strong {
+  font-size: 12px;
+}
+
+.timeline-information-card .pokemon-starter-card span {
+  font-size: 12px;
+}
+
+.timeline-information-card .pokemon-starter-sprite {
+  width: 96px;
+  height: 96px;
 }
 
 .pokemon-detail-title {
@@ -748,7 +847,7 @@ body.show-timeline-artwork-bounds .pokemon-release-artwork {
 
 .pokemon-platform-group h4 {
   margin-bottom: 7px;
-  color: var(--pokemon-color, #a63239);
+  color: #52657e;
   font-size: 12px;
 }
 
@@ -758,31 +857,32 @@ body.show-timeline-artwork-bounds .pokemon-release-artwork {
 }
 
 .pokemon-platform-card {
-  padding: 8px 9px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  padding: 7px 9px;
   border: 1px solid #d5dfec;
   border-radius: 4px;
   background: #fff;
 }
 
-.pokemon-platform-head strong {
-  color: var(--pokemon-color, #c52e36);
+.pokemon-platform-card > strong {
+  flex: 0 0 auto;
+  color: #52657e;
   font-size: 12px;
 }
 
-.pokemon-platform-head span {
-  max-width: none;
-  overflow: visible;
-  border: 0;
-  border-radius: 0;
-  color: #5f6f85;
-  font-size: 11px;
-  line-height: 1.2;
-  padding: 0;
-  text-overflow: clip;
-  white-space: normal;
+.pokemon-platform-card p {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: #223756;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.pokemon-platform-card p,
 .pokemon-empty {
   margin: 5px 0 0;
   color: #223756;
@@ -791,6 +891,15 @@ body.show-timeline-artwork-bounds .pokemon-release-artwork {
 
 .pokemon-empty {
   color: #71819a;
+}
+
+.timeline-related-note {
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px solid #e0e6ee;
+  color: #52657e;
+  font-size: 12px;
+  line-height: 1.45;
 }
 
 .pokemon-vertical-timeline {
@@ -816,10 +925,10 @@ body.show-timeline-artwork-bounds .pokemon-release-artwork {
 }
 
 .pokemon-starters-panel {
-  border: 1px solid color-mix(in srgb, var(--pokemon-color, #c8333a) 45%, #ffffff);
-  border-left: 9px solid var(--pokemon-color, #c8333a);
+  border: 1px solid #d8e0ea;
+  border-left: 1px solid #d8e0ea;
   border-radius: 6px;
-  background: color-mix(in srgb, var(--pokemon-color, #c8333a) 7%, #ffffff);
+  background: #ffffff;
   padding: 14px;
 }
 
@@ -845,7 +954,7 @@ body.show-timeline-artwork-bounds .pokemon-release-artwork {
   position: relative;
   min-height: 58px;
   padding: 8px 122px 8px 9px;
-  border: 1px solid color-mix(in srgb, var(--pokemon-color, #c8333a) 26%, #ffffff);
+  border: 1px solid #dfe5ed;
   border-radius: 4px;
   background: #ffffff;
   overflow: visible;
@@ -873,41 +982,6 @@ body.show-timeline-artwork-bounds .pokemon-release-artwork {
   image-rendering: pixelated;
   pointer-events: none;
   transform: translateY(-50%);
-}
-
-.pokemon-starters-flyout {
-  position: absolute;
-  top: 0;
-  z-index: 5;
-  width: 320px;
-  transform: scale(0.8);
-}
-
-.pokemon-starters-flyout-right {
-  left: calc(100% + 20px);
-  transform-origin: left top;
-}
-
-.pokemon-starters-flyout-left {
-  right: calc(100% + 20px);
-  transform-origin: right top;
-}
-
-.pokemon-starters-flyout::before {
-  position: absolute;
-  top: 20px;
-  width: 20px;
-  height: 2px;
-  background: #aebfd8;
-  content: "";
-}
-
-.pokemon-starters-flyout-right::before {
-  left: -20px;
-}
-
-.pokemon-starters-flyout-left::before {
-  right: -20px;
 }
 
 .insight-panel {
@@ -1894,9 +1968,7 @@ summary {
   .timeline-games-flyout,
   .timeline-games-flyout-left,
   .timeline-games-flyout-right,
-  .pokemon-starters-flyout,
-  .pokemon-starters-flyout-left,
-  .pokemon-starters-flyout-right {
+  .pokemon-starters-panel {
     position: static;
     width: 100%;
     margin-top: 12px;
@@ -1907,10 +1979,6 @@ summary {
 
   .timeline-detail-flyout::before,
   .timeline-games-flyout::before,
-  .pokemon-starters-flyout::before {
-    display: none;
-  }
-
   .pokemon-starter-card strong {
     font-size: 12px;
   }
