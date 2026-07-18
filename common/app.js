@@ -1039,6 +1039,7 @@ function plotSummaryCard(plot) {
 
 function seriesInterpretationCard(insight) {
   const fields = [
+    ...(insight.releaseStructure ? [{ label: "版本结构", value: insight.releaseStructure }] : []),
     ...(insight.loop ? [{ label: "核心体验", value: insight.loop }] : []),
     ...(insight.change ? [{ label: "本作变化", value: insight.change }] : []),
     ...(insight.designLogic ? [{ label: "机制逻辑", value: insight.designLogic }] : []),
@@ -1062,6 +1063,7 @@ function pokemonInsightFor(release) {
         : release.generation;
   return {
     position: insight.position || relation,
+    releaseStructure: release.releaseStructure || null,
     loop: editorial.loop || null,
     change: editorial.change || null,
     designLogic: pokemonDesignLogic[release.id] || null,
@@ -1547,7 +1549,9 @@ function renderPokemonTimeline() {
       ? `<span class="pokemon-card-lineage">重制：${pokemonSubtitle(release.remakeOf.chineseName)}</span>`
       : release.modOf
         ? `<span class="pokemon-card-lineage">改版：${pokemonSubtitle(release.modOf)}</span>`
-        : "";
+        : release.editionNote
+          ? `<span class="pokemon-card-lineage" title="${release.editionNote}">${release.editionNote}</span>`
+          : "";
     card.innerHTML = `<div class="pokemon-release-head"><time>${pokemonReleaseDateLabel(release)}</time><span class="pokemon-release-tag" title="${releaseLabel}">${releaseLabel}</span></div>
       <div class="pokemon-release-title"><strong title="${release.name}">${release.name}</strong><p title="${pokemonSubtitle(release.chineseName)}">${pokemonSubtitle(release.chineseName)}</p>${cardLineage}</div>
       <div class="pokemon-release-foot"><small>${platformTotal} 个平台</small></div>`;
