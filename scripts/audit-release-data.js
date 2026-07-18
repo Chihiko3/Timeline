@@ -15,8 +15,8 @@ const timelines = [
     globalName: "FINAL_FANTASY_RELEASES",
   },
   {
-    label: "Xenoblade",
-    file: "timelines/xenoblade/releases.js",
+    label: "Xeno Series",
+    file: "timelines/XenoSeries/releases.js",
     globalName: "XENOBLADE_RELEASES",
   },
 ];

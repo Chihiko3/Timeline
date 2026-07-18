@@ -9,7 +9,7 @@ This folder owns the Xeno creative-lineage timeline:
 - `external-impact-research.js`: independently sourced industry or cultural impact
 - `plot-summaries.js`: plot summaries and narrative innovations
 - `timeline-images.js`: GM-managed artwork records
-- `assets/XenoSeries`: all artwork imported through the GM image manager
+- `assets/covers`: all artwork imported through the GM image manager
 
 The timeline follows three successive IP families associated with Tetsuya
 Takahashi and related core teams: Xenogears, Xenosaga, and Xenoblade. They are

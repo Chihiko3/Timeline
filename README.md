@@ -50,7 +50,7 @@ GameConsole/
       final-fantasy-logos.js          采集到的 Logo 映射
       timeline-images.js              卡片图片清单
       assets/covers/                  封面与 Logo 文件
-    xenoblade/                        Xeno Series 创作谱系时间线
+    XenoSeries/                       Xeno Series 创作谱系时间线
       selection-criteria.js           时间线开头的收录规则
       releases.js                     作品、发售日期与平台资料
       editorial-reading.js            核心体验、本作变化与研究线索
@@ -59,7 +59,7 @@ GameConsole/
       external-impact-research.js     行业影响及验证状态
       plot-summaries.js               剧情概要与叙事创新
       timeline-images.js              卡片图片清单
-      assets/XenoSeries/              Xeno Series 全部作品图片
+      assets/covers/                  Xeno Series 全部作品图片
   scripts/                            本地服务、资源采集与维护脚本
   start-gm-server.cmd                 启动本地 GM 图片管理服务
 ```
@@ -85,7 +85,7 @@ GM 图片管理仅供本地维护使用。上传的图片会被复制到对应�
 
 - 时间线图片的唯一清单是各时间线目录下的 `timeline-images.js`。
 - 一张卡片配置一张图时，卡片只展示该图；配置多张图时，卡片支持循环切换，悬浮时展示全部图片。
-- 图片应放在所属时间线的资源目录中：主机放入 `hardware/assets/consoles`，Pokemon 放入 `pokemon/assets/covers`，Final Fantasy 放入 `final-fantasy/assets/covers`，Xeno Series 放入 `xenoblade/assets/XenoSeries`。
+- 图片应放在所属时间线的资源目录中：主机放入 `hardware/assets/consoles`，Pokemon 放入 `pokemon/assets/covers`，Final Fantasy 放入 `final-fantasy/assets/covers`，Xeno Series 放入 `XenoSeries/assets/covers`。
 - 主动采集日本游戏图片时，优先使用其最早发行平台的日本地区封面；没有独立实体封面的内容可使用日本官网主视觉，并在图片名称中注明。
 - 自动采集和批量整理只可替换 `seed-` 开头的预置图片，不得覆盖通过 GM 工具添加或替换的图片。
 - 新增或调整图片优先使用 GM 图片管理工具，避免手动改清单与文件路径产生不一致。
