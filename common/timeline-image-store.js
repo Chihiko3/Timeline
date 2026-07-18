@@ -15,7 +15,8 @@
       return {
         ...(window.HARDWARE_TIMELINE_IMAGES || {}),
         ...(window.POKEMON_TIMELINE_IMAGES || {}),
-        ...(window.FINAL_FANTASY_TIMELINE_IMAGES || {})
+        ...(window.FINAL_FANTASY_TIMELINE_IMAGES || {}),
+        ...(window.XENOBLADE_TIMELINE_IMAGES || {})
       };
     }
   }

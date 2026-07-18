@@ -24,13 +24,16 @@ const normalize = (raw, directory, key) => {
 const archive = runDataFile("timelines/hardware/data.js").CONSOLE_ARCHIVE;
 const pokemon = runDataFile("timelines/pokemon/releases.js").POKEMON_CORE_RELEASES;
 const finalFantasy = runDataFile("timelines/final-fantasy/final-fantasy-releases.js").FINAL_FANTASY_RELEASES;
+const xenoblade = runDataFile("timelines/xenoblade/releases.js").XENOBLADE_RELEASES;
+const xenobladeImages = runDataFile("timelines/xenoblade/timeline-images.js").XENOBLADE_TIMELINE_IMAGES;
 const covers = runDataFile("timelines/final-fantasy/final-fantasy-covers.js").FINAL_FANTASY_RELEASE_COVERS;
 const logos = runDataFile("timelines/final-fantasy/final-fantasy-logos.js").FINAL_FANTASY_RELEASE_LOGOS;
 const appSource = fs.readFileSync(path.join(root, "common/app.js"), "utf8");
-const pokemonCovers = extractObject(appSource, "POKEMON_RELEASE_COVERS", "POKEMON_RELEASE_DAYS");
+const pokemonCovers = extractObject(appSource, "POKEMON_RELEASE_COVERS", "BRAND_COLORS");
 const hardwareManifest = {};
 const pokemonManifest = {};
 const finalFantasyManifest = {};
+const xenobladeManifest = {};
 
 archive.forEach((brand) => brand.platforms.forEach((platform) => {
   const key = `hardware:${`${brand.brand}-${platform.name}-${platform.year}`.replace(/[^a-z0-9]+/gi, "-")}`;
@@ -49,6 +52,12 @@ finalFantasy.forEach((release) => {
     key
   );
 });
+xenoblade.forEach((release) => {
+  const key = `xenoblade:${release.id}`;
+  xenobladeManifest[key] = (xenobladeImages[key] || []).filter((entry) =>
+    entry.src?.startsWith("timelines/xenoblade/") && fs.existsSync(path.join(root, entry.src))
+  );
+});
 
 const writeManifest = (file, globalName, manifest) => fs.writeFileSync(
   path.join(root, file),
@@ -58,4 +67,5 @@ const writeManifest = (file, globalName, manifest) => fs.writeFileSync(
 writeManifest("timelines/hardware/timeline-images.js", "HARDWARE_TIMELINE_IMAGES", hardwareManifest);
 writeManifest("timelines/pokemon/timeline-images.js", "POKEMON_TIMELINE_IMAGES", pokemonManifest);
 writeManifest("timelines/final-fantasy/timeline-images.js", "FINAL_FANTASY_TIMELINE_IMAGES", finalFantasyManifest);
-console.log(`Seeded ${Object.keys(hardwareManifest).length + Object.keys(pokemonManifest).length + Object.keys(finalFantasyManifest).length} timeline image records.`);
+writeManifest("timelines/xenoblade/timeline-images.js", "XENOBLADE_TIMELINE_IMAGES", xenobladeManifest);
+console.log(`Seeded ${Object.keys(hardwareManifest).length + Object.keys(pokemonManifest).length + Object.keys(finalFantasyManifest).length + Object.keys(xenobladeManifest).length} timeline image records.`);

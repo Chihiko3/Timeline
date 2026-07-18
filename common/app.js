@@ -18,6 +18,7 @@ const curatedGames = window.CONSOLE_CURATED_GAMES || {};
 const gameLocalizations = window.CONSOLE_GAME_LOCALIZATIONS || {};
 const pokemonReleases = window.POKEMON_CORE_RELEASES || [];
 const finalFantasyReleases = window.FINAL_FANTASY_RELEASES || [];
+const xenobladeReleases = window.XENOBLADE_RELEASES || [];
 const pokemonReleaseInsights = window.POKEMON_RELEASE_INSIGHTS || {};
 const finalFantasyReleaseInsights = window.FINAL_FANTASY_RELEASE_INSIGHTS || {};
 const pokemonEditorialReading = window.POKEMON_EDITORIAL_READING || {};
@@ -30,6 +31,11 @@ const pokemonExternalImpactResearch = window.POKEMON_EXTERNAL_IMPACT_RESEARCH ||
 const finalFantasyExternalImpactResearch = window.FINAL_FANTASY_EXTERNAL_IMPACT_RESEARCH || {};
 const pokemonPlotSummaries = window.POKEMON_PLOT_SUMMARIES || {};
 const finalFantasyPlotSummaries = window.FINAL_FANTASY_PLOT_SUMMARIES || {};
+const xenobladeEditorialReading = window.XENOBLADE_EDITORIAL_READING || {};
+const xenobladeDesignLogic = window.XENOBLADE_DESIGN_LOGIC || {};
+const xenobladeSeriesImpact = window.XENOBLADE_SERIES_IMPACT || {};
+const xenobladeExternalImpactResearch = window.XENOBLADE_EXTERNAL_IMPACT_RESEARCH || {};
+const xenobladePlotSummaries = window.XENOBLADE_PLOT_SUMMARIES || {};
 const finalFantasyCovers = window.FINAL_FANTASY_RELEASE_COVERS || {};
 const finalFantasyLogos = window.FINAL_FANTASY_RELEASE_LOGOS || {};
 const timelineImageStore = window.timelineImageStore;
@@ -156,6 +162,7 @@ const elements = {
   platformGrid: document.querySelector("#platformGrid"),
   pokemonTimeline: document.querySelector("#pokemonTimeline"),
   finalFantasyTimeline: document.querySelector("#finalFantasyTimeline"),
+  xenobladeTimeline: document.querySelector("#xenobladeTimeline"),
   timelineArtworkDebug: document.querySelector("#timelineArtworkDebug"),
   imageManager: document.querySelector("#imageManager"),
   template: document.querySelector("#platformTemplate")
@@ -163,6 +170,7 @@ const elements = {
 
 let selectedPokemonReleaseId = null;
 let selectedFinalFantasyReleaseId = null;
+let selectedXenobladeReleaseId = null;
 const pokemonArtworkIndices = new Map();
 let pokemonCoverPreview = null;
 let imageManagerCategory = "hardware";
@@ -971,6 +979,7 @@ function render() {
   renderCards(platforms);
   renderPokemonTimeline();
   renderFinalFantasyTimeline();
+  renderXenobladeTimeline();
 }
 
 function pokemonPlatformCard(entry) {
@@ -1028,6 +1037,18 @@ function plotSummaryCard(plot) {
   return informationCard(3, "剧情解读", fields);
 }
 
+function seriesInterpretationCard(insight) {
+  const fields = [
+    ...(insight.loop ? [{ label: "核心体验", value: insight.loop }] : []),
+    ...(insight.change ? [{ label: "本作变化", value: insight.change }] : []),
+    ...(insight.designLogic ? [{ label: "机制逻辑", value: insight.designLogic }] : []),
+    ...(insight.legacy ? [{ label: "系列影响", value: insight.legacy }] : []),
+    ...(insight.industryImpact ? [{ label: "行业影响", value: insight.industryImpact }] : []),
+    ...(insight.note ? [{ label: "研究线索", value: insight.note }] : [])
+  ];
+  return informationCard(2, "系列解读", fields);
+}
+
 function pokemonInsightFor(release) {
   const insight = pokemonReleaseInsights[release.id] || {};
   const editorial = pokemonEditorialReading[release.id] || {};
@@ -1065,6 +1086,19 @@ function finalFantasyInsightFor(release) {
   };
 }
 
+function xenobladeInsightFor(release) {
+  const editorial = xenobladeEditorialReading[release.id] || {};
+  const externalImpact = xenobladeExternalImpactResearch[release.id];
+  return {
+    loop: editorial.loop || null,
+    change: editorial.change || null,
+    designLogic: xenobladeDesignLogic[release.id] || null,
+    legacy: xenobladeSeriesImpact[release.id] || null,
+    industryImpact: externalImpact?.status === "verified" ? externalImpact.summary : null,
+    note: editorial.note || null
+  };
+}
+
 function platformRecordCard(release, extra = null) {
   const first = release.first.map((entry) => pokemonPlatformCard(entry)).join("");
   const later = release.later.length
@@ -1086,6 +1120,10 @@ function releasePlatformCount(release) {
 
 function appendFinalFantasyReleaseArtwork(card, release) {
   appendReleaseArtwork(card, release, {}, "", `final-fantasy:${release.id}`);
+}
+
+function appendXenobladeReleaseArtwork(card, release) {
+  appendReleaseArtwork(card, release, {}, "", `xenoblade:${release.id}`);
 }
 
 function appendReleaseArtwork(card, release, coverMap, assetDirectory, artworkKey, artworkClass = "") {
@@ -1254,6 +1292,15 @@ function imageManagerGroups() {
       label: "Final Fantasy",
       entries: finalFantasyReleases.map((release) => ({
         key: `final-fantasy:${release.id}`,
+        title: release.name,
+        meta: release.chineseName
+      }))
+    },
+    {
+      id: "xenoblade",
+      label: "Xenoblade",
+      entries: xenobladeReleases.map((release) => ({
+        key: `xenoblade:${release.id}`,
         title: release.name,
         meta: release.chineseName
       }))
@@ -1523,15 +1570,7 @@ function renderPokemonTimeline() {
       const detail = document.createElement("section");
       detail.className = "pokemon-release-detail timeline-information-stack";
       const insight = pokemonInsightFor(release);
-      const snapshotFields = [
-        ...(insight.loop ? [{ label: "核心体验", value: insight.loop }] : []),
-        ...(insight.change ? [{ label: "本作变化", value: insight.change }] : []),
-        ...(insight.designLogic ? [{ label: "机制逻辑", value: insight.designLogic }] : []),
-        ...(insight.legacy ? [{ label: "系列影响", value: insight.legacy }] : []),
-        ...(insight.industryImpact ? [{ label: "行业影响", value: insight.industryImpact }] : []),
-        ...(insight.note ? [{ label: "研究线索", value: insight.note }] : [])
-      ];
-      const snapshot = informationCard(2, "系列解读", snapshotFields);
+      const snapshot = seriesInterpretationCard(insight);
       const plot = plotSummaryCard(pokemonPlotSummaries[release.id] || {
         summary: "当前版本尚未整理该作品的剧情概要。"
       });
@@ -1659,7 +1698,7 @@ function layoutPokemonReleases(releases, reserveDetailSpace) {
   return { items, height: Math.max(118, maxBottom + 10) };
 }
 
-function finalFantasyDateLabel(release) {
+function gameReleaseDateLabel(release) {
   const [year, month = "--", day = "--"] = release.date.split(".");
   return `${year}.${month}.${day}`;
 }
@@ -1675,7 +1714,7 @@ function renderFinalFantasyTimeline() {
 
   const releases = [...finalFantasyReleases].sort((a, b) => a.date.localeCompare(b.date) || a.name.localeCompare(b.name));
   const reserveDetailSpace = window.matchMedia?.("(max-width: 760px)").matches;
-  const layout = layoutFinalFantasyReleases(releases, reserveDetailSpace);
+  const layout = layoutCategorizedReleases(releases, reserveDetailSpace, selectedFinalFantasyReleaseId);
   const axis = document.createElement("div");
   axis.className = "vertical-timeline final-fantasy-vertical-timeline";
   const canvas = document.createElement("section");
@@ -1716,7 +1755,7 @@ function renderFinalFantasyTimeline() {
       ? `<span class="final-fantasy-card-lineage" title="${release.lineage}">${release.lineage}</span>`
       : "";
     const displayTag = finalFantasyDisplayTag(release);
-    card.innerHTML = `<div class="pokemon-release-head"><time>${finalFantasyDateLabel(release)}</time><span class="pokemon-release-tag" title="${displayTag}">${displayTag}</span></div>
+    card.innerHTML = `<div class="pokemon-release-head"><time>${gameReleaseDateLabel(release)}</time><span class="pokemon-release-tag" title="${displayTag}">${displayTag}</span></div>
       <div class="pokemon-release-title"><strong title="${release.name}">${release.name}</strong><p title="${release.chineseName}">${release.chineseName}</p>${cardLineage}</div>
       <div class="pokemon-release-foot"><small>${platformTotal} 个平台</small></div>`;
     appendFinalFantasyReleaseArtwork(card, release);
@@ -1738,15 +1777,7 @@ function renderFinalFantasyTimeline() {
       const detail = document.createElement("section");
       detail.className = "pokemon-release-detail timeline-information-stack";
       const insight = finalFantasyInsightFor(release);
-      const snapshotFields = [
-        ...(insight.loop ? [{ label: "核心体验", value: insight.loop }] : []),
-        ...(insight.change ? [{ label: "本作变化", value: insight.change }] : []),
-        ...(insight.designLogic ? [{ label: "机制逻辑", value: insight.designLogic }] : []),
-        ...(insight.legacy ? [{ label: "系列影响", value: insight.legacy }] : []),
-        ...(insight.industryImpact ? [{ label: "行业影响", value: insight.industryImpact }] : []),
-        ...(insight.note ? [{ label: "研究线索", value: insight.note }] : [])
-      ];
-      const snapshot = informationCard(2, "系列解读", snapshotFields);
+      const snapshot = seriesInterpretationCard(insight);
       const plot = plotSummaryCard(finalFantasyPlotSummaries[release.id] || {
         summary: "当前版本尚未整理该作品的剧情概要。"
       });
@@ -1771,7 +1802,100 @@ function renderFinalFantasyTimeline() {
   elements.finalFantasyTimeline.append(axis);
 }
 
-function layoutFinalFantasyReleases(releases, reserveDetailSpace) {
+function renderXenobladeTimeline() {
+  if (!elements.xenobladeTimeline) return;
+  elements.xenobladeTimeline.textContent = "";
+
+  const releases = [...xenobladeReleases].sort((a, b) => a.date.localeCompare(b.date) || a.name.localeCompare(b.name));
+  const reserveDetailSpace = window.matchMedia?.("(max-width: 760px)").matches;
+  const layout = layoutCategorizedReleases(releases, reserveDetailSpace, selectedXenobladeReleaseId);
+  const axis = document.createElement("div");
+  axis.className = "vertical-timeline xenoblade-vertical-timeline";
+  const canvas = document.createElement("section");
+  canvas.className = "timeline-year-row xenoblade-timeline-canvas";
+  canvas.style.setProperty("--year-row-height", `${layout.height}px`);
+  const leftContent = document.createElement("div");
+  leftContent.className = "timeline-year-content timeline-year-content-left";
+  const rightContent = document.createElement("div");
+  rightContent.className = "timeline-year-content timeline-year-content-right";
+  const yearRail = document.createElement("div");
+  yearRail.className = "timeline-year-rail";
+  const leftItems = document.createElement("div");
+  leftItems.className = "timeline-year-items";
+  const rightItems = document.createElement("div");
+  rightItems.className = "timeline-year-items";
+
+  releases.forEach((release) => {
+    const itemLayout = layout.items.get(release.id);
+    const branch = document.createElement("div");
+    branch.className = `timeline-branch pokemon-branch xenoblade-branch ${itemLayout.side === "left" ? "timeline-branch-left" : "timeline-branch-right"}${selectedXenobladeReleaseId === release.id ? " selected" : ""}`;
+    branch.style.setProperty("--branch-offset", itemLayout.branchOffset);
+    branch.style.setProperty("--month-offset", `${itemLayout.top}px`);
+    branch.style.setProperty("--pokemon-color", "var(--xenoblade-color)");
+
+    const stack = document.createElement("div");
+    stack.className = "timeline-card-anchor pokemon-release-stack";
+    const card = document.createElement("article");
+    card.className = "pokemon-release-card xenoblade-release-card";
+    const managedKey = `xenoblade:${release.id}`;
+    if (managedImagesFor(managedKey).length) {
+      card.classList.add("timeline-primary-card-has-artwork");
+    }
+    card.tabIndex = 0;
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-expanded", String(selectedXenobladeReleaseId === release.id));
+    const platformTotal = releasePlatformCount(release);
+    const cardLineage = release.lineage
+      ? `<span class="final-fantasy-card-lineage" title="${release.lineage}">${release.lineage}</span>`
+      : "";
+    const displayTag = release.tag || release.category;
+    card.innerHTML = `<div class="pokemon-release-head"><time>${gameReleaseDateLabel(release)}</time><span class="pokemon-release-tag" title="${displayTag}">${displayTag}</span></div>
+      <div class="pokemon-release-title"><strong title="${release.name}">${release.name}</strong><p title="${release.chineseName}">${release.chineseName}</p>${cardLineage}</div>
+      <div class="pokemon-release-foot"><small>${platformTotal} 个平台</small></div>`;
+    appendXenobladeReleaseArtwork(card, release);
+    const toggleRelease = () => {
+      selectedXenobladeReleaseId = selectedXenobladeReleaseId === release.id ? null : release.id;
+      renderXenobladeTimeline();
+    };
+    card.addEventListener("click", toggleRelease);
+    card.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      toggleRelease();
+    });
+    stack.append(card);
+
+    if (selectedXenobladeReleaseId === release.id) {
+      const flyout = document.createElement("section");
+      flyout.className = `timeline-detail-flyout timeline-detail-flyout-${itemLayout.side} pokemon-detail-flyout xenoblade-detail-flyout`;
+      const detail = document.createElement("section");
+      detail.className = "pokemon-release-detail timeline-information-stack";
+      const snapshot = seriesInterpretationCard(xenobladeInsightFor(release));
+      const plot = plotSummaryCard(xenobladePlotSummaries[release.id] || {
+        summary: "当前版本尚未整理该作品的剧情概要。"
+      });
+      const lineage = release.lineage
+        ? Object.assign(document.createElement("div"), { className: "timeline-related-note", textContent: `谱系关系：${release.lineage}` })
+        : null;
+      const record = platformRecordCard(release, lineage);
+      detail.append(snapshot, plot, record);
+      flyout.append(detail);
+      stack.append(flyout);
+    }
+
+    branch.append(stack);
+    if (itemLayout.side === "left") leftItems.append(branch);
+    else rightItems.append(branch);
+  });
+
+  leftContent.append(leftItems);
+  rightContent.append(rightItems);
+  canvas.append(leftContent, yearRail, rightContent);
+  axis.append(canvas);
+  elements.xenobladeTimeline.append(axis);
+}
+
+function layoutCategorizedReleases(releases, reserveDetailSpace, selectedReleaseId) {
   const items = new Map();
   const lastByCategory = new Map();
   const lastBottomBySide = { left: -Infinity, right: -Infinity };
@@ -1807,7 +1931,7 @@ function layoutFinalFantasyReleases(releases, reserveDetailSpace) {
     const top = Math.max(chronologicalTop, collisionTop);
     const monthKey = `${side}-${releaseIndex}`;
     const branchOffset = monthCounts[monthKey] || 0;
-    const occupiedHeight = reserveDetailSpace && selectedFinalFantasyReleaseId === release.id ? 480 : 132;
+    const occupiedHeight = reserveDetailSpace && selectedReleaseId === release.id ? 480 : 132;
 
     items.set(release.id, { side, top, branchOffset });
     monthCounts[monthKey] = branchOffset + 1;
@@ -1854,6 +1978,7 @@ function currentArchiveLocation() {
   const activeSeries = document.querySelector("[data-series-tab].active")?.dataset.seriesTab;
   if (activeSeries === "pokemon-library-panel") return "pokemon";
   if (activeSeries === "final-fantasy-library-panel") return "final-fantasy";
+  if (activeSeries === "xenoblade-library-panel") return "xenoblade";
   return "series-overview";
 }
 
@@ -1887,6 +2012,12 @@ function restoreArchiveLocation(libraryTabs, seriesTabs) {
   if (location === "final-fantasy") {
     activateTab(libraryTabs, "libraryTab", libraryTabs.find((button) => button.dataset.libraryTab === "series-library-panel"));
     activateTab(seriesTabs, "seriesTab", seriesTabs.find((button) => button.dataset.seriesTab === "final-fantasy-library-panel"));
+    return;
+  }
+
+  if (location === "xenoblade") {
+    activateTab(libraryTabs, "libraryTab", libraryTabs.find((button) => button.dataset.libraryTab === "series-library-panel"));
+    activateTab(seriesTabs, "seriesTab", seriesTabs.find((button) => button.dataset.seriesTab === "xenoblade-library-panel"));
     return;
   }
 

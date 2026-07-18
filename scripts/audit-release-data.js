@@ -14,6 +14,11 @@ const timelines = [
     file: "timelines/final-fantasy/final-fantasy-releases.js",
     globalName: "FINAL_FANTASY_RELEASES",
   },
+  {
+    label: "Xenoblade",
+    file: "timelines/xenoblade/releases.js",
+    globalName: "XENOBLADE_RELEASES",
+  },
 ];
 
 function loadTimeline({ file, globalName }) {
