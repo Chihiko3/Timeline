@@ -1,6 +1,15 @@
 (() => {
   const apiRoot = "/api/timeline-images";
 
+  function fallbackImages() {
+    return {
+      ...(window.HARDWARE_TIMELINE_IMAGES || {}),
+      ...(window.POKEMON_TIMELINE_IMAGES || {}),
+      ...(window.FINAL_FANTASY_TIMELINE_IMAGES || {}),
+      ...(window.XENOBLADE_TIMELINE_IMAGES || {})
+    };
+  }
+
   async function api(path = "", options = {}) {
     const response = await fetch(`${apiRoot}${path}`, options);
     if (!response.ok) throw new Error(await response.text() || "图片管理服务不可用");
@@ -10,14 +19,12 @@
   async function loadAll() {
     try {
       const payload = await api();
-      return payload.images || {};
-    } catch {
       return {
-        ...(window.HARDWARE_TIMELINE_IMAGES || {}),
-        ...(window.POKEMON_TIMELINE_IMAGES || {}),
-        ...(window.FINAL_FANTASY_TIMELINE_IMAGES || {}),
-        ...(window.XENOBLADE_TIMELINE_IMAGES || {})
+        ...fallbackImages(),
+        ...(payload.images || {})
       };
+    } catch {
+      return fallbackImages();
     }
   }
 
