@@ -462,6 +462,55 @@ input {
   display: none;
 }
 
+.timeline-selection-note {
+  --timeline-selection-accent: #536987;
+  position: relative;
+  width: min(760px, calc(100% - 32px));
+  margin: 0 auto 28px;
+  padding: 0 18px 18px;
+  border-bottom: 1px solid #d8e0ec;
+  text-align: center;
+}
+
+.timeline-selection-note::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 2px;
+  height: 29px;
+  transform: translateX(-50%);
+  background: #d8e0ec;
+}
+
+.timeline-selection-note-label {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--timeline-selection-accent);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.timeline-selection-note p {
+  max-width: 700px;
+  margin: 0 auto;
+  color: #4d607a;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.timeline-selection-note-pokemon {
+  --timeline-selection-accent: var(--pokemon-official);
+}
+
+.timeline-selection-note-final-fantasy {
+  --timeline-selection-accent: var(--final-fantasy-color);
+}
+
+.timeline-selection-note-xenoblade {
+  --timeline-selection-accent: var(--xenoblade-color);
+}
+
 .pokemon-release-stack {
   position: relative;
   width: min(100%, var(--timeline-card-width));
@@ -1903,6 +1952,23 @@ summary {
 
   .timeline-year-row {
     grid-template-columns: 22px minmax(0, 1fr);
+  }
+
+  .timeline-selection-note {
+    width: 100%;
+    margin-bottom: 24px;
+    padding: 0 8px 16px 34px;
+    text-align: left;
+  }
+
+  .timeline-selection-note p {
+    margin: 0;
+  }
+
+  .timeline-selection-note::after {
+    left: 11px;
+    height: 25px;
+    transform: none;
   }
 
   .vertical-timeline::before {

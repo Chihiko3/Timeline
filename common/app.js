@@ -1300,7 +1300,7 @@ function imageManagerGroups() {
     },
     {
       id: "xenoblade",
-      label: "Xenoblade",
+      label: "Xeno Series",
       entries: xenobladeReleases.map((release) => ({
         key: `xenoblade:${release.id}`,
         title: release.name,
@@ -1594,7 +1594,26 @@ function renderPokemonTimeline() {
   rightContent.append(rightItems);
   canvas.append(leftContent, yearRail, rightContent);
   axis.append(canvas);
-  elements.pokemonTimeline.append(axis);
+  elements.pokemonTimeline.append(
+    createTimelineSelectionNote(POKEMON_TIMELINE_SELECTION_CRITERIA, "pokemon"),
+    axis
+  );
+}
+
+function createTimelineSelectionNote(criteria, theme) {
+  const note = document.createElement("section");
+  note.className = `timeline-selection-note timeline-selection-note-${theme}`;
+  note.setAttribute("aria-label", criteria.label);
+
+  const label = document.createElement("span");
+  label.className = "timeline-selection-note-label";
+  label.textContent = criteria.label;
+
+  const text = document.createElement("p");
+  text.textContent = criteria.text;
+
+  note.append(label, text);
+  return note;
 }
 
 function pokemonStartersForRelease(release) {
@@ -1803,7 +1822,10 @@ function renderFinalFantasyTimeline() {
   rightContent.append(rightItems);
   canvas.append(leftContent, yearRail, rightContent);
   axis.append(canvas);
-  elements.finalFantasyTimeline.append(axis);
+  elements.finalFantasyTimeline.append(
+    createTimelineSelectionNote(FINAL_FANTASY_TIMELINE_SELECTION_CRITERIA, "final-fantasy"),
+    axis
+  );
 }
 
 function renderXenobladeTimeline() {
@@ -1896,7 +1918,10 @@ function renderXenobladeTimeline() {
   rightContent.append(rightItems);
   canvas.append(leftContent, yearRail, rightContent);
   axis.append(canvas);
-  elements.xenobladeTimeline.append(axis);
+  elements.xenobladeTimeline.append(
+    createTimelineSelectionNote(XENOBLADE_TIMELINE_SELECTION_CRITERIA, "xenoblade"),
+    axis
+  );
 }
 
 function layoutCategorizedReleases(releases, reserveDetailSpace, selectedReleaseId) {
@@ -1982,7 +2007,7 @@ function currentArchiveLocation() {
   const activeSeries = document.querySelector("[data-series-tab].active")?.dataset.seriesTab;
   if (activeSeries === "pokemon-library-panel") return "pokemon";
   if (activeSeries === "final-fantasy-library-panel") return "final-fantasy";
-  if (activeSeries === "xenoblade-library-panel") return "xenoblade";
+  if (activeSeries === "xenoblade-library-panel") return "xeno-series";
   return "series-overview";
 }
 
@@ -2019,7 +2044,7 @@ function restoreArchiveLocation(libraryTabs, seriesTabs) {
     return;
   }
 
-  if (location === "xenoblade") {
+  if (location === "xeno-series" || location === "xenoblade") {
     activateTab(libraryTabs, "libraryTab", libraryTabs.find((button) => button.dataset.libraryTab === "series-library-panel"));
     activateTab(seriesTabs, "seriesTab", seriesTabs.find((button) => button.dataset.seriesTab === "xenoblade-library-panel"));
     return;

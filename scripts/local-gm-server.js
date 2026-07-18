@@ -103,7 +103,7 @@ function collectionDirectoryForKey(key) {
   if (collection === "hardware") return path.join(timelinesDirectory, "hardware", "assets", "consoles");
   if (collection === "pokemon") return path.join(timelinesDirectory, "pokemon", "assets", "covers");
   if (collection === "final-fantasy") return path.join(timelinesDirectory, "final-fantasy", "assets", "covers");
-  if (collection === "xenoblade") return path.join(timelinesDirectory, "xenoblade", "assets", "covers");
+  if (collection === "xenoblade") return path.join(timelinesDirectory, "xenoblade", "assets", "XenoSeries");
   throw new Error("Unsupported timeline collection");
 }
 
