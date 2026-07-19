@@ -24,6 +24,8 @@ const normalize = (raw, directory, key) => {
 const archive = runDataFile("timelines/hardware/data.js").CONSOLE_ARCHIVE;
 const pokemon = runDataFile("timelines/pokemon/releases.js").POKEMON_CORE_RELEASES;
 const finalFantasy = runDataFile("timelines/final-fantasy/final-fantasy-releases.js").FINAL_FANTASY_RELEASES;
+const dragonQuest = runDataFile("timelines/DragonQuest/releases.js").DRAGON_QUEST_RELEASES;
+const dragonQuestImages = runDataFile("timelines/DragonQuest/timeline-images.js").DRAGON_QUEST_TIMELINE_IMAGES;
 const xenoblade = runDataFile("timelines/XenoSeries/releases.js").XENOBLADE_RELEASES;
 const xenobladeImages = runDataFile("timelines/XenoSeries/timeline-images.js").XENOBLADE_TIMELINE_IMAGES;
 const covers = runDataFile("timelines/final-fantasy/final-fantasy-covers.js").FINAL_FANTASY_RELEASE_COVERS;
@@ -33,6 +35,7 @@ const pokemonCovers = extractObject(appSource, "POKEMON_RELEASE_COVERS", "BRAND_
 const hardwareManifest = {};
 const pokemonManifest = {};
 const finalFantasyManifest = {};
+const dragonQuestManifest = {};
 const xenobladeManifest = {};
 
 archive.forEach((brand) => brand.platforms.forEach((platform) => {
@@ -52,6 +55,12 @@ finalFantasy.forEach((release) => {
     key
   );
 });
+dragonQuest.forEach((release) => {
+  const key = `dragon-quest:${release.id}`;
+  dragonQuestManifest[key] = (dragonQuestImages[key] || []).filter((entry) =>
+    entry.src?.startsWith("timelines/DragonQuest/") && fs.existsSync(path.join(root, entry.src))
+  );
+});
 xenoblade.forEach((release) => {
   const key = `xenoblade:${release.id}`;
   xenobladeManifest[key] = (xenobladeImages[key] || []).filter((entry) =>
@@ -67,5 +76,6 @@ const writeManifest = (file, globalName, manifest) => fs.writeFileSync(
 writeManifest("timelines/hardware/timeline-images.js", "HARDWARE_TIMELINE_IMAGES", hardwareManifest);
 writeManifest("timelines/pokemon/timeline-images.js", "POKEMON_TIMELINE_IMAGES", pokemonManifest);
 writeManifest("timelines/final-fantasy/timeline-images.js", "FINAL_FANTASY_TIMELINE_IMAGES", finalFantasyManifest);
+writeManifest("timelines/DragonQuest/timeline-images.js", "DRAGON_QUEST_TIMELINE_IMAGES", dragonQuestManifest);
 writeManifest("timelines/XenoSeries/timeline-images.js", "XENOBLADE_TIMELINE_IMAGES", xenobladeManifest);
-console.log(`Seeded ${Object.keys(hardwareManifest).length + Object.keys(pokemonManifest).length + Object.keys(finalFantasyManifest).length + Object.keys(xenobladeManifest).length} timeline image records.`);
+console.log(`Seeded ${Object.keys(hardwareManifest).length + Object.keys(pokemonManifest).length + Object.keys(finalFantasyManifest).length + Object.keys(dragonQuestManifest).length + Object.keys(xenobladeManifest).length} timeline image records.`);

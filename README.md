@@ -53,6 +53,16 @@ GameConsole/
       final-fantasy-logos.js          采集到的 Logo 映射
       timeline-images.js              卡片图片清单
       assets/covers/                  封面与 Logo 文件
+    DragonQuest/                      Dragon Quest 时间线
+      selection-criteria.js           时间线开头的收录规则
+      releases.js                     正传、重制与各衍生分支资料
+      editorial-reading.js            核心体验、本作变化与研究线索
+      design-logic.js                 机制底层逻辑
+      series-impact.js                系列长期影响
+      external-impact-research.js     行业影响及验证状态
+      plot-summaries.js               剧情概要与叙事创新
+      timeline-images.js              卡片图片清单
+      assets/covers/                  Dragon Quest 作品图片
     XenoSeries/                       Xeno Series 创作谱系时间线
       selection-criteria.js           时间线开头的收录规则
       releases.js                     作品、发售日期与平台资料
@@ -88,7 +98,7 @@ GM 图片管理仅供本地维护使用。上传的图片会被复制到对应�
 
 - 时间线图片的唯一清单是各时间线目录下的 `timeline-images.js`。
 - 一张卡片配置一张图时，卡片只展示该图；配置多张图时，卡片支持循环切换，悬浮时展示全部图片。
-- 图片应放在所属时间线的资源目录中：主机放入 `hardware/assets/consoles`，Pokemon 放入 `pokemon/assets/covers`，Final Fantasy 放入 `final-fantasy/assets/covers`，Xeno Series 放入 `XenoSeries/assets/covers`。
+- 图片应放在所属时间线的资源目录中：主机放入 `hardware/assets/consoles`，Pokemon 放入 `pokemon/assets/covers`，Final Fantasy 放入 `final-fantasy/assets/covers`，Dragon Quest 放入 `DragonQuest/assets/covers`，Xeno Series 放入 `XenoSeries/assets/covers`。
 - 主动采集日本游戏图片时，优先使用其最早发行平台的日本地区封面；没有独立实体封面的内容可使用日本官网主视觉，并在图片名称中注明。
 - 自动采集和批量整理只可替换 `seed-` 开头的预置图片，不得覆盖通过 GM 工具添加或替换的图片。
 - 新增或调整图片优先使用 GM 图片管理工具，避免手动改清单与文件路径产生不一致。
@@ -111,6 +121,7 @@ GM 图片管理仅供本地维护使用。上传的图片会被复制到对应�
 - `fetch-final-fantasy-covers.ps1`：补充 Final Fantasy 封面。
 - `fetch-final-fantasy-logos.ps1`：补充 Final Fantasy 横向 Logo。
 - `fetch-final-fantasy-wiki-artwork.ps1`：从 Final Fantasy Wiki 补充可供 GM 筛选的图片。
+- `fetch-dragon-quest-artwork.js`：从 Dragon Quest Wiki 补充空缺图片；保留已有 GM 图片，并优先筛选封面、日版资源与正式 Logo。
 - `audit-release-data.js`：检查所有游戏系列的完整日期、平台年份和渲染顺序。
 - `seed-timeline-image-manifest.js`：根据现有资源重建全部时间线的图片清单。该脚本会重写清单，通常只在明确需要重建时使用。
 

@@ -18,6 +18,7 @@ const curatedGames = window.CONSOLE_CURATED_GAMES || {};
 const gameLocalizations = window.CONSOLE_GAME_LOCALIZATIONS || {};
 const pokemonReleases = window.POKEMON_CORE_RELEASES || [];
 const finalFantasyReleases = window.FINAL_FANTASY_RELEASES || [];
+const dragonQuestReleases = window.DRAGON_QUEST_RELEASES || [];
 const xenobladeReleases = window.XENOBLADE_RELEASES || [];
 const pokemonReleaseInsights = window.POKEMON_RELEASE_INSIGHTS || {};
 const finalFantasyReleaseInsights = window.FINAL_FANTASY_RELEASE_INSIGHTS || {};
@@ -31,6 +32,11 @@ const pokemonExternalImpactResearch = window.POKEMON_EXTERNAL_IMPACT_RESEARCH ||
 const finalFantasyExternalImpactResearch = window.FINAL_FANTASY_EXTERNAL_IMPACT_RESEARCH || {};
 const pokemonPlotSummaries = window.POKEMON_PLOT_SUMMARIES || {};
 const finalFantasyPlotSummaries = window.FINAL_FANTASY_PLOT_SUMMARIES || {};
+const dragonQuestEditorialReading = window.DRAGON_QUEST_EDITORIAL_READING || {};
+const dragonQuestDesignLogic = window.DRAGON_QUEST_DESIGN_LOGIC || {};
+const dragonQuestSeriesImpact = window.DRAGON_QUEST_SERIES_IMPACT || {};
+const dragonQuestExternalImpactResearch = window.DRAGON_QUEST_EXTERNAL_IMPACT_RESEARCH || {};
+const dragonQuestPlotSummaries = window.DRAGON_QUEST_PLOT_SUMMARIES || {};
 const xenobladeEditorialReading = window.XENOBLADE_EDITORIAL_READING || {};
 const xenobladeDesignLogic = window.XENOBLADE_DESIGN_LOGIC || {};
 const xenobladeSeriesImpact = window.XENOBLADE_SERIES_IMPACT || {};
@@ -163,6 +169,7 @@ const elements = {
   seriesOverviewTimeline: document.querySelector("#series-overview-panel"),
   pokemonTimeline: document.querySelector("#pokemonTimeline"),
   finalFantasyTimeline: document.querySelector("#finalFantasyTimeline"),
+  dragonQuestTimeline: document.querySelector("#dragonQuestTimeline"),
   xenobladeTimeline: document.querySelector("#xenobladeTimeline"),
   timelineArtworkDebug: document.querySelector("#timelineArtworkDebug"),
   imageManager: document.querySelector("#imageManager"),
@@ -171,6 +178,7 @@ const elements = {
 
 let selectedPokemonReleaseId = null;
 let selectedFinalFantasyReleaseId = null;
+let selectedDragonQuestReleaseId = null;
 let selectedXenobladeReleaseId = null;
 let selectedSeriesOverviewReleaseKey = null;
 const selectedSeriesOverviewTimelineIds = new Set();
@@ -983,6 +991,7 @@ function render() {
   renderSeriesOverviewTimeline();
   renderPokemonTimeline();
   renderFinalFantasyTimeline();
+  renderDragonQuestTimeline();
   renderXenobladeTimeline();
 }
 
@@ -1105,6 +1114,19 @@ function xenobladeInsightFor(release) {
   };
 }
 
+function dragonQuestInsightFor(release) {
+  const editorial = dragonQuestEditorialReading[release.id] || {};
+  const externalImpact = dragonQuestExternalImpactResearch[release.id];
+  return {
+    loop: editorial.loop || null,
+    change: editorial.change || null,
+    designLogic: dragonQuestDesignLogic[release.id] || null,
+    legacy: dragonQuestSeriesImpact[release.id] || null,
+    industryImpact: externalImpact?.status === "verified" ? externalImpact.summary : null,
+    note: editorial.note || null
+  };
+}
+
 function platformRecordCard(release, extra = null) {
   const first = release.first.map((entry) => pokemonPlatformCard(entry)).join("");
   const later = release.later.length
@@ -1126,6 +1148,10 @@ function releasePlatformCount(release) {
 
 function appendFinalFantasyReleaseArtwork(card, release) {
   appendReleaseArtwork(card, release, {}, "", `final-fantasy:${release.id}`);
+}
+
+function appendDragonQuestReleaseArtwork(card, release) {
+  appendReleaseArtwork(card, release, {}, "", `dragon-quest:${release.id}`);
 }
 
 function appendXenobladeReleaseArtwork(card, release) {
@@ -1298,6 +1324,15 @@ function imageManagerGroups() {
       label: "Final Fantasy",
       entries: finalFantasyReleases.map((release) => ({
         key: `final-fantasy:${release.id}`,
+        title: release.name,
+        meta: release.chineseName
+      }))
+    },
+    {
+      id: "dragon-quest",
+      label: "Dragon Quest",
+      entries: dragonQuestReleases.map((release) => ({
+        key: `dragon-quest:${release.id}`,
         title: release.name,
         meta: release.chineseName
       }))
@@ -1604,6 +1639,44 @@ function createFinalFantasyReleaseStack(release, side, isSelected, toggleRelease
   return stack;
 }
 
+function createDragonQuestReleaseStack(release, side, isSelected, toggleRelease) {
+  const stack = document.createElement("div");
+  stack.className = "timeline-card-anchor pokemon-release-stack";
+  const card = document.createElement("article");
+  card.className = "pokemon-release-card dragon-quest-release-card";
+  if (managedImagesFor(`dragon-quest:${release.id}`).length) {
+    card.classList.add("timeline-primary-card-has-artwork");
+  }
+  const platformTotal = releasePlatformCount(release);
+  const displayTag = release.tag || release.category;
+  card.innerHTML = `<div class="pokemon-release-head"><time>${gameReleaseDateLabel(release)}</time><span class="pokemon-release-tag" title="${displayTag}">${displayTag}</span></div>
+    <div class="pokemon-release-title"><strong title="${release.name}">${release.name}</strong><p title="${release.chineseName}">${release.chineseName}</p></div>
+    <div class="pokemon-release-foot"><small>${platformTotal} 个平台</small></div>`;
+  appendDragonQuestReleaseArtwork(card, release);
+  bindReleaseCard(card, isSelected, toggleRelease);
+  stack.append(card);
+
+  if (isSelected) {
+    const flyout = document.createElement("section");
+    flyout.className = `timeline-detail-flyout timeline-detail-flyout-${side} pokemon-detail-flyout dragon-quest-detail-flyout`;
+    const detail = document.createElement("section");
+    detail.className = "pokemon-release-detail timeline-information-stack";
+    const snapshot = seriesInterpretationCard(dragonQuestInsightFor(release));
+    const plot = plotSummaryCard(dragonQuestPlotSummaries[release.id] || {
+      summary: "当前版本尚未整理该作品的剧情概要。"
+    });
+    const lineage = release.lineage
+      ? Object.assign(document.createElement("div"), { className: "timeline-related-note", textContent: `谱系关系：${release.lineage}` })
+      : null;
+    const record = platformRecordCard(release, lineage);
+    detail.append(snapshot, plot, record);
+    flyout.append(detail);
+    stack.append(flyout);
+  }
+
+  return stack;
+}
+
 function createXenoSeriesReleaseStack(release, side, isSelected, toggleRelease) {
   const stack = document.createElement("div");
   stack.className = "timeline-card-anchor pokemon-release-stack";
@@ -1661,6 +1734,15 @@ function seriesOverviewDefinitions() {
       color: () => "var(--final-fantasy-color)",
       filterColor: "var(--final-fantasy-color)",
       createStack: createFinalFantasyReleaseStack
+    },
+    {
+      id: "dragon-quest",
+      label: "Dragon Quest",
+      releases: dragonQuestReleases,
+      branchClass: "pokemon-branch dragon-quest-branch",
+      color: () => "var(--dragon-quest-color)",
+      filterColor: "var(--dragon-quest-color)",
+      createStack: createDragonQuestReleaseStack
     },
     {
       id: "xeno-series",
@@ -2028,6 +2110,63 @@ function renderFinalFantasyTimeline() {
   );
 }
 
+function renderDragonQuestTimeline() {
+  if (!elements.dragonQuestTimeline) return;
+  elements.dragonQuestTimeline.textContent = "";
+
+  const releases = [...dragonQuestReleases].sort((a, b) => a.date.localeCompare(b.date) || a.name.localeCompare(b.name));
+  const reserveDetailSpace = window.matchMedia?.("(max-width: 760px)").matches;
+  const layout = layoutCategorizedReleases(releases, reserveDetailSpace, selectedDragonQuestReleaseId);
+  const axis = document.createElement("div");
+  axis.className = "vertical-timeline dragon-quest-vertical-timeline";
+  const canvas = document.createElement("section");
+  canvas.className = "timeline-year-row dragon-quest-timeline-canvas";
+  canvas.style.setProperty("--year-row-height", `${layout.height}px`);
+  const leftContent = document.createElement("div");
+  leftContent.className = "timeline-year-content timeline-year-content-left";
+  const rightContent = document.createElement("div");
+  rightContent.className = "timeline-year-content timeline-year-content-right";
+  const yearRail = document.createElement("div");
+  yearRail.className = "timeline-year-rail";
+  const leftItems = document.createElement("div");
+  leftItems.className = "timeline-year-items";
+  const rightItems = document.createElement("div");
+  rightItems.className = "timeline-year-items";
+
+  releases.forEach((release) => {
+    const itemLayout = layout.items.get(release.id);
+    const branch = document.createElement("div");
+    branch.className = `timeline-branch pokemon-branch dragon-quest-branch ${itemLayout.side === "left" ? "timeline-branch-left" : "timeline-branch-right"}${selectedDragonQuestReleaseId === release.id ? " selected" : ""}`;
+    branch.style.setProperty("--branch-offset", itemLayout.branchOffset);
+    branch.style.setProperty("--month-offset", `${itemLayout.top}px`);
+    branch.style.setProperty("--pokemon-color", "var(--dragon-quest-color)");
+
+    const toggleRelease = () => {
+      selectedDragonQuestReleaseId = selectedDragonQuestReleaseId === release.id ? null : release.id;
+      renderDragonQuestTimeline();
+    };
+    const stack = createDragonQuestReleaseStack(
+      release,
+      itemLayout.side,
+      selectedDragonQuestReleaseId === release.id,
+      toggleRelease
+    );
+
+    branch.append(stack);
+    if (itemLayout.side === "left") leftItems.append(branch);
+    else rightItems.append(branch);
+  });
+
+  leftContent.append(leftItems);
+  rightContent.append(rightItems);
+  canvas.append(leftContent, yearRail, rightContent);
+  axis.append(canvas);
+  elements.dragonQuestTimeline.append(
+    createTimelineSelectionNote(DRAGON_QUEST_TIMELINE_SELECTION_CRITERIA, "dragon-quest"),
+    axis
+  );
+}
+
 function renderXenobladeTimeline() {
   if (!elements.xenobladeTimeline) return;
   elements.xenobladeTimeline.textContent = "";
@@ -2168,6 +2307,7 @@ function currentArchiveLocation() {
   const activeSeries = document.querySelector("[data-series-tab].active")?.dataset.seriesTab;
   if (activeSeries === "pokemon-library-panel") return "pokemon";
   if (activeSeries === "final-fantasy-library-panel") return "final-fantasy";
+  if (activeSeries === "dragon-quest-library-panel") return "dragon-quest";
   if (activeSeries === "xenoblade-library-panel") return "xeno-series";
   return "series-overview";
 }
@@ -2202,6 +2342,12 @@ function restoreArchiveLocation(libraryTabs, seriesTabs) {
   if (location === "final-fantasy") {
     activateTab(libraryTabs, "libraryTab", libraryTabs.find((button) => button.dataset.libraryTab === "series-library-panel"));
     activateTab(seriesTabs, "seriesTab", seriesTabs.find((button) => button.dataset.seriesTab === "final-fantasy-library-panel"));
+    return;
+  }
+
+  if (location === "dragon-quest") {
+    activateTab(libraryTabs, "libraryTab", libraryTabs.find((button) => button.dataset.libraryTab === "series-library-panel"));
+    activateTab(seriesTabs, "seriesTab", seriesTabs.find((button) => button.dataset.seriesTab === "dragon-quest-library-panel"));
     return;
   }
 

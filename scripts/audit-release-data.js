@@ -15,6 +15,11 @@ const timelines = [
     globalName: "FINAL_FANTASY_RELEASES",
   },
   {
+    label: "Dragon Quest",
+    file: "timelines/DragonQuest/releases.js",
+    globalName: "DRAGON_QUEST_RELEASES",
+  },
+  {
     label: "Xeno Series",
     file: "timelines/XenoSeries/releases.js",
     globalName: "XENOBLADE_RELEASES",
