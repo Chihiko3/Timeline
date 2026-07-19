@@ -458,6 +458,67 @@ input {
   padding: 4px 0;
 }
 
+.series-overview-timeline {
+  position: relative;
+  max-width: 1160px;
+  margin: 28px auto 64px;
+  padding: 4px 0;
+}
+
+.series-overview-filter {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 0 0 14px;
+  border-bottom: 1px solid #d8e0ec;
+}
+
+.series-overview-filter-label {
+  flex: 0 0 auto;
+  color: #52657e;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.series-overview-filter-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  align-items: center;
+}
+
+.series-overview-filter-option {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  color: #31445f;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.series-overview-filter-option input {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  accent-color: var(--series-filter-color);
+}
+
+.series-overview-filter-option i {
+  width: 8px;
+  height: 8px;
+  background: var(--series-filter-color);
+}
+
+.series-overview-empty {
+  min-height: 240px;
+  margin: 0;
+  display: grid;
+  place-items: center;
+  color: #71819a;
+  font-size: 13px;
+}
+
 .pokemon-timeline::before {
   display: none;
 }
@@ -1910,6 +1971,7 @@ summary {
 }
 
 @media (max-width: 900px) {
+  .series-overview-timeline,
   .pokemon-timeline,
   .final-fantasy-timeline,
   .xenoblade-timeline {
@@ -1940,6 +2002,12 @@ summary {
 
   .platform-grid {
     grid-template-columns: 1fr;
+  }
+
+  .series-overview-filter {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
   }
 
   .timeline-brand-row {
