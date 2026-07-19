@@ -529,9 +529,10 @@ input {
   position: relative;
   width: min(760px, calc(100% - 32px));
   margin: 0 auto 28px;
-  padding: 0 18px 18px;
+  padding: 2px 18px 18px 20px;
   border-bottom: 1px solid #d8e0ec;
-  text-align: center;
+  box-shadow: inset 3px 0 0 var(--timeline-selection-accent);
+  text-align: left;
 }
 
 .timeline-selection-note::after {
@@ -547,18 +548,19 @@ input {
 
 .timeline-selection-note-label {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
   color: var(--timeline-selection-accent);
   font-size: 11px;
   font-weight: 750;
+  line-height: 1.4;
 }
 
 .timeline-selection-note p {
   max-width: 700px;
-  margin: 0 auto;
+  margin: 0;
   color: #4d607a;
   font-size: 13px;
-  line-height: 1.65;
+  line-height: 1.7;
 }
 
 .timeline-selection-note-pokemon {
@@ -2037,8 +2039,7 @@ summary {
   .timeline-selection-note {
     width: 100%;
     margin-bottom: 24px;
-    padding: 0 8px 16px 34px;
-    text-align: left;
+    padding: 2px 8px 16px 31px;
   }
 
   .timeline-selection-note p {
