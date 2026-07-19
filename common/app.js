@@ -1871,12 +1871,9 @@ function renderXenobladeTimeline() {
     card.setAttribute("role", "button");
     card.setAttribute("aria-expanded", String(selectedXenobladeReleaseId === release.id));
     const platformTotal = releasePlatformCount(release);
-    const cardLineage = release.lineage
-      ? `<span class="final-fantasy-card-lineage" title="${release.lineage}">${release.lineage}</span>`
-      : "";
     const displayTag = release.tag || release.category;
     card.innerHTML = `<div class="pokemon-release-head"><time>${gameReleaseDateLabel(release)}</time><span class="pokemon-release-tag" title="${displayTag}">${displayTag}</span></div>
-      <div class="pokemon-release-title"><strong title="${release.name}">${release.name}</strong><p title="${release.chineseName}">${release.chineseName}</p>${cardLineage}</div>
+      <div class="pokemon-release-title"><strong title="${release.name}">${release.name}</strong><p title="${release.chineseName}">${release.chineseName}</p></div>
       <div class="pokemon-release-foot"><small>${platformTotal} 个平台</small></div>`;
     appendXenobladeReleaseArtwork(card, release);
     const toggleRelease = () => {

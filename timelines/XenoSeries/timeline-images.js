@@ -2,49 +2,49 @@ window.XENOBLADE_TIMELINE_IMAGES = {
   "xenoblade:xenogears": [
     {
       "id": "seed-xenoblade-xenogears-0",
-      "name": "Xenogears（日本版图片）",
+      "name": "Xenogears（日本版实体封面）",
       "src": "timelines/XenoSeries/assets/covers/xenogears.jpg"
     }
   ],
   "xenoblade:xenosaga-ep1": [
     {
       "id": "seed-xenoblade-xenosaga-ep1-0",
-      "name": "Xenosaga Episode I（日本版图片）",
-      "src": "timelines/XenoSeries/assets/covers/xenosaga-ep1.jpg"
+      "name": "Xenosaga Episode I（日本版实体封面）",
+      "src": "timelines/XenoSeries/assets/covers/xenosaga-ep1.png"
     }
   ],
   "xenoblade:xenosaga-freaks": [
     {
       "id": "seed-xenoblade-xenosaga-freaks-0",
-      "name": "Xenosaga Freaks（日本版图片）",
+      "name": "Xenosaga Freaks（日本版实体封面）",
       "src": "timelines/XenoSeries/assets/covers/xenosaga-freaks.jpg"
     }
   ],
   "xenoblade:xenosaga-ep2": [
     {
       "id": "seed-xenoblade-xenosaga-ep2-0",
-      "name": "Xenosaga Episode II（日本版封面）",
+      "name": "Xenosaga Episode II（日本版实体封面）",
       "src": "timelines/XenoSeries/assets/covers/xenosaga-ep2.jpg"
     }
   ],
   "xenoblade:xenosaga-pied-piper": [
     {
-      "id": "seed-xenoblade-xenosaga-pied-piper-0",
-      "name": "Xenosaga: Pied Piper（日本版图片）",
-      "src": "timelines/XenoSeries/assets/covers/xenosaga-pied-piper.jpg"
+      "id": "6818b520-456c-4e1b-888c-2ab6e48a0a46",
+      "name": "cd271876872ec3bcc55e3a77529aa220.png",
+      "src": "timelines/XenoSeries/assets/covers/xenosaga-pied-piper-01.png"
     }
   ],
   "xenoblade:xenosaga-i-ii": [
     {
       "id": "seed-xenoblade-xenosaga-i-ii-0",
-      "name": "Xenosaga I & II（日本版封面）",
+      "name": "Xenosaga I & II（日本版实体封面）",
       "src": "timelines/XenoSeries/assets/covers/xenosaga-i-ii.jpg"
     }
   ],
   "xenoblade:xenosaga-ep3": [
     {
       "id": "seed-xenoblade-xenosaga-ep3-0",
-      "name": "Xenosaga Episode III（日本版图片）",
+      "name": "Xenosaga Episode III（日本版实体封面）",
       "src": "timelines/XenoSeries/assets/covers/xenosaga-ep3.jpg"
     }
   ],
