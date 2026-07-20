@@ -21,7 +21,15 @@
 
 所有时间线的一级卡片遵循同一套规则：左上角日期、右上角分类标签、标题、副标题、补充文本、二级菜单提示，以及可选的右下角图片区域。不同时间线的二级、三级详情内容可以不同。
 
-二至四级信息的固定职责见 [common/TIMELINE_CARD_ARCHITECTURE.md](common/TIMELINE_CARD_ARCHITECTURE.md)：二级为作品快照，三级为结构化记录，四级为策划观察与进一步研究线索。
+二至四级信息的固定职责见 [common/TIMELINE_CARD_ARCHITECTURE.md](common/TIMELINE_CARD_ARCHITECTURE.md)：二级用于快速理解作品，三级追踪设计决策、剧情与客观记录，四级保存该时间线独有的补充信息。
+
+## 研究目标
+
+时间是入口，不是结论。项目先让玩家快速确认“这是什么、何时出现、属于哪条分支”，再帮助研究者理解作品面对了什么设计问题、提出了什么假设、做了什么实验、付出了什么代价，以及后续为何继续、放弃或回到另一条路线。
+
+设计决策链采用统一结构：`设计问题 → 设计假设 → 本作实验 → 结果与代价 → 后续选择 → 判断依据`。可验证事实与编辑研究推断必须在“判断依据”中区分，避免把合理解释伪装成官方结论。
+
+每部游戏都必须经过决策链判断，并且只能处于一种状态：独立研究、比较推断或证据不足。比较推断会明确声明它不是开发团队的官方动机；证据不足会直接列出缺失材料，不使用通用句子伪造完整结论。审计脚本会阻止“尚未判断”的作品进入完成状态。
 
 ## 项目结构
 
@@ -43,12 +51,14 @@ GameConsole/
     pokemon/                          Pokemon 时间线
       selection-criteria.js           时间线开头的收录规则
       releases.js                     版本、发售日期与平台资料
+      decision-chain.js               设计问题、实验、代价与后续选择
       timeline-images.js              卡片封面清单
       assets/covers/                  游戏封面
       assets/sprites/                 御三家像素图
     final-fantasy/                    Final Fantasy 时间线
       selection-criteria.js           时间线开头的收录规则
       final-fantasy-releases.js       作品、发售日期与平台资料
+      decision-chain.js               设计问题、实验、代价与后续选择
       final-fantasy-covers.js         采集到的封面映射
       final-fantasy-logos.js          采集到的 Logo 映射
       timeline-images.js              卡片图片清单
@@ -57,6 +67,7 @@ GameConsole/
       selection-criteria.js           时间线开头的收录规则
       releases.js                     正传、重制与各衍生分支资料
       editorial-reading.js            核心体验、本作变化与研究线索
+      decision-chain.js               设计问题、实验、代价与后续选择
       design-logic.js                 机制底层逻辑
       series-impact.js                系列长期影响
       external-impact-research.js     行业影响及验证状态
@@ -67,6 +78,7 @@ GameConsole/
       selection-criteria.js           时间线开头的收录规则
       releases.js                     作品、发售日期与平台资料
       editorial-reading.js            核心体验、本作变化与研究线索
+      decision-chain.js               设计问题、实验、代价与后续选择
       design-logic.js                 机制底层逻辑
       series-impact.js                系列长期影响
       external-impact-research.js     行业影响及验证状态
@@ -125,7 +137,7 @@ GM 图片管理仅供本地维护使用。上传的图片会被复制到对应�
 - `fetch-final-fantasy-logos.ps1`：补充 Final Fantasy 横向 Logo。
 - `fetch-final-fantasy-wiki-artwork.ps1`：从 Final Fantasy Wiki 补充可供 GM 筛选的图片。
 - `fetch-dragon-quest-artwork.js`：从 Dragon Quest Wiki 补充空缺图片；保留已有 GM 图片，并优先筛选封面、日版资源与正式 Logo。
-- `audit-release-data.js`：检查所有游戏系列的完整日期、平台年份和渲染顺序。
+- `audit-release-data.js`：检查所有游戏系列的完整日期、平台年份、渲染顺序，以及决策链的作品 ID、必填字段、唯一审查状态和全作品覆盖率。
 - `seed-timeline-image-manifest.js`：根据现有资源重建全部时间线的图片清单。该脚本会重写清单，通常只在明确需要重建时使用。
 
 ## 新增时间线

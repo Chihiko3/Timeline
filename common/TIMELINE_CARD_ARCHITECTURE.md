@@ -25,7 +25,25 @@ Do not treat this level as an encyclopedia summary.
 Answers: what detailed information supports the interpretation?
 
 Use separate compact cards as appropriate. For game timelines, the default
-cards are `剧情解读` and `客观记录`.
+order is `设计决策链` (when researched), `剧情解读`, and `客观记录`.
+
+`设计决策链` explains why a branch exists rather than merely listing its new
+features. Its fixed sequence is: design problem, design hypothesis, experiment,
+result and cost, later choice, and evidence basis. Separate verifiable facts
+from research inference in the evidence basis.
+
+Every game entry must have exactly one decision-chain review state:
+
+- `manual`: a separately researched chain with an entry-specific evidence note.
+- `inferred`: a comparative chain derived from verifiable mechanics, release
+  structure, and adjacent entries. It must state that the problem and hypothesis
+  are editorial inference rather than an official developer statement.
+- `insufficient`: the entry has been reviewed, but the available creator,
+  version, service, or branch evidence cannot support a reliable chain. Render
+  the missing-evidence reason instead of fabricating six generic fields.
+
+`unreviewed` is not a valid shipped state. The release audit must fail when any
+entry is missing all three classifications.
 
 `剧情解读` always includes a plot summary. RPGs and narrative-heavy games may
 use a longer summary; gameplay-led entries remain concise. Add `叙事创新` only

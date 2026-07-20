@@ -907,6 +907,93 @@ body.show-timeline-artwork-bounds .pokemon-release-artwork {
   background: #fff;
 }
 
+.timeline-decision-chain-card {
+  --decision-accent: #62758f;
+}
+
+.pokemon-detail-flyout {
+  --decision-accent: var(--pokemon-official);
+}
+
+.final-fantasy-detail-flyout {
+  --decision-accent: #557fa2;
+}
+
+.dragon-quest-detail-flyout {
+  --decision-accent: #b43b36;
+}
+
+.xenoblade-detail-flyout {
+  --decision-accent: #b62543;
+}
+
+.timeline-decision-chain-card .timeline-information-fields {
+  gap: 0;
+}
+
+.timeline-decision-chain-card .timeline-information-field {
+  position: relative;
+  padding: 6px 0 6px 15px;
+  border-top: 1px solid #edf1f5;
+}
+
+.timeline-decision-chain-card .timeline-information-field:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.timeline-decision-chain-card .timeline-information-field::before {
+  position: absolute;
+  top: 12px;
+  left: 1px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--decision-accent);
+  content: "";
+}
+
+.timeline-decision-chain-card .timeline-information-field:first-child::before {
+  top: 6px;
+}
+
+.timeline-decision-chain-card .timeline-information-field::after {
+  position: absolute;
+  top: 17px;
+  bottom: -12px;
+  left: 3px;
+  width: 1px;
+  background: #d8e0ea;
+  content: "";
+}
+
+.timeline-decision-chain-card .timeline-information-field:first-child::after {
+  top: 11px;
+}
+
+.timeline-decision-chain-card .timeline-information-field:last-child::after {
+  display: none;
+}
+
+.timeline-decision-chain-card .timeline-information-field:last-child {
+  margin-top: 3px;
+}
+
+.timeline-decision-chain-card .timeline-information-field:last-child p {
+  color: #687b93;
+  font-size: 11px;
+}
+
+.timeline-decision-chain-status-card {
+  border-style: dashed;
+  background: #fafbfd;
+}
+
+.timeline-decision-chain-status-card .timeline-information-field:first-child p {
+  color: #815a2b;
+  font-weight: 700;
+}
+
 .timeline-information-card .pokemon-starters-panel {
   margin-top: 10px;
   padding: 9px;

@@ -8,28 +8,63 @@ const timelines = [
     label: "Pokemon",
     file: "timelines/pokemon/releases.js",
     globalName: "POKEMON_CORE_RELEASES",
+    decisionFile: "timelines/pokemon/decision-chain.js",
+    decisionGlobalName: "POKEMON_DECISION_CHAINS",
+    reviewGlobalName: "POKEMON_DECISION_CHAIN_REVIEW",
+    editorialFile: "timelines/pokemon/editorial-reading.js",
+    editorialGlobalName: "POKEMON_EDITORIAL_READING",
   },
   {
     label: "Final Fantasy",
     file: "timelines/final-fantasy/final-fantasy-releases.js",
     globalName: "FINAL_FANTASY_RELEASES",
+    decisionFile: "timelines/final-fantasy/decision-chain.js",
+    decisionGlobalName: "FINAL_FANTASY_DECISION_CHAINS",
+    reviewGlobalName: "FINAL_FANTASY_DECISION_CHAIN_REVIEW",
+    editorialFile: "timelines/final-fantasy/editorial-reading.js",
+    editorialGlobalName: "FINAL_FANTASY_EDITORIAL_READING",
   },
   {
     label: "Dragon Quest",
     file: "timelines/DragonQuest/releases.js",
     globalName: "DRAGON_QUEST_RELEASES",
+    decisionFile: "timelines/DragonQuest/decision-chain.js",
+    decisionGlobalName: "DRAGON_QUEST_DECISION_CHAINS",
+    reviewGlobalName: "DRAGON_QUEST_DECISION_CHAIN_REVIEW",
+    editorialFile: "timelines/DragonQuest/editorial-reading.js",
+    editorialGlobalName: "DRAGON_QUEST_EDITORIAL_READING",
   },
   {
     label: "Xeno Series",
     file: "timelines/XenoSeries/releases.js",
     globalName: "XENOBLADE_RELEASES",
+    decisionFile: "timelines/XenoSeries/decision-chain.js",
+    decisionGlobalName: "XENOBLADE_DECISION_CHAINS",
+    reviewGlobalName: "XENOBLADE_DECISION_CHAIN_REVIEW",
+    editorialFile: "timelines/XenoSeries/editorial-reading.js",
+    editorialGlobalName: "XENOBLADE_EDITORIAL_READING",
   },
 ];
 
-function loadTimeline({ file, globalName }) {
+const decisionFields = [
+  "problem",
+  "hypothesis",
+  "experiment",
+  "outcome",
+  "followUp",
+  "basis",
+];
+
+function loadData(file, globalName) {
+  return loadDataFiles([file], globalName);
+}
+
+function loadDataFiles(files, globalName) {
   const context = { window: {} };
-  const source = fs.readFileSync(path.join(root, file), "utf8");
-  vm.runInNewContext(source, context, { filename: file });
+  for (const file of files) {
+    const source = fs.readFileSync(path.join(root, file), "utf8");
+    vm.runInNewContext(source, context, { filename: file });
+  }
   return context.window[globalName];
 }
 
@@ -45,7 +80,16 @@ function isValidDate(value) {
 }
 
 function auditTimeline(config) {
-  const releases = loadTimeline(config);
+  const releases = loadData(config.file, config.globalName);
+  const decisionChains = loadData(
+    config.decisionFile,
+    config.decisionGlobalName,
+  );
+  const review = loadData(config.decisionFile, config.reviewGlobalName);
+  const editorial = loadDataFiles(
+    [config.file, config.editorialFile],
+    config.editorialGlobalName,
+  );
   const errors = [];
   const ids = new Set();
 
@@ -85,6 +129,44 @@ function auditTimeline(config) {
   for (let index = 1; index < renderedOrder.length; index += 1) {
     if (renderedOrder[index].date < renderedOrder[index - 1].date) {
       errors.push(`${renderedOrder[index].id}: rendered timeline order is invalid`);
+    }
+  }
+
+  for (const [id, chain] of Object.entries(decisionChains)) {
+    if (!ids.has(id)) {
+      errors.push(`${id}: decision chain references an unknown release`);
+    }
+    for (const field of decisionFields) {
+      if (typeof chain[field] !== "string" || !chain[field].trim()) {
+        errors.push(`${id}: decision chain is missing "${field}"`);
+      }
+    }
+  }
+
+  const reviewIds = new Map();
+  const addReviewId = (id, status) => {
+    if (!ids.has(id)) {
+      errors.push(`${id}: ${status} review references an unknown release`);
+    }
+    if (reviewIds.has(id) || decisionChains[id]) {
+      errors.push(`${id}: decision review is classified more than once`);
+    }
+    reviewIds.set(id, status);
+  };
+
+  for (const id of review.inferred || []) {
+    addReviewId(id, "inferred");
+    if (!editorial[id]?.loop || !editorial[id]?.change) {
+      errors.push(`${id}: inferred decision chain lacks specific editorial data`);
+    }
+  }
+  for (const [reason, reasonIds] of Object.entries(review.insufficient || {})) {
+    for (const id of reasonIds) addReviewId(id, `insufficient:${reason}`);
+  }
+
+  for (const id of ids) {
+    if (!decisionChains[id] && !reviewIds.has(id)) {
+      errors.push(`${id}: decision chain has not been reviewed`);
     }
   }
 

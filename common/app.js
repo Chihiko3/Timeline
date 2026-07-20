@@ -1,4 +1,5 @@
 const archive = window.CONSOLE_ARCHIVE;
+const SHOW_DESIGN_DECISION_CHAINS = false;
 
 const state = {
   selectedTimelineId: null,
@@ -24,6 +25,10 @@ const pokemonReleaseInsights = window.POKEMON_RELEASE_INSIGHTS || {};
 const finalFantasyReleaseInsights = window.FINAL_FANTASY_RELEASE_INSIGHTS || {};
 const pokemonEditorialReading = window.POKEMON_EDITORIAL_READING || {};
 const finalFantasyEditorialReading = window.FINAL_FANTASY_EDITORIAL_READING || {};
+const pokemonDecisionChains = window.POKEMON_DECISION_CHAINS || {};
+const finalFantasyDecisionChains = window.FINAL_FANTASY_DECISION_CHAINS || {};
+const pokemonDecisionChainReview = window.POKEMON_DECISION_CHAIN_REVIEW || {};
+const finalFantasyDecisionChainReview = window.FINAL_FANTASY_DECISION_CHAIN_REVIEW || {};
 const pokemonSeriesImpact = window.POKEMON_SERIES_IMPACT || {};
 const finalFantasySeriesImpact = window.FINAL_FANTASY_SERIES_IMPACT || {};
 const pokemonDesignLogic = window.POKEMON_DESIGN_LOGIC || {};
@@ -37,11 +42,15 @@ const dragonQuestDesignLogic = window.DRAGON_QUEST_DESIGN_LOGIC || {};
 const dragonQuestSeriesImpact = window.DRAGON_QUEST_SERIES_IMPACT || {};
 const dragonQuestExternalImpactResearch = window.DRAGON_QUEST_EXTERNAL_IMPACT_RESEARCH || {};
 const dragonQuestPlotSummaries = window.DRAGON_QUEST_PLOT_SUMMARIES || {};
+const dragonQuestDecisionChains = window.DRAGON_QUEST_DECISION_CHAINS || {};
+const dragonQuestDecisionChainReview = window.DRAGON_QUEST_DECISION_CHAIN_REVIEW || {};
 const xenobladeEditorialReading = window.XENOBLADE_EDITORIAL_READING || {};
 const xenobladeDesignLogic = window.XENOBLADE_DESIGN_LOGIC || {};
 const xenobladeSeriesImpact = window.XENOBLADE_SERIES_IMPACT || {};
 const xenobladeExternalImpactResearch = window.XENOBLADE_EXTERNAL_IMPACT_RESEARCH || {};
 const xenobladePlotSummaries = window.XENOBLADE_PLOT_SUMMARIES || {};
+const xenobladeDecisionChains = window.XENOBLADE_DECISION_CHAINS || {};
+const xenobladeDecisionChainReview = window.XENOBLADE_DECISION_CHAIN_REVIEW || {};
 const finalFantasyCovers = window.FINAL_FANTASY_RELEASE_COVERS || {};
 const finalFantasyLogos = window.FINAL_FANTASY_RELEASE_LOGOS || {};
 const timelineImageStore = window.timelineImageStore;
@@ -1063,6 +1072,64 @@ function seriesInterpretationCard(insight) {
   return informationCard(2, "系列解读", fields);
 }
 
+function designDecisionChainCard(chain) {
+  if (!chain) return null;
+  const fields = [
+    { label: "设计问题", value: chain.problem },
+    { label: "设计假设", value: chain.hypothesis },
+    { label: "本作实验", value: chain.experiment },
+    { label: "结果与代价", value: chain.outcome },
+    { label: "后续选择", value: chain.followUp },
+    { label: "判断依据", value: chain.basis }
+  ].filter(({ value }) => value);
+  const card = informationCard(3, "设计决策链", fields);
+  card.classList.add("timeline-decision-chain-card");
+  return card;
+}
+
+const DECISION_REVIEW_REASONS = {
+  "creator-evidence": "现有资料可以确认成品内容，但缺少可核对的作者访谈、版本日志和连续开发记录，无法可靠区分作者原始目标、社区解释与后期改动。",
+  "version-evidence": "现有资料能确认作品或版本存在，但还不足以逐项核对相对原作改变了什么、为何改变，以及这些变化是否被后续作品继承。",
+  "service-evidence": "作品依赖街机、联网运营或已经停服的内容版本；当前缺少完整规则、版本演进和运营复盘，无法建立可靠的实验结果与后续选择。",
+  "branch-evidence": "现有资料主要说明类型与题材，尚不足以证明本作相对同分支前后作品解决了哪个具体问题，强行补链会把产品差异误写成设计动机。",
+  unreviewed: "该作品尚未完成证据判断。"
+};
+
+function decisionReviewStatus(releaseId, review) {
+  if ((review.inferred || []).includes(releaseId)) return { status: "inferred" };
+  for (const [reason, ids] of Object.entries(review.insufficient || {})) {
+    if (ids.includes(releaseId)) return { status: "insufficient", reason };
+  }
+  return { status: "unreviewed", reason: "unreviewed" };
+}
+
+function inferredDecisionChain(insight) {
+  return {
+    problem: `现有资料未能确认团队的原始命题。依据成品与相邻作品的差异，可研究的问题是：如何在保留系列识别度的同时完成这项结构变化——${insight.change}`,
+    hypothesis: `编辑推断：团队可能认为，把玩家的主要活动组织为“${insight.loop}”，能够回应上述问题。此处不是官方动机陈述。`,
+    experiment: insight.designLogic
+      ? `成品中可以直接验证的机制实验是：${insight.designLogic}`
+      : `成品中可以直接验证的规则、内容或发行结构变化是：${insight.change}`,
+    outcome: `成品最终形成的核心体验是：${insight.loop}。其代价与适用边界需要沿以下线索继续检验：${insight.note || "比较玩家行为、流程摩擦与版本差异。"}`,
+    followUp: insight.legacy || "当前没有足够材料证明这项实验被后续作品明确继承、修正或放弃，因此暂不作长期影响判断。",
+    basis: "证据等级：比较推断。机制、流程和前后作差异属于可验证事实；“设计问题”与“设计假设”是编辑研究结论，不代表开发团队的官方说法。"
+  };
+}
+
+function decisionChainReviewCard(release, insight, manualChains, review) {
+  if (manualChains[release.id]) return designDecisionChainCard(manualChains[release.id]);
+  const assessment = decisionReviewStatus(release.id, review);
+  if (assessment.status === "inferred") {
+    return designDecisionChainCard(inferredDecisionChain(insight));
+  }
+  const card = informationCard(3, "设计决策链", [
+    { label: "判断结果", value: assessment.status === "insufficient" ? "证据不足，暂不建立决策链。" : "尚未完成判断。" },
+    { label: "缺少依据", value: DECISION_REVIEW_REASONS[assessment.reason] || DECISION_REVIEW_REASONS.unreviewed }
+  ]);
+  card.classList.add("timeline-decision-chain-status-card");
+  return card;
+}
+
 function pokemonInsightFor(release) {
   const insight = pokemonReleaseInsights[release.id] || {};
   const editorial = pokemonEditorialReading[release.id] || {};
@@ -1584,12 +1651,20 @@ function createPokemonReleaseStack(release, side, isSelected, toggleRelease) {
     detail.className = "pokemon-release-detail timeline-information-stack";
     const insight = pokemonInsightFor(release);
     const snapshot = seriesInterpretationCard(insight);
+    const decision = decisionChainReviewCard(
+      release,
+      insight,
+      pokemonDecisionChains,
+      pokemonDecisionChainReview
+    );
     const plot = plotSummaryCard(pokemonPlotSummaries[release.id] || {
       summary: "当前版本尚未整理该作品的剧情概要。"
     });
     const record = platformRecordCard(release);
     const supplement = informationCard(4, "补充信息", [], createPokemonStartersPanel(release));
-    detail.append(snapshot, plot, record, supplement);
+    detail.append(snapshot);
+    if (SHOW_DESIGN_DECISION_CHAINS) detail.append(decision);
+    detail.append(plot, record, supplement);
     flyout.append(detail);
     stack.append(flyout);
   }
@@ -1624,6 +1699,12 @@ function createFinalFantasyReleaseStack(release, side, isSelected, toggleRelease
     detail.className = "pokemon-release-detail timeline-information-stack";
     const insight = finalFantasyInsightFor(release);
     const snapshot = seriesInterpretationCard(insight);
+    const decision = decisionChainReviewCard(
+      release,
+      insight,
+      finalFantasyDecisionChains,
+      finalFantasyDecisionChainReview
+    );
     const plot = plotSummaryCard(finalFantasyPlotSummaries[release.id] || {
       summary: "当前版本尚未整理该作品的剧情概要。"
     });
@@ -1631,7 +1712,9 @@ function createFinalFantasyReleaseStack(release, side, isSelected, toggleRelease
       ? Object.assign(document.createElement("div"), { className: "timeline-related-note", textContent: `谱系关系：${release.lineage}` })
       : null;
     const record = platformRecordCard(release, lineage);
-    detail.append(snapshot, plot, record);
+    detail.append(snapshot);
+    if (SHOW_DESIGN_DECISION_CHAINS) detail.append(decision);
+    detail.append(plot, record);
     flyout.append(detail);
     stack.append(flyout);
   }
@@ -1661,7 +1744,14 @@ function createDragonQuestReleaseStack(release, side, isSelected, toggleRelease)
     flyout.className = `timeline-detail-flyout timeline-detail-flyout-${side} pokemon-detail-flyout dragon-quest-detail-flyout`;
     const detail = document.createElement("section");
     detail.className = "pokemon-release-detail timeline-information-stack";
-    const snapshot = seriesInterpretationCard(dragonQuestInsightFor(release));
+    const insight = dragonQuestInsightFor(release);
+    const snapshot = seriesInterpretationCard(insight);
+    const decision = decisionChainReviewCard(
+      release,
+      insight,
+      dragonQuestDecisionChains,
+      dragonQuestDecisionChainReview
+    );
     const plot = plotSummaryCard(dragonQuestPlotSummaries[release.id] || {
       summary: "当前版本尚未整理该作品的剧情概要。"
     });
@@ -1669,7 +1759,9 @@ function createDragonQuestReleaseStack(release, side, isSelected, toggleRelease)
       ? Object.assign(document.createElement("div"), { className: "timeline-related-note", textContent: `谱系关系：${release.lineage}` })
       : null;
     const record = platformRecordCard(release, lineage);
-    detail.append(snapshot, plot, record);
+    detail.append(snapshot);
+    if (SHOW_DESIGN_DECISION_CHAINS) detail.append(decision);
+    detail.append(plot, record);
     flyout.append(detail);
     stack.append(flyout);
   }
@@ -1699,7 +1791,14 @@ function createXenoSeriesReleaseStack(release, side, isSelected, toggleRelease) 
     flyout.className = `timeline-detail-flyout timeline-detail-flyout-${side} pokemon-detail-flyout xenoblade-detail-flyout`;
     const detail = document.createElement("section");
     detail.className = "pokemon-release-detail timeline-information-stack";
-    const snapshot = seriesInterpretationCard(xenobladeInsightFor(release));
+    const insight = xenobladeInsightFor(release);
+    const snapshot = seriesInterpretationCard(insight);
+    const decision = decisionChainReviewCard(
+      release,
+      insight,
+      xenobladeDecisionChains,
+      xenobladeDecisionChainReview
+    );
     const plot = plotSummaryCard(xenobladePlotSummaries[release.id] || {
       summary: "当前版本尚未整理该作品的剧情概要。"
     });
@@ -1707,7 +1806,9 @@ function createXenoSeriesReleaseStack(release, side, isSelected, toggleRelease) 
       ? Object.assign(document.createElement("div"), { className: "timeline-related-note", textContent: `谱系关系：${release.lineage}` })
       : null;
     const record = platformRecordCard(release, lineage);
-    detail.append(snapshot, plot, record);
+    detail.append(snapshot);
+    if (SHOW_DESIGN_DECISION_CHAINS) detail.append(decision);
+    detail.append(plot, record);
     flyout.append(detail);
     stack.append(flyout);
   }
