@@ -57,7 +57,7 @@ window.FINAL_FANTASY_EXTERNAL_IMPACT_RESEARCH = {
     "ff-dimensions": "移动端像素风正传式 RPG",
     "ff7-g-bike": "移动端轻量化外传与 IP 再利用",
     "lightning-returns": "时间限制、城市任务与单主角结构",
-    "ff-agito": "移动端项目转型与取消原因",
+    "ff-agito": "移动端全服选择、章节运营、服务终止与 Agito+ 取消的区别",
     "ff-dimensions-2": "移动端免费游玩、抽取与角色编队",
     "mobius-ff": "移动端高规格 3D RPG 与服务运营",
     "ff-explorers": "多人共斗与职业能力组合",

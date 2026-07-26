@@ -39,7 +39,10 @@ window.FINAL_FANTASY_DECISION_CHAIN_REVIEW = {
     "ff-dimensions", "ff7-g-bike", "lightning-returns", "ff-agito",
     "ff-dimensions-2", "mobius-ff", "ff-explorers", "ff15",
     "ff7-first-soldier", "stranger-of-paradise", "chocobo-gp", "ff16",
-    "ff7-ever-crisis", "ff7-rebirth"
+    "ff7-ever-crisis", "ff7-rebirth", "dissidia", "dissidia-012",
+    "theatrhythm-ff", "theatrhythm-curtain-call", "record-keeper",
+    "brave-exvius", "dissidia-arcade-nt", "world-of-ff", "opera-omnia",
+    "wotv-ffbe", "theatrhythm-final-bar-line", "dissidia-duellum"
   ],
   insufficient: {}
 };

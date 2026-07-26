@@ -25,6 +25,12 @@ const timelines = [
     reviewGlobalName: "FINAL_FANTASY_DECISION_CHAIN_REVIEW",
     editorialFile: "timelines/final-fantasy/editorial-reading.js",
     editorialGlobalName: "FINAL_FANTASY_EDITORIAL_READING",
+    editorialSupportFiles: [
+      "timelines/final-fantasy/design-logic.js",
+      "timelines/final-fantasy/series-impact.js",
+      "timelines/final-fantasy/plot-summaries.js",
+      "timelines/final-fantasy/verified-additions.js",
+    ],
     milestoneFile: "timelines/final-fantasy/milestones.js",
     milestoneGlobalName: "FINAL_FANTASY_MILESTONES",
   },
@@ -39,6 +45,18 @@ const timelines = [
     editorialGlobalName: "DRAGON_QUEST_EDITORIAL_READING",
     milestoneFile: "timelines/DragonQuest/milestones.js",
     milestoneGlobalName: "DRAGON_QUEST_MILESTONES",
+  },
+  {
+    label: "Like a Dragon",
+    file: "timelines/LikeADragon/releases.js",
+    globalName: "LIKE_A_DRAGON_RELEASES",
+    decisionFile: "timelines/LikeADragon/decision-chain.js",
+    decisionGlobalName: "LIKE_A_DRAGON_DECISION_CHAINS",
+    reviewGlobalName: "LIKE_A_DRAGON_DECISION_CHAIN_REVIEW",
+    editorialFile: "timelines/LikeADragon/editorial-reading.js",
+    editorialGlobalName: "LIKE_A_DRAGON_EDITORIAL_READING",
+    milestoneFile: "timelines/LikeADragon/milestones.js",
+    milestoneGlobalName: "LIKE_A_DRAGON_MILESTONES",
   },
   {
     label: "Xeno Series",
@@ -95,7 +113,7 @@ function auditTimeline(config) {
   );
   const review = loadData(config.decisionFile, config.reviewGlobalName);
   const editorial = loadDataFiles(
-    [config.file, config.editorialFile],
+    [config.file, config.editorialFile, ...(config.editorialSupportFiles || [])],
     config.editorialGlobalName,
   );
   const milestones = loadData(config.milestoneFile, config.milestoneGlobalName);

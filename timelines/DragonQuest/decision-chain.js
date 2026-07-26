@@ -42,7 +42,7 @@ window.DRAGON_QUEST_DECISION_CHAIN_REVIEW = {
       "battle-road-2", "battle-road-victory", "monster-parade",
       "dqm-super-light", "stars", "battle-scanner", "dq-rivals", "dq-walk",
       "dq-tact", "dai-cross-blade", "dai-bonds", "keshi-keshi",
-      "dq-champions"
+      "dq-champions", "smash-grow"
     ],
     "branch-evidence": [
       "kenshin", "slime-1", "slime-2", "dqm-joker", "dq-swords",

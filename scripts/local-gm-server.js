@@ -24,6 +24,10 @@ const manifestDefinitions = {
     path: path.join(timelinesDirectory, "DragonQuest", "timeline-images.js"),
     globalName: "DRAGON_QUEST_TIMELINE_IMAGES"
   },
+  "like-a-dragon": {
+    path: path.join(timelinesDirectory, "LikeADragon", "timeline-images.js"),
+    globalName: "LIKE_A_DRAGON_TIMELINE_IMAGES"
+  },
   xenoblade: {
     path: path.join(timelinesDirectory, "XenoSeries", "timeline-images.js"),
     globalName: "XENOBLADE_TIMELINE_IMAGES"
@@ -108,6 +112,7 @@ function collectionDirectoryForKey(key) {
   if (collection === "pokemon") return path.join(timelinesDirectory, "pokemon", "assets", "covers");
   if (collection === "final-fantasy") return path.join(timelinesDirectory, "final-fantasy", "assets", "covers");
   if (collection === "dragon-quest") return path.join(timelinesDirectory, "DragonQuest", "assets", "covers");
+  if (collection === "like-a-dragon") return path.join(timelinesDirectory, "LikeADragon", "assets", "covers");
   if (collection === "xenoblade") return path.join(timelinesDirectory, "XenoSeries", "assets", "covers");
   throw new Error("Unsupported timeline collection");
 }

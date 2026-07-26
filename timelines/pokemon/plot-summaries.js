@@ -29,3 +29,62 @@ window.POKEMON_PLOT_SUMMARIES = {
   "radical-red": { summary: "沿用《火红》的关都主线：主角挑战道馆、对抗火箭队并冲击联盟；叙事不是重点，重心在强化后的训练家战和队伍构筑。" },
   bdsp: { summary: "重述神奥主线：主角挑战道馆、粉碎银河队创造新宇宙的计划，随后成为联盟冠军并继续探索神奥传说。" }
 };
+
+Object.assign(window.POKEMON_PLOT_SUMMARIES, {
+  "red-green-blue": {
+    ...window.POKEMON_PLOT_SUMMARIES["red-green-blue"],
+    innovation: "把图鉴收集、道馆成长、反派阻碍和冠军目标叠成同一条旅行线；故事不是独立过场，而是持续为发现新物种、取得新移动能力和扩大可探索区域提供动机。"
+  },
+  "ruby-sapphire": {
+    ...window.POKEMON_PLOT_SUMMARIES["ruby-sapphire"],
+    innovation: "首次让版本差异改变主线反派、传说宝可梦与灾难形态；同一地区因此拥有两套互为镜像的生态极端主义冲突。"
+  },
+  "firered-leafgreen": {
+    ...window.POKEMON_PLOT_SUMMARIES["firered-leafgreen"],
+    innovation: "在忠实重述关都主线后增加七之岛后日谈，用火箭队残党与网络机器把重制故事接入第三世代的交换生态，而不是让旧地区停留在封闭复刻中。"
+  },
+  "diamond-pearl": {
+    ...window.POKEMON_PLOT_SUMMARIES["diamond-pearl"],
+    innovation: "把反派目标从牟利或环境改造提升为重写时间、空间与情感本身，使地区神话首次直接承担宇宙创世层面的主线冲突。"
+  },
+  "heartgold-soulsilver": {
+    ...window.POKEMON_PLOT_SUMMARIES["heartgold-soulsilver"],
+    innovation: "保留跨越城都、关都的后日谈结构，并用雪拉比事件补写坂木与火箭队广播之间的缺席因果，让重制版以可选事件修补旧作人物线。"
+  },
+  oras: {
+    ...window.POKEMON_PLOT_SUMMARIES.oras,
+    innovation: "德尔塔篇章把原作未解释的流星传说、超级进化起源和多世界假说接入战后章节，并以骑乘烈空坐进入太空作为可操作的叙事高潮。"
+  },
+  "black-shadow": {
+    ...window.POKEMON_PLOT_SUMMARIES["black-shadow"],
+    innovation: "以三个周目逐步开放原创地区、跨作品角色与高难首领，把原版通关后的收集阶段改写为持续推进的新剧情；具体文本会因 5.0、5.0EX 与 EX+ 版本而有差异。"
+  },
+  prism: {
+    ...window.POKEMON_PLOT_SUMMARIES.prism,
+    innovation: "把《Brown》的 Rijon 世界延伸到 Naljo，并以矿车、采矿、角色扮演宝可梦等段落打断传统道馆旅行，使 GBC 改版拥有独立于官方地区的连续同人谱系。"
+  },
+  "ultra-sun-moon": {
+    ...window.POKEMON_PLOT_SUMMARIES["ultra-sun-moon"],
+    innovation: "不是《太阳／月亮》结局后的续篇，而是从中段开始分叉的平行改写：奈克洛兹玛取代露莎米奈承担终局危机，玩家首次主动穿越究极之洞前往异世界处理主线。"
+  },
+  "lets-go": {
+    ...window.POKEMON_PLOT_SUMMARIES["lets-go"],
+    innovation: "用新主角和新劲敌重走关都，并让赤红、青绿作为已经完成旅程的前代训练家出现；它把复述初代与承认系列历史放在同一版本中。"
+  },
+  "sword-shield": {
+    ...window.POKEMON_PLOT_SUMMARIES["sword-shield"],
+    innovation: "把道馆挑战包装成全国直播的职业体育联赛，让竞争者、赞助、观众和冠军共同参与主线；能源危机则在决赛阶段打断赛事，揭示竞技体制背后的治理问题。"
+  },
+  "radical-red": {
+    ...window.POKEMON_PLOT_SUMMARIES["radical-red"],
+    innovation: "剧情刻意保持《火红》骨架，变化集中在每个首领的队伍脚本和规则压力；叙事功能由讲新故事转为稳定地串联一组逐级升级的战术考题。"
+  },
+  bdsp: {
+    ...window.POKEMON_PLOT_SUMMARIES.bdsp,
+    innovation: "主线几乎逐段保留《钻石／珍珠》而非吸收《白金》的反转世界改写，因而成为研究“视觉重制与叙事重构可以彼此分离”的清晰案例。"
+  },
+  "legends-za": {
+    summary: "主角来到密阿雷市后加入旅馆 Z 的 MZ 队，一面参与夜间 Z-A Royale 晋级，一面处理失控超级进化。随着城市再开发、AZ 与最终兵器旧史逐渐交汇，众人必须阻止棱镜塔上方的“光之破灭”再次伤害城市。",
+    innovation: "把整部故事限制在一座会随昼夜改变功能的城市：白天调查野生区，夜间进入对战区晋级；失控超级进化既是首领战规则，也是连接城市治理、AZ 往事与终局危机的叙事原因。"
+  }
+});

@@ -15,6 +15,8 @@
 - **总览**：提供所有已注册游戏时间线的筛选器。默认不显示任何系列；用户勾选后，将所选系列的一级卡片按全球最早发售日期合并到同一条时间线，并复用各系列原有的卡片内容、图片与展开详情。
 - **Pokemon**：官方作品与代表性同人/ROM 改版，包含首发及后续登陆平台、御三家、重制/改版关系和封面图。
 - **Final Fantasy**：不含跨界作品的最终幻想相关作品，包含正传、续作、战略版、水晶编年史、陆行鸟等分支，以及首发及后续登陆平台和封面/Logo 图。
+- **Dragon Quest**：整理正传、重制、怪兽篇、不思议迷宫、创世小玩家等官方产品线，并追踪各分支的机制演进。
+- **Like a Dragon**：整理正传、时代剧、黑豹、审判、重制与重要外传，重点记录高密度城市、动作／回合制系统和多主角叙事的演进。
 - **Xeno Series**：以创作谱系串联 Xenogears、Xenosaga 与 Xenoblade，区分版权与世界观边界，并整理发行平台、机制演进和剧情解读。
 
 新增游戏时间线时，应同时在 `common/app.js` 的 `seriesOverviewDefinitions()` 中完成注册。注册后的系列会自动进入总览筛选器，但不会默认勾选。
@@ -79,6 +81,18 @@ GameConsole/
       plot-summaries.js               剧情概要与叙事创新
       timeline-images.js              卡片图片清单
       assets/covers/                  Dragon Quest 作品图片
+    LikeADragon/                      Like a Dragon 时间线
+      selection-criteria.js           时间线开头的收录规则
+      releases.js                     正传、衍生、重制与平台资料
+      milestones.js                   系列全球突破与转型节点
+      editorial-reading.js            核心体验、本作变化与研究线索
+      decision-chain.js               设计决策链审查状态
+      design-logic.js                 机制底层逻辑
+      series-impact.js                系列长期影响
+      external-impact-research.js     可验证的行业影响
+      plot-summaries.js               剧情概要与叙事创新
+      timeline-images.js              卡片图片清单
+      assets/covers/                  官方宣传图与日版封面
     XenoSeries/                       Xeno Series 创作谱系时间线
       selection-criteria.js           时间线开头的收录规则
       releases.js                     作品、发售日期与平台资料
@@ -116,7 +130,7 @@ GM 图片管理仅供本地维护使用。上传的图片会被复制到对应�
 
 - 时间线图片的唯一清单是各时间线目录下的 `timeline-images.js`。
 - 一张卡片配置一张图时，卡片只展示该图；配置多张图时，卡片支持循环切换，悬浮时展示全部图片。
-- 图片应放在所属时间线的资源目录中：主机放入 `hardware/assets/consoles`，Pokemon 放入 `pokemon/assets/covers`，Final Fantasy 放入 `final-fantasy/assets/covers`，Dragon Quest 放入 `DragonQuest/assets/covers`，Xeno Series 放入 `XenoSeries/assets/covers`。
+- 图片应放在所属时间线的资源目录中：主机放入 `hardware/assets/consoles`，Pokemon 放入 `pokemon/assets/covers`，Final Fantasy 放入 `final-fantasy/assets/covers`，Dragon Quest 放入 `DragonQuest/assets/covers`，Like a Dragon 放入 `LikeADragon/assets/covers`，Xeno Series 放入 `XenoSeries/assets/covers`。
 - 主动采集日本游戏图片时，优先使用其最早发行平台的日本地区封面；没有独立实体封面的内容可使用日本官网主视觉，并在图片名称中注明。
 - 搜索图片时必须并行使用作品的英文名、中文名和日文原名，不得只依赖单一语言或单一标题写法；必要时同时搜索副标题、平台名、地区版本名和日文商品编号。
 - 搜索范围可包括官方网站、发行商与平台商店、游戏数据库、专题 Wiki、日文资料站、粉丝资料站、旧游戏商店和媒体图库。找到内容可靠、图片质量较高的系列专题站后，应继续检查该站是否覆盖同系列的其他作品。

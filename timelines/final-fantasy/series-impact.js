@@ -45,7 +45,7 @@ window.FINAL_FANTASY_SERIES_IMPACT = {
   "ff-dimensions": null,
   "ff7-g-bike": null,
   "lightning-returns": "它把队伍战斗缩成雷霆单人换装，并以十三天倒计时和任务推进世界时间，完成《XIII》三部曲从线性到开放时限结构的连续实验。这套方案没有被后续正传直接继承。",
-  "ff-agito": null,
+  "ff-agito": "它把《零式》的战争轮回改造成自建候补生、章节配信、全服投票和角色收集驱动的移动端服务，并实际运营至 2015 年。它没有成为长期分支，但清楚记录了 Square Enix 早期尝试让单机世界观接受集体选择与持续运营的方式；Vita 版《Agito+》取消、手机原作停服也暴露了这类叙事的保存风险。",
   "ff-dimensions-2": null,
   "mobius-ff": "它尝试在手机上提供接近主机规格的 3D 演出、章节主线和职业卡组运营，成为 Square Enix 探索高成本移动 RPG 的代表；服务终止也说明纯线上叙事在保存与长期可访问性上的风险。",
   "ff-explorers": "它把职业、召唤兽和经典角色能力整理成四人共斗狩猎循环，测试 Final Fantasy 资产在任务制多人动作 RPG 中的适配。该方向后来没有发展为稳定系列。",

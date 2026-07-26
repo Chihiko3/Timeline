@@ -13,6 +13,7 @@
   --pokemon-fan: #3b4cca;
   --final-fantasy-color: #4f7595;
   --dragon-quest-color: #2458a6;
+  --like-a-dragon-color: #9f2f24;
   --xenoblade-color: #a1263d;
   --timeline-card-width: 500px;
   --shadow: 0 12px 36px rgba(32, 36, 44, 0.08);
@@ -148,13 +149,23 @@ input {
   display: flex;
   align-items: center;
   gap: 20px;
+  width: 100%;
+  max-width: 100%;
   margin: -4px 0 26px;
   padding-left: 14px;
   border-left: 2px solid #dbe2ec;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+
+.series-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .series-tab {
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   gap: 7px;
   height: 28px;
@@ -575,6 +586,10 @@ input {
   --timeline-selection-accent: var(--dragon-quest-color);
 }
 
+.timeline-selection-note-like-a-dragon {
+  --timeline-selection-accent: var(--like-a-dragon-color);
+}
+
 .timeline-selection-note-xenoblade {
   --timeline-selection-accent: var(--xenoblade-color);
 }
@@ -761,6 +776,7 @@ input {
 
 .final-fantasy-timeline,
 .dragon-quest-timeline,
+.like-a-dragon-timeline,
 .xenoblade-timeline {
   position: relative;
   max-width: 1160px;
@@ -869,6 +885,8 @@ body.show-timeline-artwork-bounds .pokemon-release-artwork {
 
 .final-fantasy-release-card.timeline-primary-card-has-artwork .pokemon-release-title p,
 .final-fantasy-release-card.timeline-primary-card-has-artwork .final-fantasy-card-lineage,
+.like-a-dragon-release-card.timeline-primary-card-has-artwork .pokemon-release-title p,
+.like-a-dragon-release-card.timeline-primary-card-has-artwork .final-fantasy-card-lineage,
 .xenoblade-release-card.timeline-primary-card-has-artwork .pokemon-release-title p,
 .xenoblade-release-card.timeline-primary-card-has-artwork .final-fantasy-card-lineage {
   padding-right: 144px;
@@ -1013,6 +1031,10 @@ body.show-timeline-artwork-bounds .pokemon-release-artwork {
 
 .dragon-quest-detail-flyout {
   --decision-accent: #b43b36;
+}
+
+.like-a-dragon-detail-flyout {
+  --decision-accent: var(--like-a-dragon-color);
 }
 
 .xenoblade-detail-flyout {
@@ -1218,6 +1240,10 @@ body.show-timeline-artwork-bounds .pokemon-release-artwork {
 
 .dragon-quest-branch::after {
   background: var(--dragon-quest-color);
+}
+
+.like-a-dragon-branch::after {
+  background: var(--like-a-dragon-color);
 }
 
 .pokemon-branch .pokemon-release-stack {
@@ -2171,6 +2197,7 @@ summary {
   .pokemon-timeline,
   .final-fantasy-timeline,
   .dragon-quest-timeline,
+  .like-a-dragon-timeline,
   .xenoblade-timeline {
     margin-left: 8px;
   }
@@ -2178,6 +2205,7 @@ summary {
   .pokemon-branch .pokemon-release-stack,
   .final-fantasy-branch .pokemon-release-stack,
   .dragon-quest-branch .pokemon-release-stack,
+  .like-a-dragon-branch .pokemon-release-stack,
   .xenoblade-branch .pokemon-release-stack {
     width: 100%;
     flex-basis: 100%;
