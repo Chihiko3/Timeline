@@ -21,6 +21,10 @@ const pokemonReleases = window.POKEMON_CORE_RELEASES || [];
 const finalFantasyReleases = window.FINAL_FANTASY_RELEASES || [];
 const dragonQuestReleases = window.DRAGON_QUEST_RELEASES || [];
 const xenobladeReleases = window.XENOBLADE_RELEASES || [];
+const pokemonMilestones = window.POKEMON_MILESTONES || {};
+const finalFantasyMilestones = window.FINAL_FANTASY_MILESTONES || {};
+const dragonQuestMilestones = window.DRAGON_QUEST_MILESTONES || {};
+const xenobladeMilestones = window.XENOBLADE_MILESTONES || {};
 const pokemonReleaseInsights = window.POKEMON_RELEASE_INSIGHTS || {};
 const finalFantasyReleaseInsights = window.FINAL_FANTASY_RELEASE_INSIGHTS || {};
 const pokemonEditorialReading = window.POKEMON_EDITORIAL_READING || {};
@@ -1618,6 +1622,35 @@ function bindReleaseCard(card, isSelected, toggleRelease) {
   });
 }
 
+function appendReleaseMilestone(stack, release, side, milestones, seriesLabel) {
+  const milestone = milestones[release.id];
+  if (!milestone) return;
+
+  const marker = document.createElement("button");
+  marker.type = "button";
+  marker.className = `timeline-milestone-marker timeline-milestone-marker-${side}`;
+  marker.setAttribute(
+    "aria-label",
+    `${seriesLabel} 里程碑，${release.name}：${milestone.label}。${milestone.achievement}`
+  );
+  marker.textContent = "★";
+
+  const tooltip = document.createElement("span");
+  tooltip.className = "timeline-milestone-tooltip";
+  tooltip.setAttribute("role", "tooltip");
+
+  const label = document.createElement("strong");
+  label.textContent = milestone.label;
+  const achievement = document.createElement("span");
+  achievement.textContent = milestone.achievement;
+  const evidence = document.createElement("small");
+  evidence.textContent = `判断依据：${milestone.evidence}`;
+
+  tooltip.append(label, achievement, evidence);
+  marker.append(tooltip);
+  stack.append(marker);
+}
+
 function createPokemonReleaseStack(release, side, isSelected, toggleRelease) {
   const stack = document.createElement("div");
   stack.className = "timeline-card-anchor pokemon-release-stack";
@@ -1643,6 +1676,7 @@ function createPokemonReleaseStack(release, side, isSelected, toggleRelease) {
   appendPokemonReleaseArtwork(card, release);
   bindReleaseCard(card, isSelected, toggleRelease);
   stack.append(card);
+  appendReleaseMilestone(stack, release, side, pokemonMilestones, "Pokémon");
 
   if (isSelected) {
     const flyout = document.createElement("section");
@@ -1691,6 +1725,7 @@ function createFinalFantasyReleaseStack(release, side, isSelected, toggleRelease
   appendFinalFantasyReleaseArtwork(card, release);
   bindReleaseCard(card, isSelected, toggleRelease);
   stack.append(card);
+  appendReleaseMilestone(stack, release, side, finalFantasyMilestones, "Final Fantasy");
 
   if (isSelected) {
     const flyout = document.createElement("section");
@@ -1738,6 +1773,7 @@ function createDragonQuestReleaseStack(release, side, isSelected, toggleRelease)
   appendDragonQuestReleaseArtwork(card, release);
   bindReleaseCard(card, isSelected, toggleRelease);
   stack.append(card);
+  appendReleaseMilestone(stack, release, side, dragonQuestMilestones, "Dragon Quest");
 
   if (isSelected) {
     const flyout = document.createElement("section");
@@ -1785,6 +1821,7 @@ function createXenoSeriesReleaseStack(release, side, isSelected, toggleRelease) 
   appendXenobladeReleaseArtwork(card, release);
   bindReleaseCard(card, isSelected, toggleRelease);
   stack.append(card);
+  appendReleaseMilestone(stack, release, side, xenobladeMilestones, "Xeno Series");
 
   if (isSelected) {
     const flyout = document.createElement("section");

@@ -21,6 +21,8 @@
 
 所有时间线的一级卡片遵循同一套规则：左上角日期、右上角分类标签、标题、副标题、补充文本、二级菜单提示，以及可选的右下角图片区域。不同时间线的二级、三级详情内容可以不同。
 
+每条游戏系列时间线还会在卡片与时间线中轴之间标出“破圈节点”。星标不占用一级卡片内容，悬浮或键盘聚焦后会说明该作取得的具体成就、为何构成系列的重要突破，以及判断依据。同一系列可以有多个性质不同的突破节点。
+
 二至四级信息的固定职责见 [common/TIMELINE_CARD_ARCHITECTURE.md](common/TIMELINE_CARD_ARCHITECTURE.md)：二级用于快速理解作品，三级追踪设计决策、剧情与客观记录，四级保存该时间线独有的补充信息。
 
 ## 研究目标
@@ -51,6 +53,7 @@ GameConsole/
     pokemon/                          Pokemon 时间线
       selection-criteria.js           时间线开头的收录规则
       releases.js                     版本、发售日期与平台资料
+      milestones.js                   系列破圈节点及判断依据
       decision-chain.js               设计问题、实验、代价与后续选择
       timeline-images.js              卡片封面清单
       assets/covers/                  游戏封面
@@ -58,6 +61,7 @@ GameConsole/
     final-fantasy/                    Final Fantasy 时间线
       selection-criteria.js           时间线开头的收录规则
       final-fantasy-releases.js       作品、发售日期与平台资料
+      milestones.js                   系列破圈节点及判断依据
       decision-chain.js               设计问题、实验、代价与后续选择
       final-fantasy-covers.js         采集到的封面映射
       final-fantasy-logos.js          采集到的 Logo 映射
@@ -66,6 +70,7 @@ GameConsole/
     DragonQuest/                      Dragon Quest 时间线
       selection-criteria.js           时间线开头的收录规则
       releases.js                     正传、重制与各衍生分支资料
+      milestones.js                   系列破圈节点及判断依据
       editorial-reading.js            核心体验、本作变化与研究线索
       decision-chain.js               设计问题、实验、代价与后续选择
       design-logic.js                 机制底层逻辑
@@ -77,6 +82,7 @@ GameConsole/
     XenoSeries/                       Xeno Series 创作谱系时间线
       selection-criteria.js           时间线开头的收录规则
       releases.js                     作品、发售日期与平台资料
+      milestones.js                   系列破圈节点及判断依据
       editorial-reading.js            核心体验、本作变化与研究线索
       decision-chain.js               设计问题、实验、代价与后续选择
       design-logic.js                 机制底层逻辑

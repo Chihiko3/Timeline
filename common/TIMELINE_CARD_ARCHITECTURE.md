@@ -10,6 +10,18 @@ Answers: when did it appear, what is it, and where does it belong?
 Required structure: date, category tag, title, subtitle, short lineage note,
 and a concise hint about the next level. Artwork is optional.
 
+Game-series timelines also use milestone markers to identify the work that
+first brought the series broad public recognition and any later work that
+created another major global breakthrough. The marker sits between the card
+and the timeline axis, never inside the card content. Its hover/focus note must
+state the kind of breakthrough, the concrete achievement, and the evidence
+used for the editorial judgment.
+
+Every game-series timeline must evaluate at least one milestone. Multiple
+milestones are allowed when they represent distinct breakthroughs, such as an
+initial domestic phenomenon, international expansion, or a later commercial
+relaunch. Popularity alone is not sufficient.
+
 ## Level 2: Series Reading Card
 
 Answers: how should a player or developer understand this entry within its
@@ -66,3 +78,5 @@ optional; do not create one merely to make every timeline have four levels.
 
 Timeline-specific facts and research notes stay inside that timeline folder.
 `common` owns only the rendering rules and shared visual behavior.
+Milestone judgments stay in that timeline's `milestones.js`; the shared marker
+and tooltip behavior stays in `common`.

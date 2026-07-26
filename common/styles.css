@@ -584,6 +584,98 @@ input {
   width: min(100%, var(--timeline-card-width));
 }
 
+.timeline-milestone-marker {
+  position: absolute;
+  top: 9px;
+  z-index: 6;
+  display: grid;
+  width: 19px;
+  height: 19px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid #a97816;
+  border-radius: 50%;
+  background: #fff8d8;
+  color: #b67700;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1;
+  box-shadow: 0 0 0 2px #fff;
+  cursor: help;
+}
+
+.timeline-milestone-marker-left {
+  right: -27px;
+}
+
+.timeline-milestone-marker-right {
+  left: -27px;
+}
+
+.timeline-milestone-marker:hover,
+.timeline-milestone-marker:focus-visible {
+  border-color: #7f5709;
+  background: #ffefad;
+  color: #7f5709;
+  outline: none;
+}
+
+.timeline-milestone-tooltip {
+  position: absolute;
+  bottom: calc(100% + 9px);
+  z-index: 30;
+  display: grid;
+  gap: 6px;
+  width: 300px;
+  max-width: calc(100vw - 24px);
+  padding: 10px 11px;
+  border: 1px solid #cbd5e2;
+  border-radius: 5px;
+  background: #fff;
+  color: #334967;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  text-align: left;
+  box-shadow: 0 10px 26px rgba(25, 39, 59, 0.16);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(3px);
+  transition: opacity 120ms ease, transform 120ms ease, visibility 120ms ease;
+}
+
+.timeline-milestone-marker-left .timeline-milestone-tooltip {
+  right: 0;
+}
+
+.timeline-milestone-marker-right .timeline-milestone-tooltip {
+  left: 0;
+}
+
+.timeline-milestone-tooltip strong {
+  color: #172944;
+  font-size: 12px;
+}
+
+.timeline-milestone-tooltip span {
+  display: block;
+}
+
+.timeline-milestone-tooltip small {
+  display: block;
+  color: #6b7c93;
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.timeline-milestone-marker:hover .timeline-milestone-tooltip,
+.timeline-milestone-marker:focus-visible .timeline-milestone-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
 .pokemon-release-card {
   position: relative;
   z-index: 2;
@@ -1374,6 +1466,11 @@ body.show-timeline-artwork-bounds .pokemon-release-artwork {
   display: flex;
   box-sizing: border-box;
   z-index: 1;
+}
+
+.timeline-branch:hover,
+.timeline-branch:focus-within {
+  z-index: 8;
 }
 
 .timeline-branch-right {
@@ -2200,6 +2297,18 @@ summary {
   .timeline-card-anchor {
     width: 100%;
     flex-basis: 100%;
+  }
+
+  .timeline-milestone-marker,
+  .timeline-milestone-marker-left,
+  .timeline-milestone-marker-right {
+    left: -21px;
+    right: auto;
+  }
+
+  .timeline-milestone-marker .timeline-milestone-tooltip {
+    right: auto;
+    left: 0;
   }
 
   .timeline-detail-flyout,

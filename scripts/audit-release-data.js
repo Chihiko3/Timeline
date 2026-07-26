@@ -13,6 +13,8 @@ const timelines = [
     reviewGlobalName: "POKEMON_DECISION_CHAIN_REVIEW",
     editorialFile: "timelines/pokemon/editorial-reading.js",
     editorialGlobalName: "POKEMON_EDITORIAL_READING",
+    milestoneFile: "timelines/pokemon/milestones.js",
+    milestoneGlobalName: "POKEMON_MILESTONES",
   },
   {
     label: "Final Fantasy",
@@ -23,6 +25,8 @@ const timelines = [
     reviewGlobalName: "FINAL_FANTASY_DECISION_CHAIN_REVIEW",
     editorialFile: "timelines/final-fantasy/editorial-reading.js",
     editorialGlobalName: "FINAL_FANTASY_EDITORIAL_READING",
+    milestoneFile: "timelines/final-fantasy/milestones.js",
+    milestoneGlobalName: "FINAL_FANTASY_MILESTONES",
   },
   {
     label: "Dragon Quest",
@@ -33,6 +37,8 @@ const timelines = [
     reviewGlobalName: "DRAGON_QUEST_DECISION_CHAIN_REVIEW",
     editorialFile: "timelines/DragonQuest/editorial-reading.js",
     editorialGlobalName: "DRAGON_QUEST_EDITORIAL_READING",
+    milestoneFile: "timelines/DragonQuest/milestones.js",
+    milestoneGlobalName: "DRAGON_QUEST_MILESTONES",
   },
   {
     label: "Xeno Series",
@@ -43,6 +49,8 @@ const timelines = [
     reviewGlobalName: "XENOBLADE_DECISION_CHAIN_REVIEW",
     editorialFile: "timelines/XenoSeries/editorial-reading.js",
     editorialGlobalName: "XENOBLADE_EDITORIAL_READING",
+    milestoneFile: "timelines/XenoSeries/milestones.js",
+    milestoneGlobalName: "XENOBLADE_MILESTONES",
   },
 ];
 
@@ -90,6 +98,7 @@ function auditTimeline(config) {
     [config.file, config.editorialFile],
     config.editorialGlobalName,
   );
+  const milestones = loadData(config.milestoneFile, config.milestoneGlobalName);
   const errors = [];
   const ids = new Set();
 
@@ -167,6 +176,21 @@ function auditTimeline(config) {
   for (const id of ids) {
     if (!decisionChains[id] && !reviewIds.has(id)) {
       errors.push(`${id}: decision chain has not been reviewed`);
+    }
+  }
+
+  const milestoneEntries = Object.entries(milestones);
+  if (!milestoneEntries.length) {
+    errors.push("timeline has no milestone entry");
+  }
+  for (const [id, milestone] of milestoneEntries) {
+    if (!ids.has(id)) {
+      errors.push(`${id}: milestone references an unknown release`);
+    }
+    for (const field of ["label", "achievement", "evidence"]) {
+      if (typeof milestone[field] !== "string" || !milestone[field].trim()) {
+        errors.push(`${id}: milestone is missing "${field}"`);
+      }
     }
   }
 
