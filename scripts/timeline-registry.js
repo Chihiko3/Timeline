@@ -58,5 +58,17 @@ module.exports = [
     decision: ["timelines/LikeADragon/decision-chain.js", "LIKE_A_DRAGON_DECISION_CHAINS", "LIKE_A_DRAGON_DECISION_CHAIN_REVIEW"],
     milestone: ["timelines/LikeADragon/milestones.js", "LIKE_A_DRAGON_MILESTONES"],
     overrides: []
+  },
+  {
+    label: "Spike Series",
+    release: ["timelines/SpikeSeries/releases.js", "SPIKE_SERIES_RELEASES"],
+    editorial: ["timelines/SpikeSeries/editorial-reading.js", "SPIKE_SERIES_EDITORIAL_READING"],
+    design: ["timelines/SpikeSeries/design-logic.js", "SPIKE_SERIES_DESIGN_LOGIC"],
+    impact: ["timelines/SpikeSeries/series-impact.js", "SPIKE_SERIES_IMPACT"],
+    externalImpact: ["timelines/SpikeSeries/external-impact-research.js", "SPIKE_SERIES_EXTERNAL_IMPACT_RESEARCH"],
+    plot: ["timelines/SpikeSeries/plot-summaries.js", "SPIKE_SERIES_PLOT_SUMMARIES"],
+    decision: ["timelines/SpikeSeries/decision-chain.js", "SPIKE_SERIES_DECISION_CHAINS", "SPIKE_SERIES_DECISION_CHAIN_REVIEW"],
+    milestone: ["timelines/SpikeSeries/milestones.js", "SPIKE_SERIES_MILESTONES"],
+    overrides: []
   }
 ];

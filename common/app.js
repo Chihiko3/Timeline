@@ -24,11 +24,13 @@ const finalFantasyReleases = window.FINAL_FANTASY_RELEASES || [];
 const dragonQuestReleases = window.DRAGON_QUEST_RELEASES || [];
 const likeADragonReleases = window.LIKE_A_DRAGON_RELEASES || [];
 const xenobladeReleases = window.XENOBLADE_RELEASES || [];
+const spikeSeriesReleases = window.SPIKE_SERIES_RELEASES || [];
 const pokemonMilestones = window.POKEMON_MILESTONES || {};
 const finalFantasyMilestones = window.FINAL_FANTASY_MILESTONES || {};
 const dragonQuestMilestones = window.DRAGON_QUEST_MILESTONES || {};
 const likeADragonMilestones = window.LIKE_A_DRAGON_MILESTONES || {};
 const xenobladeMilestones = window.XENOBLADE_MILESTONES || {};
+const spikeSeriesMilestones = window.SPIKE_SERIES_MILESTONES || {};
 const pokemonEditorialReading = window.POKEMON_EDITORIAL_READING || {};
 const finalFantasyEditorialReading = window.FINAL_FANTASY_EDITORIAL_READING || {};
 const pokemonDecisionChains = window.POKEMON_DECISION_CHAINS || {};
@@ -64,6 +66,13 @@ const xenobladeExternalImpactResearch = window.XENOBLADE_EXTERNAL_IMPACT_RESEARC
 const xenobladePlotSummaries = window.XENOBLADE_PLOT_SUMMARIES || {};
 const xenobladeDecisionChains = window.XENOBLADE_DECISION_CHAINS || {};
 const xenobladeDecisionChainReview = window.XENOBLADE_DECISION_CHAIN_REVIEW || {};
+const spikeSeriesEditorialReading = window.SPIKE_SERIES_EDITORIAL_READING || {};
+const spikeSeriesDesignLogic = window.SPIKE_SERIES_DESIGN_LOGIC || {};
+const spikeSeriesImpact = window.SPIKE_SERIES_IMPACT || {};
+const spikeSeriesExternalImpactResearch = window.SPIKE_SERIES_EXTERNAL_IMPACT_RESEARCH || {};
+const spikeSeriesPlotSummaries = window.SPIKE_SERIES_PLOT_SUMMARIES || {};
+const spikeSeriesDecisionChains = window.SPIKE_SERIES_DECISION_CHAINS || {};
+const spikeSeriesDecisionChainReview = window.SPIKE_SERIES_DECISION_CHAIN_REVIEW || {};
 const timelineImageStore = window.timelineImageStore;
 let managedTimelineImages = {};
 const FINAL_FANTASY_DISPLAY_TAGS = {
@@ -175,6 +184,7 @@ const elements = {
   dragonQuestTimeline: document.querySelector("#dragonQuestTimeline"),
   likeADragonTimeline: document.querySelector("#likeADragonTimeline"),
   xenobladeTimeline: document.querySelector("#xenobladeTimeline"),
+  spikeSeriesTimeline: document.querySelector("#spikeSeriesTimeline"),
   timelineArtworkDebug: document.querySelector("#timelineArtworkDebug"),
   imageManager: document.querySelector("#imageManager"),
   template: document.querySelector("#platformTemplate")
@@ -1736,6 +1746,34 @@ function gameSeriesDefinitions() {
         decisionChains: likeADragonDecisionChains,
         decisionReview: likeADragonDecisionChainReview
       }
+    },
+    {
+      id: "spike-series",
+      label: "Spike Series",
+      releases: spikeSeriesReleases,
+      element: elements.spikeSeriesTimeline,
+      theme: "spike-series",
+      imageCollectionId: "spike-series",
+      cardClass: "spike-series-release-card",
+      detailClass: "spike-series-detail-flyout",
+      artworkCardClasses: standardArtworkClasses,
+      branchClass: "pokemon-branch spike-series-branch",
+      color: () => "var(--spike-series-color)",
+      filterColor: "var(--spike-series-color)",
+      tagFor: standardTag,
+      subtitleFor: standardSubtitle,
+      showDetailLineage: true,
+      milestones: spikeSeriesMilestones,
+      criteria: window.SPIKE_SERIES_TIMELINE_SELECTION_CRITERIA,
+      content: {
+        editorial: spikeSeriesEditorialReading,
+        designLogic: spikeSeriesDesignLogic,
+        seriesImpact: spikeSeriesImpact,
+        externalImpactResearch: spikeSeriesExternalImpactResearch,
+        plotSummaries: spikeSeriesPlotSummaries,
+        decisionChains: spikeSeriesDecisionChains,
+        decisionReview: spikeSeriesDecisionChainReview
+      }
     }
   ];
   return gameSeriesDefinitionCache;
@@ -2137,6 +2175,7 @@ function currentArchiveLocation() {
   if (activeSeries === "dragon-quest-library-panel") return "dragon-quest";
   if (activeSeries === "like-a-dragon-library-panel") return "like-a-dragon";
   if (activeSeries === "xenoblade-library-panel") return "xeno-series";
+  if (activeSeries === "spike-series-library-panel") return "spike-series";
   return "series-overview";
 }
 
@@ -2188,6 +2227,12 @@ function restoreArchiveLocation(libraryTabs, seriesTabs) {
   if (location === "xeno-series" || location === "xenoblade") {
     activateTab(libraryTabs, "libraryTab", libraryTabs.find((button) => button.dataset.libraryTab === "series-library-panel"));
     activateTab(seriesTabs, "seriesTab", seriesTabs.find((button) => button.dataset.seriesTab === "xenoblade-library-panel"));
+    return;
+  }
+
+  if (location === "spike-series") {
+    activateTab(libraryTabs, "libraryTab", libraryTabs.find((button) => button.dataset.libraryTab === "series-library-panel"));
+    activateTab(seriesTabs, "seriesTab", seriesTabs.find((button) => button.dataset.seriesTab === "spike-series-library-panel"));
     return;
   }
 

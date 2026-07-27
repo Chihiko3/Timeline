@@ -15,6 +15,7 @@
   --dragon-quest-color: #2458a6;
   --like-a-dragon-color: #9f2f24;
   --xenoblade-color: #a1263d;
+  --spike-series-color: #713a6f;
   --timeline-card-width: 500px;
   --shadow: 0 12px 36px rgba(32, 36, 44, 0.08);
 }
@@ -571,6 +572,10 @@ input {
   --timeline-selection-accent: var(--xenoblade-color);
 }
 
+.timeline-selection-note-spike-series {
+  --timeline-selection-accent: var(--spike-series-color);
+}
+
 .pokemon-release-stack {
   position: relative;
   width: min(100%, var(--timeline-card-width));
@@ -785,7 +790,8 @@ input {
 .final-fantasy-timeline,
 .dragon-quest-timeline,
 .like-a-dragon-timeline,
-.xenoblade-timeline {
+.xenoblade-timeline,
+.spike-series-timeline {
   position: relative;
   max-width: 1160px;
   margin: 28px auto 64px;
@@ -1022,6 +1028,10 @@ body.show-timeline-artwork-bounds .pokemon-release-artwork {
   --decision-accent: #b62543;
 }
 
+.spike-series-detail-flyout {
+  --decision-accent: var(--spike-series-color);
+}
+
 .timeline-decision-chain-card .timeline-information-fields {
   gap: 0;
 }
@@ -1203,6 +1213,10 @@ body.show-timeline-artwork-bounds .pokemon-release-artwork {
 
 .like-a-dragon-branch::after {
   background: var(--like-a-dragon-color);
+}
+
+.spike-series-branch::after {
+  background: var(--spike-series-color);
 }
 
 .pokemon-branch .pokemon-release-stack {
@@ -2152,7 +2166,8 @@ summary {
   .final-fantasy-timeline,
   .dragon-quest-timeline,
   .like-a-dragon-timeline,
-  .xenoblade-timeline {
+  .xenoblade-timeline,
+  .spike-series-timeline {
     margin-left: 8px;
   }
 
@@ -2160,7 +2175,8 @@ summary {
   .final-fantasy-branch .pokemon-release-stack,
   .dragon-quest-branch .pokemon-release-stack,
   .like-a-dragon-branch .pokemon-release-stack,
-  .xenoblade-branch .pokemon-release-stack {
+  .xenoblade-branch .pokemon-release-stack,
+  .spike-series-branch .pokemon-release-stack {
     width: 100%;
     flex-basis: 100%;
   }

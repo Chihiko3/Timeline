@@ -61,3 +61,12 @@
 - ROM 文件不下载、不保存，站点只记录元数据。
 - 对游戏策划视角有用的信息优先：首发阵容、代表玩法、硬件特性绑定、商业成败、社区讨论度。
 - 每次批量补资料后，抽查几个冷门平台，避免把错误的平台归类批量带进来。
+
+## Spike Series
+
+- Spike Chunsoft 公司史与代表作：https://www.spike-chunsoft.co.jp/company/about/
+- Spike Chunsoft Games Archive：https://www.spike-chunsoft.com/games/
+- Spike Chunsoft 日本官网：https://www.spike-chunsoft.co.jp/
+- 《弹丸论破》系列全球累计出货 1,000 万套公告：https://www.spike-chunsoft.com/news/danganronpa-series-surpasses-10-million-units-shipped-worldwide/
+- 《风来的西林》系列全球累计出货 300 万套公告：https://www.spike-chunsoft.co.jp/news/45940/
+- 作品日期与平台另外交叉检查各作品官方站、Nintendo / PlayStation / Steam 商店、Wikipedia 与 GameFAQs 发行记录。
