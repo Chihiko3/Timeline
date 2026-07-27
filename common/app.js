@@ -1,5 +1,6 @@
 const archive = window.CONSOLE_ARCHIVE;
 const SHOW_DESIGN_DECISION_CHAINS = false;
+const SHOW_RESEARCH_PROMPTS = false;
 const SHOW_HARDWARE_CARD_GRID = false;
 
 const state = {
@@ -1029,13 +1030,12 @@ function pokemonSubtitle(chineseName) {
   return chineseName.replace(/^\u5b9d\u53ef\u68a6[\uff1a:\s]*/, "");
 }
 
-function informationCard(level, title, fields, extra = null) {
+function informationCard(fields, extra = null) {
   const card = document.createElement("section");
-  card.className = `timeline-information-card timeline-information-card-level-${level}`;
+  card.className = "timeline-information-card";
   const fieldMarkup = fields.map(({ label, value }) => `
     <div class="timeline-information-field"><span>${label}</span><p>${value}</p></div>`).join("");
-  const headingMarkup = title ? `<header><h3>${title}</h3></header>` : "";
-  card.innerHTML = `${headingMarkup}<div class="timeline-information-fields">${fieldMarkup}</div>`;
+  card.innerHTML = `<div class="timeline-information-fields">${fieldMarkup}</div>`;
   if (extra) card.append(extra);
   return card;
 }
@@ -1043,7 +1043,7 @@ function informationCard(level, title, fields, extra = null) {
 function plotSummaryCard(plot) {
   const fields = [{ label: "剧情概要", value: plot.summary }];
   if (plot.innovation) fields.push({ label: "叙事创新", value: plot.innovation });
-  return informationCard(3, "剧情解读", fields);
+  return informationCard(fields);
 }
 
 function seriesInterpretationCard(insight) {
@@ -1054,9 +1054,9 @@ function seriesInterpretationCard(insight) {
     ...(insight.designLogic ? [{ label: "机制逻辑", value: insight.designLogic }] : []),
     ...(insight.legacy ? [{ label: "系列影响", value: insight.legacy }] : []),
     ...(insight.industryImpact ? [{ label: "行业影响", value: insight.industryImpact }] : []),
-    ...(insight.note ? [{ label: "研究线索", value: insight.note }] : [])
+    ...(SHOW_RESEARCH_PROMPTS && insight.note ? [{ label: "研究线索", value: insight.note }] : [])
   ];
-  return informationCard(2, "系列解读", fields);
+  return informationCard(fields);
 }
 
 function designDecisionChainCard(chain) {
@@ -1069,7 +1069,7 @@ function designDecisionChainCard(chain) {
     { label: "后续选择", value: chain.followUp },
     { label: "判断依据", value: chain.basis }
   ].filter(({ value }) => value);
-  const card = informationCard(3, "设计决策链", fields);
+  const card = informationCard(fields);
   card.classList.add("timeline-decision-chain-card");
   return card;
 }
@@ -1109,7 +1109,7 @@ function decisionChainReviewCard(release, insight, manualChains, review) {
   if (assessment.status === "inferred") {
     return designDecisionChainCard(inferredDecisionChain(insight));
   }
-  const card = informationCard(3, "设计决策链", [
+  const card = informationCard([
     { label: "判断结果", value: assessment.status === "insufficient" ? "证据不足，暂不建立决策链。" : "尚未完成判断。" },
     { label: "缺少依据", value: DECISION_REVIEW_REASONS[assessment.reason] || DECISION_REVIEW_REASONS.unreviewed }
   ]);
@@ -1143,7 +1143,7 @@ function platformRecordCard(release, extra = null) {
   record.innerHTML = `<div class="pokemon-platform-group"><h4>首次登陆</h4><div class="pokemon-platform-list">${first}</div></div>
     <div class="pokemon-platform-group"><h4>后续登陆</h4><div class="pokemon-platform-list">${later}</div></div>`;
   if (extra) record.append(extra);
-  return informationCard(3, "", [], record);
+  return informationCard([], record);
 }
 
 function releasePlatformCount(release) {
@@ -1486,32 +1486,40 @@ function bindReleaseCard(card, isSelected, toggleRelease) {
 }
 
 function appendReleaseMilestone(stack, release, side, milestones, seriesLabel) {
-  const milestone = milestones[release.id];
-  if (!milestone) return;
+  const releaseMilestones = milestones[release.id];
+  if (!releaseMilestones) return;
 
-  const marker = document.createElement("button");
-  marker.type = "button";
-  marker.className = `timeline-milestone-marker timeline-milestone-marker-${side}`;
-  marker.setAttribute(
-    "aria-label",
-    `${seriesLabel} 里程碑，${release.name}：${milestone.label}。${milestone.achievement}`
-  );
-  marker.textContent = "★";
+  const entries = ["domestic", "global"]
+    .filter((type) => releaseMilestones[type])
+    .map((type) => [type, releaseMilestones[type]]);
 
-  const tooltip = document.createElement("span");
-  tooltip.className = "timeline-milestone-tooltip";
-  tooltip.setAttribute("role", "tooltip");
+  entries.forEach(([type, milestone], index) => {
+    const typeLabel = type === "domestic" ? "国内里程碑" : "全球化里程碑";
+    const marker = document.createElement("button");
+    marker.type = "button";
+    marker.className = `timeline-milestone-marker timeline-milestone-marker-${side} timeline-milestone-marker-${type}`;
+    marker.style.setProperty("--milestone-index", index);
+    marker.setAttribute(
+      "aria-label",
+      `${seriesLabel} ${typeLabel}，${release.name}：${milestone.label}。${milestone.achievement}`
+    );
+    marker.textContent = type === "domestic" ? "内" : "全";
 
-  const label = document.createElement("strong");
-  label.textContent = milestone.label;
-  const achievement = document.createElement("span");
-  achievement.textContent = milestone.achievement;
-  const evidence = document.createElement("small");
-  evidence.textContent = `判断依据：${milestone.evidence}`;
+    const tooltip = document.createElement("span");
+    tooltip.className = "timeline-milestone-tooltip";
+    tooltip.setAttribute("role", "tooltip");
 
-  tooltip.append(label, achievement, evidence);
-  marker.append(tooltip);
-  stack.append(marker);
+    const label = document.createElement("strong");
+    label.textContent = `${typeLabel} · ${milestone.label}`;
+    const achievement = document.createElement("span");
+    achievement.textContent = milestone.achievement;
+    const evidence = document.createElement("small");
+    evidence.textContent = `判断依据：${milestone.evidence}`;
+
+    tooltip.append(label, achievement, evidence);
+    marker.append(tooltip);
+    stack.append(marker);
+  });
 }
 
 function createSeriesReleaseStack(release, side, isSelected, toggleRelease, definition) {
@@ -1601,7 +1609,7 @@ function gameSeriesDefinitions() {
       criteria: window.POKEMON_TIMELINE_SELECTION_CRITERIA,
       releaseStructure: (release) => release.releaseStructure,
       supplementFor: (release) => pokemonStartersForRelease(release).length
-        ? informationCard(4, "补充信息", [], createPokemonStartersPanel(release))
+        ? informationCard([], createPokemonStartersPanel(release))
         : null,
       layout: (releases, reserveDetailSpace, selectedId) =>
         layoutPokemonReleases(releases, reserveDetailSpace, selectedId),
@@ -1675,34 +1683,6 @@ function gameSeriesDefinitions() {
       }
     },
     {
-      id: "like-a-dragon",
-      label: "Like a Dragon",
-      releases: likeADragonReleases,
-      element: elements.likeADragonTimeline,
-      theme: "like-a-dragon",
-      imageCollectionId: "like-a-dragon",
-      cardClass: "like-a-dragon-release-card",
-      detailClass: "like-a-dragon-detail-flyout",
-      artworkCardClasses: standardArtworkClasses,
-      branchClass: "pokemon-branch like-a-dragon-branch",
-      color: () => "var(--like-a-dragon-color)",
-      filterColor: "var(--like-a-dragon-color)",
-      tagFor: standardTag,
-      subtitleFor: standardSubtitle,
-      showDetailLineage: true,
-      milestones: likeADragonMilestones,
-      criteria: window.LIKE_A_DRAGON_TIMELINE_SELECTION_CRITERIA,
-      content: {
-        editorial: likeADragonEditorialReading,
-        designLogic: likeADragonDesignLogic,
-        seriesImpact: likeADragonSeriesImpact,
-        externalImpactResearch: likeADragonExternalImpactResearch,
-        plotSummaries: likeADragonPlotSummaries,
-        decisionChains: likeADragonDecisionChains,
-        decisionReview: likeADragonDecisionChainReview
-      }
-    },
-    {
       id: "xeno-series",
       label: "Xeno Series",
       releases: xenobladeReleases,
@@ -1728,6 +1708,34 @@ function gameSeriesDefinitions() {
         plotSummaries: xenobladePlotSummaries,
         decisionChains: xenobladeDecisionChains,
         decisionReview: xenobladeDecisionChainReview
+      }
+    },
+    {
+      id: "like-a-dragon",
+      label: "Like a Dragon",
+      releases: likeADragonReleases,
+      element: elements.likeADragonTimeline,
+      theme: "like-a-dragon",
+      imageCollectionId: "like-a-dragon",
+      cardClass: "like-a-dragon-release-card",
+      detailClass: "like-a-dragon-detail-flyout",
+      artworkCardClasses: standardArtworkClasses,
+      branchClass: "pokemon-branch like-a-dragon-branch",
+      color: () => "var(--like-a-dragon-color)",
+      filterColor: "var(--like-a-dragon-color)",
+      tagFor: standardTag,
+      subtitleFor: standardSubtitle,
+      showDetailLineage: true,
+      milestones: likeADragonMilestones,
+      criteria: window.LIKE_A_DRAGON_TIMELINE_SELECTION_CRITERIA,
+      content: {
+        editorial: likeADragonEditorialReading,
+        designLogic: likeADragonDesignLogic,
+        seriesImpact: likeADragonSeriesImpact,
+        externalImpactResearch: likeADragonExternalImpactResearch,
+        plotSummaries: likeADragonPlotSummaries,
+        decisionChains: likeADragonDecisionChains,
+        decisionReview: likeADragonDecisionChainReview
       }
     }
   ];

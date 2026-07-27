@@ -578,22 +578,30 @@ input {
 
 .timeline-milestone-marker {
   position: absolute;
-  top: 9px;
+  top: calc(9px + var(--milestone-index, 0) * 23px);
   z-index: 6;
   display: grid;
-  width: 19px;
-  height: 19px;
+  width: 18px;
+  height: 18px;
   padding: 0;
   place-items: center;
-  border: 1px solid #a97816;
-  border-radius: 50%;
-  background: #fff8d8;
-  color: #b67700;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  background: #fff;
   font-family: inherit;
-  font-size: 12px;
+  font-size: 9px;
+  font-weight: 800;
   line-height: 1;
   box-shadow: 0 0 0 2px #fff;
   cursor: help;
+}
+
+.timeline-milestone-marker-domestic {
+  color: #9a671d;
+}
+
+.timeline-milestone-marker-global {
+  color: #356d9f;
 }
 
 .timeline-milestone-marker-left {
@@ -606,9 +614,7 @@ input {
 
 .timeline-milestone-marker:hover,
 .timeline-milestone-marker:focus-visible {
-  border-color: #7f5709;
-  background: #ffefad;
-  color: #7f5709;
+  background: #f3f6fa;
   outline: none;
 }
 
@@ -930,19 +936,6 @@ body.show-timeline-artwork-bounds .pokemon-release-artwork {
   background: #fff;
 }
 
-.timeline-information-card > header {
-  display: flex;
-  align-items: baseline;
-  gap: 7px;
-  margin-bottom: 8px;
-}
-
-.timeline-information-card > header h3 {
-  margin: 0;
-  color: #24364f;
-  font-size: 13px;
-}
-
 .timeline-information-fields {
   display: grid;
   gap: 7px;
@@ -971,13 +964,6 @@ body.show-timeline-artwork-bounds .pokemon-release-artwork {
   color: #334967;
   font-size: 12px;
   line-height: 1.45;
-}
-
-.timeline-information-card-level-2,
-.timeline-information-card-level-3,
-.timeline-information-card-level-4 {
-  border-color: #d8e0ea;
-  background: #fff;
 }
 
 .timeline-decision-chain-card {

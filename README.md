@@ -16,14 +16,14 @@
 - **Pokemon**：官方作品与代表性同人/ROM 改版，包含首发及后续登陆平台、御三家、重制/改版关系和封面图。
 - **Final Fantasy**：不含跨界作品的最终幻想相关作品，包含正传、续作、战略版、水晶编年史、陆行鸟等分支，以及首发及后续登陆平台和封面/Logo 图。
 - **Dragon Quest**：整理正传、重制、怪兽篇、不思议迷宫、创世小玩家等官方产品线，并追踪各分支的机制演进。
-- **Like a Dragon**：整理正传、时代剧、黑豹、审判、重制与重要外传，重点记录高密度城市、动作／回合制系统和多主角叙事的演进。
 - **Xeno Series**：以创作谱系串联 Xenogears、Xenosaga 与 Xenoblade，区分版权与世界观边界，并整理发行平台、机制演进和剧情解读。
+- **Like a Dragon**：整理正传、时代剧、黑豹、审判、重制与重要外传，重点记录高密度城市、动作／回合制系统和多主角叙事的演进。
 
-新增游戏时间线时，应同时在 `common/app.js` 的 `seriesOverviewDefinitions()` 中完成注册。注册后的系列会自动进入总览筛选器，但不会默认勾选。
+新增游戏时间线时，应追加到 `common/app.js` 的 `gameSeriesDefinitions()` 末尾。注册后的系列会自动进入总览筛选器和 GM 图片分类，但不会默认勾选；除非另有要求，不调整已有时间线的创建顺序。
 
 所有时间线的一级卡片遵循同一套规则：左上角日期、右上角分类标签、标题、副标题、补充文本、二级菜单提示，以及可选的右下角图片区域。不同时间线的二级、三级详情内容可以不同。
 
-每条游戏系列时间线还会在卡片与时间线中轴之间标出“破圈节点”。星标不占用一级卡片内容，悬浮或键盘聚焦后会说明该作取得的具体成就、为何构成系列的重要突破，以及判断依据。同一系列可以有多个性质不同的突破节点。
+每条游戏系列时间线还会在卡片与时间线中轴之间标出“里程碑”，并明确区分“国内里程碑”与“全球化里程碑”。“内 / 全”标记不占用一级卡片内容，悬浮或键盘聚焦后会说明具体成就与判断依据；同一作品可以同时拥有两个独立标记。
 
 二至四级信息的固定职责见 [common/TIMELINE_CARD_ARCHITECTURE.md](common/TIMELINE_CARD_ARCHITECTURE.md)：二级用于快速理解作品，三级追踪设计决策、剧情与客观记录，四级保存该时间线独有的补充信息。
 
@@ -55,7 +55,7 @@ GameConsole/
     pokemon/                          Pokemon 时间线
       selection-criteria.js           时间线开头的收录规则
       releases.js                     版本、发售日期与平台资料
-      milestones.js                   系列破圈节点及判断依据
+      milestones.js                   国内与全球化里程碑及判断依据
       editorial-reading.js            核心体验、本作变化与研究线索
       decision-chain.js               设计问题、实验、代价与后续选择
       design-logic.js                 机制底层逻辑
@@ -68,7 +68,7 @@ GameConsole/
     final-fantasy/                    Final Fantasy 时间线
       selection-criteria.js           时间线开头的收录规则
       final-fantasy-releases.js       作品、发售日期与平台资料
-      milestones.js                   系列破圈节点及判断依据
+      milestones.js                   国内与全球化里程碑及判断依据
       editorial-reading.js            核心体验、本作变化与研究线索
       decision-chain.js               设计问题、实验、代价与后续选择
       design-logic.js                 机制底层逻辑
@@ -80,7 +80,7 @@ GameConsole/
     DragonQuest/                      Dragon Quest 时间线
       selection-criteria.js           时间线开头的收录规则
       releases.js                     正传、重制与各衍生分支资料
-      milestones.js                   系列破圈节点及判断依据
+      milestones.js                   国内与全球化里程碑及判断依据
       editorial-reading.js            核心体验、本作变化与研究线索
       decision-chain.js               设计问题、实验、代价与后续选择
       design-logic.js                 机制底层逻辑
@@ -89,22 +89,10 @@ GameConsole/
       plot-summaries.js               剧情概要与叙事创新
       timeline-images.js              卡片图片清单
       assets/covers/                  Dragon Quest 作品图片
-    LikeADragon/                      Like a Dragon 时间线
-      selection-criteria.js           时间线开头的收录规则
-      releases.js                     正传、衍生、重制与平台资料
-      milestones.js                   系列全球突破与转型节点
-      editorial-reading.js            核心体验、本作变化与研究线索
-      decision-chain.js               设计决策链审查状态
-      design-logic.js                 机制底层逻辑
-      series-impact.js                系列长期影响
-      external-impact-research.js     可验证的行业影响
-      plot-summaries.js               剧情概要与叙事创新
-      timeline-images.js              卡片图片清单
-      assets/covers/                  官方宣传图与日版封面
     XenoSeries/                       Xeno Series 创作谱系时间线
       selection-criteria.js           时间线开头的收录规则
       releases.js                     作品、发售日期与平台资料
-      milestones.js                   系列破圈节点及判断依据
+      milestones.js                   国内与全球化里程碑及判断依据
       editorial-reading.js            核心体验、本作变化与研究线索
       decision-chain.js               设计问题、实验、代价与后续选择
       design-logic.js                 机制底层逻辑
@@ -113,6 +101,18 @@ GameConsole/
       plot-summaries.js               剧情概要与叙事创新
       timeline-images.js              卡片图片清单
       assets/covers/                  Xeno Series 全部作品图片
+    LikeADragon/                      Like a Dragon 时间线
+      selection-criteria.js           时间线开头的收录规则
+      releases.js                     正传、衍生、重制与平台资料
+      milestones.js                   国内与全球化里程碑及判断依据
+      editorial-reading.js            核心体验、本作变化与研究线索
+      decision-chain.js               设计决策链审查状态
+      design-logic.js                 机制底层逻辑
+      series-impact.js                系列长期影响
+      external-impact-research.js     可验证的行业影响
+      plot-summaries.js               剧情概要与叙事创新
+      timeline-images.js              卡片图片清单
+      assets/covers/                  官方宣传图与日版封面
   scripts/                            本地服务、资源采集与维护脚本
   start-gm-server.cmd                 启动本地 GM 图片管理服务
 ```

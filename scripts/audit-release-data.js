@@ -136,14 +136,25 @@ function auditTimeline(config) {
   if (!milestoneEntries.length) {
     errors.push("timeline has no milestone entry");
   }
-  for (const [id, milestone] of milestoneEntries) {
+  const milestoneTypeCounts = { domestic: 0, global: 0 };
+  for (const [id, releaseMilestones] of milestoneEntries) {
     if (!ids.has(id)) {
       errors.push(`${id}: milestone references an unknown release`);
     }
-    for (const field of ["label", "achievement", "evidence"]) {
-      if (typeof milestone[field] !== "string" || !milestone[field].trim()) {
-        errors.push(`${id}: milestone is missing "${field}"`);
+    for (const type of ["domestic", "global"]) {
+      const milestone = releaseMilestones[type];
+      if (!milestone) continue;
+      milestoneTypeCounts[type] += 1;
+      for (const field of ["label", "achievement", "evidence"]) {
+        if (typeof milestone[field] !== "string" || !milestone[field].trim()) {
+          errors.push(`${id}: ${type} milestone is missing "${field}"`);
+        }
       }
+    }
+  }
+  for (const type of ["domestic", "global"]) {
+    if (!milestoneTypeCounts[type]) {
+      errors.push(`timeline has no ${type} milestone`);
     }
   }
 

@@ -36,18 +36,6 @@ module.exports = [
     overrides: ["timelines/DragonQuest/verified-content.js"]
   },
   {
-    label: "Like a Dragon",
-    release: ["timelines/LikeADragon/releases.js", "LIKE_A_DRAGON_RELEASES"],
-    editorial: ["timelines/LikeADragon/editorial-reading.js", "LIKE_A_DRAGON_EDITORIAL_READING"],
-    design: ["timelines/LikeADragon/design-logic.js", "LIKE_A_DRAGON_DESIGN_LOGIC"],
-    impact: ["timelines/LikeADragon/series-impact.js", "LIKE_A_DRAGON_SERIES_IMPACT"],
-    externalImpact: ["timelines/LikeADragon/external-impact-research.js", "LIKE_A_DRAGON_EXTERNAL_IMPACT_RESEARCH"],
-    plot: ["timelines/LikeADragon/plot-summaries.js", "LIKE_A_DRAGON_PLOT_SUMMARIES"],
-    decision: ["timelines/LikeADragon/decision-chain.js", "LIKE_A_DRAGON_DECISION_CHAINS", "LIKE_A_DRAGON_DECISION_CHAIN_REVIEW"],
-    milestone: ["timelines/LikeADragon/milestones.js", "LIKE_A_DRAGON_MILESTONES"],
-    overrides: []
-  },
-  {
     label: "Xeno Series",
     release: ["timelines/XenoSeries/releases.js", "XENOBLADE_RELEASES"],
     editorial: ["timelines/XenoSeries/editorial-reading.js", "XENOBLADE_EDITORIAL_READING"],
@@ -57,6 +45,18 @@ module.exports = [
     plot: ["timelines/XenoSeries/plot-summaries.js", "XENOBLADE_PLOT_SUMMARIES"],
     decision: ["timelines/XenoSeries/decision-chain.js", "XENOBLADE_DECISION_CHAINS", "XENOBLADE_DECISION_CHAIN_REVIEW"],
     milestone: ["timelines/XenoSeries/milestones.js", "XENOBLADE_MILESTONES"],
+    overrides: []
+  },
+  {
+    label: "Like a Dragon",
+    release: ["timelines/LikeADragon/releases.js", "LIKE_A_DRAGON_RELEASES"],
+    editorial: ["timelines/LikeADragon/editorial-reading.js", "LIKE_A_DRAGON_EDITORIAL_READING"],
+    design: ["timelines/LikeADragon/design-logic.js", "LIKE_A_DRAGON_DESIGN_LOGIC"],
+    impact: ["timelines/LikeADragon/series-impact.js", "LIKE_A_DRAGON_SERIES_IMPACT"],
+    externalImpact: ["timelines/LikeADragon/external-impact-research.js", "LIKE_A_DRAGON_EXTERNAL_IMPACT_RESEARCH"],
+    plot: ["timelines/LikeADragon/plot-summaries.js", "LIKE_A_DRAGON_PLOT_SUMMARIES"],
+    decision: ["timelines/LikeADragon/decision-chain.js", "LIKE_A_DRAGON_DECISION_CHAINS", "LIKE_A_DRAGON_DECISION_CHAIN_REVIEW"],
+    milestone: ["timelines/LikeADragon/milestones.js", "LIKE_A_DRAGON_MILESTONES"],
     overrides: []
   }
 ];
