@@ -1,5 +1,6 @@
 const archive = window.CONSOLE_ARCHIVE;
 const SHOW_DESIGN_DECISION_CHAINS = false;
+const SHOW_HARDWARE_CARD_GRID = false;
 
 const state = {
   selectedTimelineId: null,
@@ -27,8 +28,6 @@ const finalFantasyMilestones = window.FINAL_FANTASY_MILESTONES || {};
 const dragonQuestMilestones = window.DRAGON_QUEST_MILESTONES || {};
 const likeADragonMilestones = window.LIKE_A_DRAGON_MILESTONES || {};
 const xenobladeMilestones = window.XENOBLADE_MILESTONES || {};
-const pokemonReleaseInsights = window.POKEMON_RELEASE_INSIGHTS || {};
-const finalFantasyReleaseInsights = window.FINAL_FANTASY_RELEASE_INSIGHTS || {};
 const pokemonEditorialReading = window.POKEMON_EDITORIAL_READING || {};
 const finalFantasyEditorialReading = window.FINAL_FANTASY_EDITORIAL_READING || {};
 const pokemonDecisionChains = window.POKEMON_DECISION_CHAINS || {};
@@ -64,8 +63,6 @@ const xenobladeExternalImpactResearch = window.XENOBLADE_EXTERNAL_IMPACT_RESEARC
 const xenobladePlotSummaries = window.XENOBLADE_PLOT_SUMMARIES || {};
 const xenobladeDecisionChains = window.XENOBLADE_DECISION_CHAINS || {};
 const xenobladeDecisionChainReview = window.XENOBLADE_DECISION_CHAIN_REVIEW || {};
-const finalFantasyCovers = window.FINAL_FANTASY_RELEASE_COVERS || {};
-const finalFantasyLogos = window.FINAL_FANTASY_RELEASE_LOGOS || {};
 const timelineImageStore = window.timelineImageStore;
 let managedTimelineImages = {};
 const FINAL_FANTASY_DISPLAY_TAGS = {
@@ -122,30 +119,6 @@ const POKEMON_SPRITE_IDS = {
   Turtwig: 387, Chimchar: 390, Piplup: 393, Snivy: 495, Tepig: 498, Oshawott: 501,
   Chespin: 650, Fennekin: 653, Froakie: 656, Rowlet: 722, Litten: 725, Popplio: 728,
   Grookey: 810, Scorbunny: 813, Sobble: 816, Sprigatito: 906, Fuecoco: 909, Quaxly: 912
-};
-const POKEMON_RELEASE_COVERS = {
-  "red-green-blue": [["red.png", "Pokémon Red"], ["green.png", "Pokémon Green"], ["blue.png", "Pokémon Blue"]],
-  yellow: [["yellow.png", "Pokémon Yellow"]],
-  "gold-silver": [["gold.png", "Pokémon Gold"], ["silver.png", "Pokémon Silver"]],
-  crystal: [["crystal.png", "Pokémon Crystal"]],
-  "ruby-sapphire": [["ruby.png", "Pokémon Ruby"], ["sapphire.png", "Pokémon Sapphire"]],
-  "firered-leafgreen": [["firered.png", "Pokémon FireRed"], ["leafgreen.png", "Pokémon LeafGreen"]],
-  emerald: [["emerald.png", "Pokémon Emerald"]],
-  "diamond-pearl": [["diamond.png", "Pokémon Diamond"], ["pearl.png", "Pokémon Pearl"]],
-  platinum: [["platinum.png", "Pokémon Platinum"]],
-  "heartgold-soulsilver": [["heartgold.png", "Pokémon HeartGold"], ["soulsilver.png", "Pokémon SoulSilver"]],
-  "black-white": [["black.png", "Pokémon Black"], ["white.png", "Pokémon White"]],
-  "black2-white2": [["black-2.png", "Pokémon Black 2"], ["white-2.png", "Pokémon White 2"]],
-  "x-y": [["x.png", "Pokémon X"], ["y.png", "Pokémon Y"]],
-  oras: [["omega-ruby.png", "Pokémon Omega Ruby"], ["alpha-sapphire.png", "Pokémon Alpha Sapphire"]],
-  "sun-moon": [["sun.png", "Pokémon Sun"], ["moon.png", "Pokémon Moon"]],
-  "ultra-sun-moon": [["ultra-sun.png", "Pokémon Ultra Sun"], ["ultra-moon.png", "Pokémon Ultra Moon"]],
-  "lets-go": [["lets-go-pikachu.png", "Let's Go, Pikachu!"], ["lets-go-eevee.png", "Let's Go, Eevee!"]],
-  "sword-shield": [["sword.png", "Pokémon Sword"], ["shield.png", "Pokémon Shield"]],
-  bdsp: [["brilliant-diamond.png", "Brilliant Diamond"], ["shining-pearl.png", "Shining Pearl"]],
-  "legends-arceus": [["legends-arceus.png", "Pokémon Legends: Arceus"]],
-  "scarlet-violet": [["scarlet.png", "Pokémon Scarlet"], ["violet.png", "Pokémon Violet"]],
-  "legends-za": [["legends-za.png", "Pokémon Legends: Z-A"]]
 };
 const BRAND_COLORS = [
   "#3268b8",
@@ -206,15 +179,12 @@ const elements = {
   template: document.querySelector("#platformTemplate")
 };
 
-let selectedPokemonReleaseId = null;
-let selectedFinalFantasyReleaseId = null;
-let selectedDragonQuestReleaseId = null;
-let selectedLikeADragonReleaseId = null;
-let selectedXenobladeReleaseId = null;
+const selectedSeriesReleaseIds = Object.create(null);
 let selectedSeriesOverviewReleaseKey = null;
 const selectedSeriesOverviewTimelineIds = new Set();
-const pokemonArtworkIndices = new Map();
-let pokemonCoverPreview = null;
+const releaseArtworkIndices = new Map();
+let releaseArtworkPreview = null;
+let gameSeriesDefinitionCache = null;
 let imageManagerCategory = "hardware";
 let imageManagerSearch = "";
 let gmImageManagerOpen = false;
@@ -588,7 +558,7 @@ function createTimelineNode(platform) {
   const artworkKey = `hardware:${id}`;
   if (managedImagesFor(artworkKey).length) {
     node.classList.add("timeline-primary-card-has-artwork");
-    appendReleaseArtwork(button, { id }, {}, "", artworkKey, "timeline-hardware-artwork");
+    appendReleaseArtwork(button, artworkKey, "timeline-hardware-artwork");
   }
   node.append(button);
 
@@ -1017,17 +987,15 @@ function renderVariants(container, variants) {
 function render() {
   const platforms = filteredPlatforms();
   renderTimeline(platforms);
-  renderMeta(platforms);
-  renderCards(platforms);
+  if (SHOW_HARDWARE_CARD_GRID) {
+    renderMeta(platforms);
+    renderCards(platforms);
+  }
   renderSeriesOverviewTimeline();
-  renderPokemonTimeline();
-  renderFinalFantasyTimeline();
-  renderDragonQuestTimeline();
-  renderLikeADragonTimeline();
-  renderXenobladeTimeline();
+  gameSeriesDefinitions().forEach(renderGameSeriesTimeline);
 }
 
-function pokemonPlatformCard(entry) {
+function platformRecordEntryCard(entry) {
   const { platform, change } = platformRecordDisplay(entry.platform);
   const displayPlatform = change ? `${platform} · ${change}` : platform;
   return `<article class="pokemon-platform-card">
@@ -1059,10 +1027,6 @@ function platformDisplayName(platform) {
 
 function pokemonSubtitle(chineseName) {
   return chineseName.replace(/^\u5b9d\u53ef\u68a6[\uff1a:\s]*/, "");
-}
-
-function appendPokemonReleaseArtwork(card, release) {
-  appendReleaseArtwork(card, release, {}, "", `pokemon:${release.id}`);
 }
 
 function informationCard(level, title, fields, extra = null) {
@@ -1153,89 +1117,27 @@ function decisionChainReviewCard(release, insight, manualChains, review) {
   return card;
 }
 
-function pokemonInsightFor(release) {
-  const insight = pokemonReleaseInsights[release.id] || {};
-  const editorial = pokemonEditorialReading[release.id] || {};
-  const externalImpact = pokemonExternalImpactResearch[release.id];
-  const relation = release.remakeOf
-    ? `重制自 ${pokemonSubtitle(release.remakeOf.chineseName)}`
-    : release.modOf
-      ? `改版自 ${pokemonSubtitle(release.modOf)}`
-      : release.official === false
-        ? `${release.workType || "同人作品"} · ${release.creator || "未知制作者"}`
-        : release.generation;
+function seriesInsightFor(release, definition) {
+  const { editorial, designLogic, seriesImpact, externalImpactResearch } = definition.content;
+  const reading = editorial[release.id] || {};
+  const externalImpact = externalImpactResearch[release.id];
   return {
-    position: insight.position || relation,
-    releaseStructure: release.releaseStructure || null,
-    loop: editorial.loop || null,
-    change: editorial.change || null,
-    designLogic: pokemonDesignLogic[release.id] || null,
-    legacy: pokemonSeriesImpact[release.id] || null,
-    industryImpact: externalImpact?.status === "verified" ? externalImpact.summary : null,
-    note: editorial.note || null
-  };
-}
-
-function finalFantasyInsightFor(release) {
-  const insight = finalFantasyReleaseInsights[release.id] || {};
-  const editorial = finalFantasyEditorialReading[release.id] || {};
-  const externalImpact = finalFantasyExternalImpactResearch[release.id];
-  return {
-    position: finalFantasyDisplayTag(release),
-    loop: editorial.loop || null,
-    change: editorial.change || null,
-    designLogic: finalFantasyDesignLogic[release.id] || null,
-    legacy: finalFantasySeriesImpact[release.id] || null,
-    industryImpact: externalImpact?.status === "verified" ? externalImpact.summary : null,
-    note: editorial.note || null
-  };
-}
-
-function xenobladeInsightFor(release) {
-  const editorial = xenobladeEditorialReading[release.id] || {};
-  const externalImpact = xenobladeExternalImpactResearch[release.id];
-  return {
-    loop: editorial.loop || null,
-    change: editorial.change || null,
-    designLogic: xenobladeDesignLogic[release.id] || null,
-    legacy: xenobladeSeriesImpact[release.id] || null,
-    industryImpact: externalImpact?.status === "verified" ? externalImpact.summary : null,
-    note: editorial.note || null
-  };
-}
-
-function dragonQuestInsightFor(release) {
-  const editorial = dragonQuestEditorialReading[release.id] || {};
-  const externalImpact = dragonQuestExternalImpactResearch[release.id];
-  return {
-    loop: editorial.loop || null,
-    change: editorial.change || null,
-    designLogic: dragonQuestDesignLogic[release.id] || null,
-    legacy: dragonQuestSeriesImpact[release.id] || null,
-    industryImpact: externalImpact?.status === "verified" ? externalImpact.summary : null,
-    note: editorial.note || null
-  };
-}
-
-function likeADragonInsightFor(release) {
-  const editorial = likeADragonEditorialReading[release.id] || {};
-  const externalImpact = likeADragonExternalImpactResearch[release.id];
-  return {
-    loop: editorial.loop || null,
-    change: editorial.change || null,
-    designLogic: likeADragonDesignLogic[release.id] || null,
-    legacy: likeADragonSeriesImpact[release.id] || null,
+    releaseStructure: definition.releaseStructure?.(release) || null,
+    loop: reading.loop || null,
+    change: reading.change || null,
+    designLogic: designLogic[release.id] || null,
+    legacy: seriesImpact[release.id] || null,
     industryImpact: typeof externalImpact === "string"
       ? externalImpact
       : externalImpact?.status === "verified" ? externalImpact.summary : null,
-    note: editorial.note || null
+    note: reading.note || null
   };
 }
 
 function platformRecordCard(release, extra = null) {
-  const first = release.first.map((entry) => pokemonPlatformCard(entry)).join("");
+  const first = release.first.map((entry) => platformRecordEntryCard(entry)).join("");
   const later = release.later.length
-    ? release.later.map((entry) => pokemonPlatformCard(entry)).join("")
+    ? release.later.map((entry) => platformRecordEntryCard(entry)).join("")
     : '<p class="pokemon-empty">暂无后续独立版本</p>';
   const record = document.createElement("div");
   record.innerHTML = `<div class="pokemon-platform-group"><h4>首次登陆</h4><div class="pokemon-platform-list">${first}</div></div>
@@ -1251,29 +1153,11 @@ function releasePlatformCount(release) {
   }, 0);
 }
 
-function appendFinalFantasyReleaseArtwork(card, release) {
-  appendReleaseArtwork(card, release, {}, "", `final-fantasy:${release.id}`);
-}
-
-function appendDragonQuestReleaseArtwork(card, release) {
-  appendReleaseArtwork(card, release, {}, "", `dragon-quest:${release.id}`);
-}
-
-function appendLikeADragonReleaseArtwork(card, release) {
-  appendReleaseArtwork(card, release, {}, "", `like-a-dragon:${release.id}`);
-}
-
-function appendXenobladeReleaseArtwork(card, release) {
-  appendReleaseArtwork(card, release, {}, "", `xenoblade:${release.id}`);
-}
-
-function appendReleaseArtwork(card, release, coverMap, assetDirectory, artworkKey, artworkClass = "") {
-  const managed = managedImagesFor(artworkKey);
-  const rawArtworks = managed;
-  const artworks = rawArtworks.length && typeof rawArtworks[0] === "string" ? [rawArtworks] : rawArtworks;
+function appendReleaseArtwork(card, artworkKey, artworkClass = "") {
+  const artworks = managedImagesFor(artworkKey);
   if (!artworks.length) return;
 
-  let artworkIndex = pokemonArtworkIndices.get(artworkKey) || 0;
+  let artworkIndex = releaseArtworkIndices.get(artworkKey) || 0;
   artworkIndex %= artworks.length;
   const frame = document.createElement("div");
   frame.className = "pokemon-release-artwork";
@@ -1287,14 +1171,14 @@ function appendReleaseArtwork(card, release, coverMap, assetDirectory, artworkKe
     const displayedWidth = Math.min(frame.clientWidth, frame.clientHeight * imageRatio);
     frame.style.setProperty("--cover-display-width", `${Math.round(displayedWidth)}px`);
   });
-  bindPokemonCoverPreview(image, artworks, assetDirectory);
+  bindReleaseArtworkPreview(image, artworks);
   frame.append(image);
 
   const updateArtwork = () => {
     const [filename, label] = artworks[artworkIndex];
-    image.src = resolveArtworkSource(filename, assetDirectory);
+    image.src = filename;
     image.alt = label;
-    pokemonArtworkIndices.set(artworkKey, artworkIndex);
+    releaseArtworkIndices.set(artworkKey, artworkIndex);
   };
 
   if (artworks.length > 1) {
@@ -1321,22 +1205,13 @@ function managedImagesFor(key) {
   return (managedTimelineImages[key] || []).map((image) => [image.src, image.name]);
 }
 
-function hasManagedImages(key) {
-  return Object.prototype.hasOwnProperty.call(managedTimelineImages, key);
-}
-
-function resolveArtworkSource(source, assetDirectory) {
-  if (/^(?:https?:|blob:|data:|\/)/.test(source)) return source;
-  return assetDirectory ? `${assetDirectory}/${source}` : source;
-}
-
-function bindPokemonCoverPreview(image, artworks, assetDirectory) {
+function bindReleaseArtworkPreview(image, artworks) {
   const showPreview = (event) => {
-    const preview = pokemonCoverPreview || document.createElement("div");
-    if (!pokemonCoverPreview) {
+    const preview = releaseArtworkPreview || document.createElement("div");
+    if (!releaseArtworkPreview) {
       preview.className = "pokemon-cover-preview";
       document.body.append(preview);
-      pokemonCoverPreview = preview;
+      releaseArtworkPreview = preview;
     }
 
     const previewArtworks = artworks.length > 1 ? artworks : [[image.currentSrc || image.src, image.alt]];
@@ -1352,27 +1227,27 @@ function bindPokemonCoverPreview(image, artworks, assetDirectory) {
     );
     preview.replaceChildren(...previewArtworks.map(([source, label]) => {
       const previewImage = document.createElement("img");
-      previewImage.src = resolveArtworkSource(source, assetDirectory);
+      previewImage.src = source;
       previewImage.alt = label;
       return previewImage;
     }));
     preview.style.setProperty("--cover-preview-size", `${previewSize}px`);
     preview.hidden = false;
-    positionPokemonCoverPreview(preview, event);
+    positionReleaseArtworkPreview(preview, event);
   };
 
   image.addEventListener("pointerenter", showPreview);
   image.addEventListener("pointermove", (event) => {
-    if (pokemonCoverPreview && !pokemonCoverPreview.hidden) {
-      positionPokemonCoverPreview(pokemonCoverPreview, event);
+    if (releaseArtworkPreview && !releaseArtworkPreview.hidden) {
+      positionReleaseArtworkPreview(releaseArtworkPreview, event);
     }
   });
   image.addEventListener("pointerleave", () => {
-    if (pokemonCoverPreview) pokemonCoverPreview.hidden = true;
+    if (releaseArtworkPreview) releaseArtworkPreview.hidden = true;
   });
 }
 
-function positionPokemonCoverPreview(preview, event) {
+function positionReleaseArtworkPreview(preview, event) {
   const gap = 16;
   const previewBounds = preview.getBoundingClientRect();
   const preferredLeft = event.clientX + gap + previewBounds.width > window.innerWidth
@@ -1386,85 +1261,26 @@ function positionPokemonCoverPreview(preview, event) {
   preview.style.top = `${top}px`;
 }
 
-function staticArtworkEntries(rawArtworks, directory) {
-  const artworks = rawArtworks?.length && typeof rawArtworks[0] === "string" ? [rawArtworks] : rawArtworks || [];
-  return artworks.map(([filename, name]) => ({ src: resolveArtworkSource(filename, directory), name }));
-}
-
-function consoleFallbackImages(platform) {
-  const manual = manualImageForPlatform(platform);
-  if (manual?.images?.length) return manual.images.map((image) => ({ src: image.src, name: image.title || platform.name }));
-  if (manual?.src) return [{ src: manual.src, name: manual.title || platform.name }];
-  const local = localImages[platformId(platform)];
-  if (local?.images?.length) return local.images.map((image) => ({ src: image.src, name: image.title || platform.name }));
-  if (local?.src) return [{ src: local.src, name: local.title || platform.name }];
-  try {
-    const cached = JSON.parse(localStorage.getItem(imageKey(platform)) || "null");
-    if (cached?.images?.length) return cached.images.map((image) => ({ src: image.src, name: image.title || platform.name }));
-    if (cached?.src) return [{ src: cached.src, name: cached.title || platform.name }];
-  } catch {
-    return [];
-  }
-  return [];
-}
-
 function imageManagerGroups() {
-  return [
-    {
-      id: "hardware",
-      label: "游戏主机",
-      entries: allPlatforms.map((platform) => ({
-        key: `hardware:${platformId(platform)}`,
-        title: platform.name,
-        meta: `${platform.brand} · ${releaseDateLabel(platform)}`
-      }))
-    },
-    {
-      id: "pokemon",
-      label: "Pokémon",
-      entries: pokemonReleases.map((release) => ({
-        key: `pokemon:${release.id}`,
-        title: release.name,
-        meta: pokemonSubtitle(release.chineseName)
-      }))
-    },
-    {
-      id: "final-fantasy",
-      label: "Final Fantasy",
-      entries: finalFantasyReleases.map((release) => ({
-        key: `final-fantasy:${release.id}`,
-        title: release.name,
-        meta: release.chineseName
-      }))
-    },
-    {
-      id: "dragon-quest",
-      label: "Dragon Quest",
-      entries: dragonQuestReleases.map((release) => ({
-        key: `dragon-quest:${release.id}`,
-        title: release.name,
-        meta: release.chineseName
-      }))
-    },
-    {
-      id: "like-a-dragon",
-      label: "Like a Dragon",
-      entries: likeADragonReleases.map((release) => ({
-        key: `like-a-dragon:${release.id}`,
-        title: release.name,
-        meta: release.chineseName
-      }))
-    },
-    {
-      id: "xenoblade",
-      label: "Xeno Series",
-      entries: xenobladeReleases.map((release) => ({
-        key: `xenoblade:${release.id}`,
-        title: release.name,
-        meta: release.chineseName
-      }))
-    }
-  ];
+  const hardware = {
+    id: "hardware",
+    label: "游戏主机",
+    entries: allPlatforms.map((platform) => ({
+      key: `hardware:${platformId(platform)}`,
+      title: platform.name,
+      meta: `${platform.brand} · ${releaseDateLabel(platform)}`
+    }))
+  };
+  const gameSeries = gameSeriesDefinitions().map((definition) => ({
+    id: definition.imageCollectionId,
+    label: definition.label,
+    entries: definition.releases.map((release) => ({
+      key: `${definition.imageCollectionId}:${release.id}`,
+      title: release.name,
+      meta: definition.subtitleFor(release)
+    }))
+  }));
+  return [hardware, ...gameSeries];
 }
 
 function renderImageManager() {
@@ -1698,105 +1514,52 @@ function appendReleaseMilestone(stack, release, side, milestones, seriesLabel) {
   stack.append(marker);
 }
 
-function createPokemonReleaseStack(release, side, isSelected, toggleRelease) {
+function createSeriesReleaseStack(release, side, isSelected, toggleRelease, definition) {
   const stack = document.createElement("div");
   stack.className = "timeline-card-anchor pokemon-release-stack";
   const card = document.createElement("article");
-  card.className = "pokemon-release-card";
-  if (managedImagesFor(`pokemon:${release.id}`).length) {
-    card.classList.add("pokemon-release-card-has-artwork", "timeline-primary-card-has-artwork");
+  card.className = `pokemon-release-card${definition.cardClass ? ` ${definition.cardClass}` : ""}`;
+  const artworkKey = `${definition.imageCollectionId}:${release.id}`;
+  if (managedImagesFor(artworkKey).length) {
+    card.classList.add(...definition.artworkCardClasses);
   }
-  const releaseLabel = release.official === false
-    ? `${release.workType || "同人作品"}・${release.creator || "未知制作者"}`
-    : release.generation;
+  const releaseLabel = definition.tagFor(release);
   const platformTotal = releasePlatformCount(release);
-  const cardLineage = release.remakeOf
-    ? `<span class="pokemon-card-lineage">重制：${pokemonSubtitle(release.remakeOf.chineseName)}</span>`
-    : release.modOf
-      ? `<span class="pokemon-card-lineage">改版：${pokemonSubtitle(release.modOf)}</span>`
-      : release.editionNote
-        ? `<span class="pokemon-card-lineage" title="${release.editionNote}">${release.editionNote}</span>`
-        : "";
-  card.innerHTML = `<div class="pokemon-release-head"><time>${pokemonReleaseDateLabel(release)}</time><span class="pokemon-release-tag" title="${releaseLabel}">${releaseLabel}</span></div>
-    <div class="pokemon-release-title"><strong title="${release.name}">${release.name}</strong><p title="${pokemonSubtitle(release.chineseName)}">${pokemonSubtitle(release.chineseName)}</p>${cardLineage}</div>
+  const subtitle = definition.subtitleFor(release);
+  const cardLineage = definition.cardLineageFor?.(release) || "";
+  card.innerHTML = `<div class="pokemon-release-head"><time>${gameReleaseDateLabel(release)}</time><span class="pokemon-release-tag" title="${releaseLabel}">${releaseLabel}</span></div>
+    <div class="pokemon-release-title"><strong title="${release.name}">${release.name}</strong><p title="${subtitle}">${subtitle}</p>${cardLineage}</div>
     <div class="pokemon-release-foot"><small>${platformTotal} 个平台</small></div>`;
-  appendPokemonReleaseArtwork(card, release);
+  appendReleaseArtwork(card, artworkKey);
   bindReleaseCard(card, isSelected, toggleRelease);
   stack.append(card);
-  appendReleaseMilestone(stack, release, side, pokemonMilestones, "Pokémon");
+  appendReleaseMilestone(stack, release, side, definition.milestones, definition.label);
 
   if (isSelected) {
     const flyout = document.createElement("section");
-    flyout.className = `timeline-detail-flyout timeline-detail-flyout-${side} pokemon-detail-flyout`;
+    flyout.className = `timeline-detail-flyout timeline-detail-flyout-${side} pokemon-detail-flyout${definition.detailClass ? ` ${definition.detailClass}` : ""}`;
     const detail = document.createElement("section");
     detail.className = "pokemon-release-detail timeline-information-stack";
-    const insight = pokemonInsightFor(release);
-    const snapshot = seriesInterpretationCard(insight);
-    const decision = decisionChainReviewCard(
-      release,
-      insight,
-      pokemonDecisionChains,
-      pokemonDecisionChainReview
-    );
-    const plot = plotSummaryCard(pokemonPlotSummaries[release.id] || {
+    const insight = seriesInsightFor(release, definition);
+    detail.append(seriesInterpretationCard(insight));
+    if (SHOW_DESIGN_DECISION_CHAINS) {
+      detail.append(decisionChainReviewCard(
+        release,
+        insight,
+        definition.content.decisionChains,
+        definition.content.decisionReview
+      ));
+    }
+    const plot = plotSummaryCard(definition.content.plotSummaries[release.id] || {
       summary: "当前版本尚未整理该作品的剧情概要。"
     });
-    const record = platformRecordCard(release);
-    const supplement = informationCard(4, "补充信息", [], createPokemonStartersPanel(release));
-    detail.append(snapshot);
-    if (SHOW_DESIGN_DECISION_CHAINS) detail.append(decision);
-    detail.append(plot, record, supplement);
-    flyout.append(detail);
-    stack.append(flyout);
-  }
-
-  return stack;
-}
-
-function createFinalFantasyReleaseStack(release, side, isSelected, toggleRelease) {
-  const stack = document.createElement("div");
-  stack.className = "timeline-card-anchor pokemon-release-stack";
-  const card = document.createElement("article");
-  card.className = "pokemon-release-card final-fantasy-release-card";
-  if (managedImagesFor(`final-fantasy:${release.id}`).length) {
-    card.classList.add("timeline-primary-card-has-artwork");
-  }
-  const platformTotal = releasePlatformCount(release);
-  const cardLineage = release.lineage
-    ? `<span class="final-fantasy-card-lineage" title="${release.lineage}">${release.lineage}</span>`
-    : "";
-  const displayTag = finalFantasyDisplayTag(release);
-  card.innerHTML = `<div class="pokemon-release-head"><time>${gameReleaseDateLabel(release)}</time><span class="pokemon-release-tag" title="${displayTag}">${displayTag}</span></div>
-    <div class="pokemon-release-title"><strong title="${release.name}">${release.name}</strong><p title="${release.chineseName}">${release.chineseName}</p>${cardLineage}</div>
-    <div class="pokemon-release-foot"><small>${platformTotal} 个平台</small></div>`;
-  appendFinalFantasyReleaseArtwork(card, release);
-  bindReleaseCard(card, isSelected, toggleRelease);
-  stack.append(card);
-  appendReleaseMilestone(stack, release, side, finalFantasyMilestones, "Final Fantasy");
-
-  if (isSelected) {
-    const flyout = document.createElement("section");
-    flyout.className = `timeline-detail-flyout timeline-detail-flyout-${side} pokemon-detail-flyout final-fantasy-detail-flyout`;
-    const detail = document.createElement("section");
-    detail.className = "pokemon-release-detail timeline-information-stack";
-    const insight = finalFantasyInsightFor(release);
-    const snapshot = seriesInterpretationCard(insight);
-    const decision = decisionChainReviewCard(
-      release,
-      insight,
-      finalFantasyDecisionChains,
-      finalFantasyDecisionChainReview
-    );
-    const plot = plotSummaryCard(finalFantasyPlotSummaries[release.id] || {
-      summary: "当前版本尚未整理该作品的剧情概要。"
-    });
-    const lineage = release.lineage
+    const lineage = definition.showDetailLineage && release.lineage
       ? Object.assign(document.createElement("div"), { className: "timeline-related-note", textContent: `谱系关系：${release.lineage}` })
       : null;
     const record = platformRecordCard(release, lineage);
-    detail.append(snapshot);
-    if (SHOW_DESIGN_DECISION_CHAINS) detail.append(decision);
     detail.append(plot, record);
+    const supplement = definition.supplementFor?.(release);
+    if (supplement) detail.append(supplement);
     flyout.append(detail);
     stack.append(flyout);
   }
@@ -1804,198 +1567,171 @@ function createFinalFantasyReleaseStack(release, side, isSelected, toggleRelease
   return stack;
 }
 
-function createDragonQuestReleaseStack(release, side, isSelected, toggleRelease) {
-  const stack = document.createElement("div");
-  stack.className = "timeline-card-anchor pokemon-release-stack";
-  const card = document.createElement("article");
-  card.className = "pokemon-release-card dragon-quest-release-card";
-  if (managedImagesFor(`dragon-quest:${release.id}`).length) {
-    card.classList.add("timeline-primary-card-has-artwork");
-  }
-  const platformTotal = releasePlatformCount(release);
-  const displayTag = release.tag || release.category;
-  card.innerHTML = `<div class="pokemon-release-head"><time>${gameReleaseDateLabel(release)}</time><span class="pokemon-release-tag" title="${displayTag}">${displayTag}</span></div>
-    <div class="pokemon-release-title"><strong title="${release.name}">${release.name}</strong><p title="${release.chineseName}">${release.chineseName}</p></div>
-    <div class="pokemon-release-foot"><small>${platformTotal} 个平台</small></div>`;
-  appendDragonQuestReleaseArtwork(card, release);
-  bindReleaseCard(card, isSelected, toggleRelease);
-  stack.append(card);
-  appendReleaseMilestone(stack, release, side, dragonQuestMilestones, "Dragon Quest");
-
-  if (isSelected) {
-    const flyout = document.createElement("section");
-    flyout.className = `timeline-detail-flyout timeline-detail-flyout-${side} pokemon-detail-flyout dragon-quest-detail-flyout`;
-    const detail = document.createElement("section");
-    detail.className = "pokemon-release-detail timeline-information-stack";
-    const insight = dragonQuestInsightFor(release);
-    const snapshot = seriesInterpretationCard(insight);
-    const decision = decisionChainReviewCard(
-      release,
-      insight,
-      dragonQuestDecisionChains,
-      dragonQuestDecisionChainReview
-    );
-    const plot = plotSummaryCard(dragonQuestPlotSummaries[release.id] || {
-      summary: "当前版本尚未整理该作品的剧情概要。"
-    });
-    const lineage = release.lineage
-      ? Object.assign(document.createElement("div"), { className: "timeline-related-note", textContent: `谱系关系：${release.lineage}` })
-      : null;
-    const record = platformRecordCard(release, lineage);
-    detail.append(snapshot);
-    if (SHOW_DESIGN_DECISION_CHAINS) detail.append(decision);
-    detail.append(plot, record);
-    flyout.append(detail);
-    stack.append(flyout);
-  }
-
-  return stack;
-}
-
-function createLikeADragonReleaseStack(release, side, isSelected, toggleRelease) {
-  const stack = document.createElement("div");
-  stack.className = "timeline-card-anchor pokemon-release-stack";
-  const card = document.createElement("article");
-  card.className = "pokemon-release-card like-a-dragon-release-card";
-  if (managedImagesFor(`like-a-dragon:${release.id}`).length) {
-    card.classList.add("timeline-primary-card-has-artwork");
-  }
-  const platformTotal = releasePlatformCount(release);
-  const displayTag = release.tag || release.category;
-  card.innerHTML = `<div class="pokemon-release-head"><time>${gameReleaseDateLabel(release)}</time><span class="pokemon-release-tag" title="${displayTag}">${displayTag}</span></div>
-    <div class="pokemon-release-title"><strong title="${release.name}">${release.name}</strong><p title="${release.chineseName}">${release.chineseName}</p></div>
-    <div class="pokemon-release-foot"><small>${platformTotal} 个平台</small></div>`;
-  appendLikeADragonReleaseArtwork(card, release);
-  bindReleaseCard(card, isSelected, toggleRelease);
-  stack.append(card);
-  appendReleaseMilestone(stack, release, side, likeADragonMilestones, "Like a Dragon");
-
-  if (isSelected) {
-    const flyout = document.createElement("section");
-    flyout.className = `timeline-detail-flyout timeline-detail-flyout-${side} pokemon-detail-flyout like-a-dragon-detail-flyout`;
-    const detail = document.createElement("section");
-    detail.className = "pokemon-release-detail timeline-information-stack";
-    const insight = likeADragonInsightFor(release);
-    const snapshot = seriesInterpretationCard(insight);
-    const decision = decisionChainReviewCard(
-      release,
-      insight,
-      likeADragonDecisionChains,
-      likeADragonDecisionChainReview
-    );
-    const plot = plotSummaryCard(likeADragonPlotSummaries[release.id] || {
-      summary: "当前版本尚未整理该作品的剧情概要。"
-    });
-    const lineage = release.lineage
-      ? Object.assign(document.createElement("div"), { className: "timeline-related-note", textContent: `谱系关系：${release.lineage}` })
-      : null;
-    const record = platformRecordCard(release, lineage);
-    detail.append(snapshot);
-    if (SHOW_DESIGN_DECISION_CHAINS) detail.append(decision);
-    detail.append(plot, record);
-    flyout.append(detail);
-    stack.append(flyout);
-  }
-
-  return stack;
-}
-
-function createXenoSeriesReleaseStack(release, side, isSelected, toggleRelease) {
-  const stack = document.createElement("div");
-  stack.className = "timeline-card-anchor pokemon-release-stack";
-  const card = document.createElement("article");
-  card.className = "pokemon-release-card xenoblade-release-card";
-  if (managedImagesFor(`xenoblade:${release.id}`).length) {
-    card.classList.add("timeline-primary-card-has-artwork");
-  }
-  const platformTotal = releasePlatformCount(release);
-  const displayTag = release.tag || release.category;
-  card.innerHTML = `<div class="pokemon-release-head"><time>${gameReleaseDateLabel(release)}</time><span class="pokemon-release-tag" title="${displayTag}">${displayTag}</span></div>
-    <div class="pokemon-release-title"><strong title="${release.name}">${release.name}</strong><p title="${release.chineseName}">${release.chineseName}</p></div>
-    <div class="pokemon-release-foot"><small>${platformTotal} 个平台</small></div>`;
-  appendXenobladeReleaseArtwork(card, release);
-  bindReleaseCard(card, isSelected, toggleRelease);
-  stack.append(card);
-  appendReleaseMilestone(stack, release, side, xenobladeMilestones, "Xeno Series");
-
-  if (isSelected) {
-    const flyout = document.createElement("section");
-    flyout.className = `timeline-detail-flyout timeline-detail-flyout-${side} pokemon-detail-flyout xenoblade-detail-flyout`;
-    const detail = document.createElement("section");
-    detail.className = "pokemon-release-detail timeline-information-stack";
-    const insight = xenobladeInsightFor(release);
-    const snapshot = seriesInterpretationCard(insight);
-    const decision = decisionChainReviewCard(
-      release,
-      insight,
-      xenobladeDecisionChains,
-      xenobladeDecisionChainReview
-    );
-    const plot = plotSummaryCard(xenobladePlotSummaries[release.id] || {
-      summary: "当前版本尚未整理该作品的剧情概要。"
-    });
-    const lineage = release.lineage
-      ? Object.assign(document.createElement("div"), { className: "timeline-related-note", textContent: `谱系关系：${release.lineage}` })
-      : null;
-    const record = platformRecordCard(release, lineage);
-    detail.append(snapshot);
-    if (SHOW_DESIGN_DECISION_CHAINS) detail.append(decision);
-    detail.append(plot, record);
-    flyout.append(detail);
-    stack.append(flyout);
-  }
-
-  return stack;
-}
-
-function seriesOverviewDefinitions() {
-  return [
+function gameSeriesDefinitions() {
+  if (gameSeriesDefinitionCache) return gameSeriesDefinitionCache;
+  const standardArtworkClasses = ["timeline-primary-card-has-artwork"];
+  const standardTag = (release) => release.tag || release.category;
+  const standardSubtitle = (release) => release.chineseName;
+  gameSeriesDefinitionCache = [
     {
       id: "pokemon",
       label: "Pokémon",
       releases: pokemonReleases,
+      element: elements.pokemonTimeline,
+      theme: "pokemon",
+      imageCollectionId: "pokemon",
+      cardClass: "",
+      detailClass: "",
+      artworkCardClasses: ["pokemon-release-card-has-artwork", ...standardArtworkClasses],
       branchClass: "pokemon-branch",
       color: (release) => release.official === false ? "var(--pokemon-fan)" : "var(--pokemon-official)",
       filterColor: "var(--pokemon-official)",
-      createStack: createPokemonReleaseStack
+      tagFor: (release) => release.official === false
+        ? `${release.workType || "同人作品"}・${release.creator || "未知制作者"}`
+        : release.generation,
+      subtitleFor: (release) => pokemonSubtitle(release.chineseName),
+      cardLineageFor: (release) => release.remakeOf
+        ? `<span class="pokemon-card-lineage">重制：${pokemonSubtitle(release.remakeOf.chineseName)}</span>`
+        : release.modOf
+          ? `<span class="pokemon-card-lineage">改版：${pokemonSubtitle(release.modOf)}</span>`
+          : release.editionNote
+            ? `<span class="pokemon-card-lineage" title="${release.editionNote}">${release.editionNote}</span>`
+            : "",
+      milestones: pokemonMilestones,
+      criteria: window.POKEMON_TIMELINE_SELECTION_CRITERIA,
+      releaseStructure: (release) => release.releaseStructure,
+      supplementFor: (release) => pokemonStartersForRelease(release).length
+        ? informationCard(4, "补充信息", [], createPokemonStartersPanel(release))
+        : null,
+      layout: (releases, reserveDetailSpace, selectedId) =>
+        layoutPokemonReleases(releases, reserveDetailSpace, selectedId),
+      content: {
+        editorial: pokemonEditorialReading,
+        designLogic: pokemonDesignLogic,
+        seriesImpact: pokemonSeriesImpact,
+        externalImpactResearch: pokemonExternalImpactResearch,
+        plotSummaries: pokemonPlotSummaries,
+        decisionChains: pokemonDecisionChains,
+        decisionReview: pokemonDecisionChainReview
+      }
     },
     {
       id: "final-fantasy",
       label: "Final Fantasy",
       releases: finalFantasyReleases,
+      element: elements.finalFantasyTimeline,
+      theme: "final-fantasy",
+      imageCollectionId: "final-fantasy",
+      cardClass: "final-fantasy-release-card",
+      detailClass: "final-fantasy-detail-flyout",
+      artworkCardClasses: standardArtworkClasses,
       branchClass: "pokemon-branch final-fantasy-branch",
       color: () => "var(--final-fantasy-color)",
       filterColor: "var(--final-fantasy-color)",
-      createStack: createFinalFantasyReleaseStack
+      tagFor: finalFantasyDisplayTag,
+      subtitleFor: standardSubtitle,
+      cardLineageFor: (release) => release.lineage
+        ? `<span class="final-fantasy-card-lineage" title="${release.lineage}">${release.lineage}</span>`
+        : "",
+      showDetailLineage: true,
+      milestones: finalFantasyMilestones,
+      criteria: window.FINAL_FANTASY_TIMELINE_SELECTION_CRITERIA,
+      content: {
+        editorial: finalFantasyEditorialReading,
+        designLogic: finalFantasyDesignLogic,
+        seriesImpact: finalFantasySeriesImpact,
+        externalImpactResearch: finalFantasyExternalImpactResearch,
+        plotSummaries: finalFantasyPlotSummaries,
+        decisionChains: finalFantasyDecisionChains,
+        decisionReview: finalFantasyDecisionChainReview
+      }
     },
     {
       id: "dragon-quest",
       label: "Dragon Quest",
       releases: dragonQuestReleases,
+      element: elements.dragonQuestTimeline,
+      theme: "dragon-quest",
+      imageCollectionId: "dragon-quest",
+      cardClass: "dragon-quest-release-card",
+      detailClass: "dragon-quest-detail-flyout",
+      artworkCardClasses: standardArtworkClasses,
       branchClass: "pokemon-branch dragon-quest-branch",
       color: () => "var(--dragon-quest-color)",
       filterColor: "var(--dragon-quest-color)",
-      createStack: createDragonQuestReleaseStack
+      tagFor: standardTag,
+      subtitleFor: standardSubtitle,
+      showDetailLineage: true,
+      milestones: dragonQuestMilestones,
+      criteria: window.DRAGON_QUEST_TIMELINE_SELECTION_CRITERIA,
+      content: {
+        editorial: dragonQuestEditorialReading,
+        designLogic: dragonQuestDesignLogic,
+        seriesImpact: dragonQuestSeriesImpact,
+        externalImpactResearch: dragonQuestExternalImpactResearch,
+        plotSummaries: dragonQuestPlotSummaries,
+        decisionChains: dragonQuestDecisionChains,
+        decisionReview: dragonQuestDecisionChainReview
+      }
     },
     {
       id: "like-a-dragon",
       label: "Like a Dragon",
       releases: likeADragonReleases,
+      element: elements.likeADragonTimeline,
+      theme: "like-a-dragon",
+      imageCollectionId: "like-a-dragon",
+      cardClass: "like-a-dragon-release-card",
+      detailClass: "like-a-dragon-detail-flyout",
+      artworkCardClasses: standardArtworkClasses,
       branchClass: "pokemon-branch like-a-dragon-branch",
       color: () => "var(--like-a-dragon-color)",
       filterColor: "var(--like-a-dragon-color)",
-      createStack: createLikeADragonReleaseStack
+      tagFor: standardTag,
+      subtitleFor: standardSubtitle,
+      showDetailLineage: true,
+      milestones: likeADragonMilestones,
+      criteria: window.LIKE_A_DRAGON_TIMELINE_SELECTION_CRITERIA,
+      content: {
+        editorial: likeADragonEditorialReading,
+        designLogic: likeADragonDesignLogic,
+        seriesImpact: likeADragonSeriesImpact,
+        externalImpactResearch: likeADragonExternalImpactResearch,
+        plotSummaries: likeADragonPlotSummaries,
+        decisionChains: likeADragonDecisionChains,
+        decisionReview: likeADragonDecisionChainReview
+      }
     },
     {
       id: "xeno-series",
       label: "Xeno Series",
       releases: xenobladeReleases,
+      element: elements.xenobladeTimeline,
+      theme: "xenoblade",
+      imageCollectionId: "xenoblade",
+      cardClass: "xenoblade-release-card",
+      detailClass: "xenoblade-detail-flyout",
+      artworkCardClasses: standardArtworkClasses,
       branchClass: "pokemon-branch xenoblade-branch",
       color: () => "var(--xenoblade-color)",
       filterColor: "var(--xenoblade-color)",
-      createStack: createXenoSeriesReleaseStack
+      tagFor: standardTag,
+      subtitleFor: standardSubtitle,
+      showDetailLineage: true,
+      milestones: xenobladeMilestones,
+      criteria: window.XENOBLADE_TIMELINE_SELECTION_CRITERIA,
+      content: {
+        editorial: xenobladeEditorialReading,
+        designLogic: xenobladeDesignLogic,
+        seriesImpact: xenobladeSeriesImpact,
+        externalImpactResearch: xenobladeExternalImpactResearch,
+        plotSummaries: xenobladePlotSummaries,
+        decisionChains: xenobladeDecisionChains,
+        decisionReview: xenobladeDecisionChainReview
+      }
     }
   ];
+  return gameSeriesDefinitionCache;
 }
 
 function createSeriesOverviewFilter(definitions) {
@@ -2036,7 +1772,7 @@ function renderSeriesOverviewTimeline() {
   if (!elements.seriesOverviewTimeline) return;
   elements.seriesOverviewTimeline.textContent = "";
 
-  const definitions = seriesOverviewDefinitions();
+  const definitions = gameSeriesDefinitions();
   const activeDefinitions = definitions.filter((definition) => selectedSeriesOverviewTimelineIds.has(definition.id));
   if (
     selectedSeriesOverviewReleaseKey
@@ -2094,7 +1830,7 @@ function renderSeriesOverviewTimeline() {
       selectedSeriesOverviewReleaseKey = selected ? null : entry.id;
       renderSeriesOverviewTimeline();
     };
-    const stack = entry.definition.createStack(entry.release, itemLayout.side, selected, toggleRelease);
+    const stack = createSeriesReleaseStack(entry.release, itemLayout.side, selected, toggleRelease, entry.definition);
     branch.append(stack);
     if (itemLayout.side === "left") leftItems.append(branch);
     else rightItems.append(branch);
@@ -2107,17 +1843,20 @@ function renderSeriesOverviewTimeline() {
   elements.seriesOverviewTimeline.append(axis);
 }
 
-function renderPokemonTimeline() {
-  if (!elements.pokemonTimeline) return;
-  elements.pokemonTimeline.textContent = "";
+function renderGameSeriesTimeline(definition) {
+  if (!definition.element) return;
+  definition.element.textContent = "";
 
-  const releases = [...pokemonReleases].sort((a, b) => a.date.localeCompare(b.date) || a.name.localeCompare(b.name));
+  const releases = [...definition.releases].sort((a, b) => a.date.localeCompare(b.date) || a.name.localeCompare(b.name));
   const reserveDetailSpace = window.matchMedia?.("(max-width: 760px)").matches;
-  const layout = layoutPokemonReleases(releases, reserveDetailSpace);
+  const selectedId = selectedSeriesReleaseIds[definition.id] || null;
+  const layout = definition.layout
+    ? definition.layout(releases, reserveDetailSpace, selectedId)
+    : layoutCategorizedReleases(releases, reserveDetailSpace, selectedId);
   const axis = document.createElement("div");
-  axis.className = "vertical-timeline pokemon-vertical-timeline";
+  axis.className = `vertical-timeline ${definition.theme}-vertical-timeline`;
   const canvas = document.createElement("section");
-  canvas.className = "timeline-year-row pokemon-timeline-canvas";
+  canvas.className = `timeline-year-row ${definition.theme}-timeline-canvas`;
   canvas.style.setProperty("--year-row-height", `${layout.height}px`);
   const leftContent = document.createElement("div");
   leftContent.className = "timeline-year-content timeline-year-content-left";
@@ -2133,20 +1872,23 @@ function renderPokemonTimeline() {
   releases.forEach((release) => {
     const itemLayout = layout.items.get(release.id);
     const branch = document.createElement("div");
-    branch.className = `timeline-branch pokemon-branch ${itemLayout.side === "left" ? "timeline-branch-left" : "timeline-branch-right"}${selectedPokemonReleaseId === release.id ? " selected" : ""}`;
+    branch.className = `timeline-branch ${definition.branchClass} ${itemLayout.side === "left" ? "timeline-branch-left" : "timeline-branch-right"}${selectedId === release.id ? " selected" : ""}`;
     branch.style.setProperty("--branch-offset", itemLayout.branchOffset);
     branch.style.setProperty("--month-offset", `${itemLayout.top}px`);
-    branch.style.setProperty("--pokemon-color", release.official === false ? "var(--pokemon-fan)" : "var(--pokemon-official)");
+    branch.style.setProperty("--pokemon-color", definition.color(release));
 
     const toggleRelease = () => {
-      selectedPokemonReleaseId = selectedPokemonReleaseId === release.id ? null : release.id;
-      renderPokemonTimeline();
+      selectedSeriesReleaseIds[definition.id] = selectedSeriesReleaseIds[definition.id] === release.id
+        ? null
+        : release.id;
+      renderGameSeriesTimeline(definition);
     };
-    const stack = createPokemonReleaseStack(
+    const stack = createSeriesReleaseStack(
       release,
       itemLayout.side,
-      selectedPokemonReleaseId === release.id,
-      toggleRelease
+      selectedId === release.id,
+      toggleRelease,
+      definition
     );
 
     branch.append(stack);
@@ -2158,8 +1900,8 @@ function renderPokemonTimeline() {
   rightContent.append(rightItems);
   canvas.append(leftContent, yearRail, rightContent);
   axis.append(canvas);
-  elements.pokemonTimeline.append(
-    createTimelineSelectionNote(POKEMON_TIMELINE_SELECTION_CRITERIA, "pokemon"),
+  definition.element.append(
+    createTimelineSelectionNote(definition.criteria, definition.theme),
     axis
   );
 }
@@ -2228,12 +1970,7 @@ function releaseTimeIndex(release) {
   return utcDay / (365.2425 / 12);
 }
 
-function pokemonReleaseDateLabel(release) {
-  const [year, month = "--", day = "--"] = release.date.split(".");
-  return `${year}.${month}.${day}`;
-}
-
-function layoutPokemonReleases(releases, reserveDetailSpace) {
+function layoutPokemonReleases(releases, reserveDetailSpace, selectedReleaseId) {
   const items = new Map();
   const lastByLine = new Map();
   const lastBottomBySide = { left: -Infinity, right: -Infinity };
@@ -2270,7 +2007,7 @@ function layoutPokemonReleases(releases, reserveDetailSpace) {
     const top = Math.max(chronologicalTop, collisionTop);
     const monthKey = `${side}-${releaseIndex}`;
     const branchOffset = monthCounts[monthKey] || 0;
-    const occupiedHeight = reserveDetailSpace && selectedPokemonReleaseId === release.id ? 760 : 132;
+    const occupiedHeight = reserveDetailSpace && selectedReleaseId === release.id ? 760 : 132;
 
     items.set(release.id, { side, top, branchOffset });
     monthCounts[monthKey] = branchOffset + 1;
@@ -2293,234 +2030,6 @@ function gameReleaseDateLabel(release) {
 function finalFantasyDisplayTag(release) {
   const tag = FINAL_FANTASY_DISPLAY_TAGS[release.id];
   return tag ? `${tag[0]} · ${tag[1]}` : release.category;
-}
-
-function renderFinalFantasyTimeline() {
-  if (!elements.finalFantasyTimeline) return;
-  elements.finalFantasyTimeline.textContent = "";
-
-  const releases = [...finalFantasyReleases].sort((a, b) => a.date.localeCompare(b.date) || a.name.localeCompare(b.name));
-  const reserveDetailSpace = window.matchMedia?.("(max-width: 760px)").matches;
-  const layout = layoutCategorizedReleases(releases, reserveDetailSpace, selectedFinalFantasyReleaseId);
-  const axis = document.createElement("div");
-  axis.className = "vertical-timeline final-fantasy-vertical-timeline";
-  const canvas = document.createElement("section");
-  canvas.className = "timeline-year-row final-fantasy-timeline-canvas";
-  canvas.style.setProperty("--year-row-height", `${layout.height}px`);
-  const leftContent = document.createElement("div");
-  leftContent.className = "timeline-year-content timeline-year-content-left";
-  const rightContent = document.createElement("div");
-  rightContent.className = "timeline-year-content timeline-year-content-right";
-  const yearRail = document.createElement("div");
-  yearRail.className = "timeline-year-rail";
-  const leftItems = document.createElement("div");
-  leftItems.className = "timeline-year-items";
-  const rightItems = document.createElement("div");
-  rightItems.className = "timeline-year-items";
-
-  releases.forEach((release) => {
-    const itemLayout = layout.items.get(release.id);
-    const branch = document.createElement("div");
-    branch.className = `timeline-branch pokemon-branch final-fantasy-branch ${itemLayout.side === "left" ? "timeline-branch-left" : "timeline-branch-right"}${selectedFinalFantasyReleaseId === release.id ? " selected" : ""}`;
-    branch.style.setProperty("--branch-offset", itemLayout.branchOffset);
-    branch.style.setProperty("--month-offset", `${itemLayout.top}px`);
-    branch.style.setProperty("--pokemon-color", "var(--final-fantasy-color)");
-
-    const toggleRelease = () => {
-      selectedFinalFantasyReleaseId = selectedFinalFantasyReleaseId === release.id ? null : release.id;
-      renderFinalFantasyTimeline();
-    };
-    const stack = createFinalFantasyReleaseStack(
-      release,
-      itemLayout.side,
-      selectedFinalFantasyReleaseId === release.id,
-      toggleRelease
-    );
-
-    branch.append(stack);
-    if (itemLayout.side === "left") leftItems.append(branch);
-    else rightItems.append(branch);
-  });
-
-  leftContent.append(leftItems);
-  rightContent.append(rightItems);
-  canvas.append(leftContent, yearRail, rightContent);
-  axis.append(canvas);
-  elements.finalFantasyTimeline.append(
-    createTimelineSelectionNote(FINAL_FANTASY_TIMELINE_SELECTION_CRITERIA, "final-fantasy"),
-    axis
-  );
-}
-
-function renderDragonQuestTimeline() {
-  if (!elements.dragonQuestTimeline) return;
-  elements.dragonQuestTimeline.textContent = "";
-
-  const releases = [...dragonQuestReleases].sort((a, b) => a.date.localeCompare(b.date) || a.name.localeCompare(b.name));
-  const reserveDetailSpace = window.matchMedia?.("(max-width: 760px)").matches;
-  const layout = layoutCategorizedReleases(releases, reserveDetailSpace, selectedDragonQuestReleaseId);
-  const axis = document.createElement("div");
-  axis.className = "vertical-timeline dragon-quest-vertical-timeline";
-  const canvas = document.createElement("section");
-  canvas.className = "timeline-year-row dragon-quest-timeline-canvas";
-  canvas.style.setProperty("--year-row-height", `${layout.height}px`);
-  const leftContent = document.createElement("div");
-  leftContent.className = "timeline-year-content timeline-year-content-left";
-  const rightContent = document.createElement("div");
-  rightContent.className = "timeline-year-content timeline-year-content-right";
-  const yearRail = document.createElement("div");
-  yearRail.className = "timeline-year-rail";
-  const leftItems = document.createElement("div");
-  leftItems.className = "timeline-year-items";
-  const rightItems = document.createElement("div");
-  rightItems.className = "timeline-year-items";
-
-  releases.forEach((release) => {
-    const itemLayout = layout.items.get(release.id);
-    const branch = document.createElement("div");
-    branch.className = `timeline-branch pokemon-branch dragon-quest-branch ${itemLayout.side === "left" ? "timeline-branch-left" : "timeline-branch-right"}${selectedDragonQuestReleaseId === release.id ? " selected" : ""}`;
-    branch.style.setProperty("--branch-offset", itemLayout.branchOffset);
-    branch.style.setProperty("--month-offset", `${itemLayout.top}px`);
-    branch.style.setProperty("--pokemon-color", "var(--dragon-quest-color)");
-
-    const toggleRelease = () => {
-      selectedDragonQuestReleaseId = selectedDragonQuestReleaseId === release.id ? null : release.id;
-      renderDragonQuestTimeline();
-    };
-    const stack = createDragonQuestReleaseStack(
-      release,
-      itemLayout.side,
-      selectedDragonQuestReleaseId === release.id,
-      toggleRelease
-    );
-
-    branch.append(stack);
-    if (itemLayout.side === "left") leftItems.append(branch);
-    else rightItems.append(branch);
-  });
-
-  leftContent.append(leftItems);
-  rightContent.append(rightItems);
-  canvas.append(leftContent, yearRail, rightContent);
-  axis.append(canvas);
-  elements.dragonQuestTimeline.append(
-    createTimelineSelectionNote(DRAGON_QUEST_TIMELINE_SELECTION_CRITERIA, "dragon-quest"),
-    axis
-  );
-}
-
-function renderLikeADragonTimeline() {
-  if (!elements.likeADragonTimeline) return;
-  elements.likeADragonTimeline.textContent = "";
-
-  const releases = [...likeADragonReleases].sort((a, b) => a.date.localeCompare(b.date) || a.name.localeCompare(b.name));
-  const reserveDetailSpace = window.matchMedia?.("(max-width: 760px)").matches;
-  const layout = layoutCategorizedReleases(releases, reserveDetailSpace, selectedLikeADragonReleaseId);
-  const axis = document.createElement("div");
-  axis.className = "vertical-timeline like-a-dragon-vertical-timeline";
-  const canvas = document.createElement("section");
-  canvas.className = "timeline-year-row like-a-dragon-timeline-canvas";
-  canvas.style.setProperty("--year-row-height", `${layout.height}px`);
-  const leftContent = document.createElement("div");
-  leftContent.className = "timeline-year-content timeline-year-content-left";
-  const rightContent = document.createElement("div");
-  rightContent.className = "timeline-year-content timeline-year-content-right";
-  const yearRail = document.createElement("div");
-  yearRail.className = "timeline-year-rail";
-  const leftItems = document.createElement("div");
-  leftItems.className = "timeline-year-items";
-  const rightItems = document.createElement("div");
-  rightItems.className = "timeline-year-items";
-
-  releases.forEach((release) => {
-    const itemLayout = layout.items.get(release.id);
-    const branch = document.createElement("div");
-    branch.className = `timeline-branch pokemon-branch like-a-dragon-branch ${itemLayout.side === "left" ? "timeline-branch-left" : "timeline-branch-right"}${selectedLikeADragonReleaseId === release.id ? " selected" : ""}`;
-    branch.style.setProperty("--branch-offset", itemLayout.branchOffset);
-    branch.style.setProperty("--month-offset", `${itemLayout.top}px`);
-    branch.style.setProperty("--pokemon-color", "var(--like-a-dragon-color)");
-
-    const toggleRelease = () => {
-      selectedLikeADragonReleaseId = selectedLikeADragonReleaseId === release.id ? null : release.id;
-      renderLikeADragonTimeline();
-    };
-    const stack = createLikeADragonReleaseStack(
-      release,
-      itemLayout.side,
-      selectedLikeADragonReleaseId === release.id,
-      toggleRelease
-    );
-
-    branch.append(stack);
-    if (itemLayout.side === "left") leftItems.append(branch);
-    else rightItems.append(branch);
-  });
-
-  leftContent.append(leftItems);
-  rightContent.append(rightItems);
-  canvas.append(leftContent, yearRail, rightContent);
-  axis.append(canvas);
-  elements.likeADragonTimeline.append(
-    createTimelineSelectionNote(LIKE_A_DRAGON_TIMELINE_SELECTION_CRITERIA, "like-a-dragon"),
-    axis
-  );
-}
-
-function renderXenobladeTimeline() {
-  if (!elements.xenobladeTimeline) return;
-  elements.xenobladeTimeline.textContent = "";
-
-  const releases = [...xenobladeReleases].sort((a, b) => a.date.localeCompare(b.date) || a.name.localeCompare(b.name));
-  const reserveDetailSpace = window.matchMedia?.("(max-width: 760px)").matches;
-  const layout = layoutCategorizedReleases(releases, reserveDetailSpace, selectedXenobladeReleaseId);
-  const axis = document.createElement("div");
-  axis.className = "vertical-timeline xenoblade-vertical-timeline";
-  const canvas = document.createElement("section");
-  canvas.className = "timeline-year-row xenoblade-timeline-canvas";
-  canvas.style.setProperty("--year-row-height", `${layout.height}px`);
-  const leftContent = document.createElement("div");
-  leftContent.className = "timeline-year-content timeline-year-content-left";
-  const rightContent = document.createElement("div");
-  rightContent.className = "timeline-year-content timeline-year-content-right";
-  const yearRail = document.createElement("div");
-  yearRail.className = "timeline-year-rail";
-  const leftItems = document.createElement("div");
-  leftItems.className = "timeline-year-items";
-  const rightItems = document.createElement("div");
-  rightItems.className = "timeline-year-items";
-
-  releases.forEach((release) => {
-    const itemLayout = layout.items.get(release.id);
-    const branch = document.createElement("div");
-    branch.className = `timeline-branch pokemon-branch xenoblade-branch ${itemLayout.side === "left" ? "timeline-branch-left" : "timeline-branch-right"}${selectedXenobladeReleaseId === release.id ? " selected" : ""}`;
-    branch.style.setProperty("--branch-offset", itemLayout.branchOffset);
-    branch.style.setProperty("--month-offset", `${itemLayout.top}px`);
-    branch.style.setProperty("--pokemon-color", "var(--xenoblade-color)");
-
-    const toggleRelease = () => {
-      selectedXenobladeReleaseId = selectedXenobladeReleaseId === release.id ? null : release.id;
-      renderXenobladeTimeline();
-    };
-    const stack = createXenoSeriesReleaseStack(
-      release,
-      itemLayout.side,
-      selectedXenobladeReleaseId === release.id,
-      toggleRelease
-    );
-
-    branch.append(stack);
-    if (itemLayout.side === "left") leftItems.append(branch);
-    else rightItems.append(branch);
-  });
-
-  leftContent.append(leftItems);
-  rightContent.append(rightItems);
-  canvas.append(leftContent, yearRail, rightContent);
-  axis.append(canvas);
-  elements.xenobladeTimeline.append(
-    createTimelineSelectionNote(XENOBLADE_TIMELINE_SELECTION_CRITERIA, "xenoblade"),
-    axis
-  );
 }
 
 function layoutCategorizedReleases(releases, reserveDetailSpace, selectedReleaseId, selectedDetailHeight = 480) {

@@ -10,27 +10,33 @@ const timelinesDirectory = path.join(root, "timelines");
 const manifestDefinitions = {
   hardware: {
     path: path.join(timelinesDirectory, "hardware", "timeline-images.js"),
-    globalName: "HARDWARE_TIMELINE_IMAGES"
+    globalName: "HARDWARE_TIMELINE_IMAGES",
+    assetDirectory: path.join(timelinesDirectory, "hardware", "assets", "consoles")
   },
   pokemon: {
     path: path.join(timelinesDirectory, "pokemon", "timeline-images.js"),
-    globalName: "POKEMON_TIMELINE_IMAGES"
+    globalName: "POKEMON_TIMELINE_IMAGES",
+    assetDirectory: path.join(timelinesDirectory, "pokemon", "assets", "covers")
   },
   "final-fantasy": {
     path: path.join(timelinesDirectory, "final-fantasy", "timeline-images.js"),
-    globalName: "FINAL_FANTASY_TIMELINE_IMAGES"
+    globalName: "FINAL_FANTASY_TIMELINE_IMAGES",
+    assetDirectory: path.join(timelinesDirectory, "final-fantasy", "assets", "covers")
   },
   "dragon-quest": {
     path: path.join(timelinesDirectory, "DragonQuest", "timeline-images.js"),
-    globalName: "DRAGON_QUEST_TIMELINE_IMAGES"
+    globalName: "DRAGON_QUEST_TIMELINE_IMAGES",
+    assetDirectory: path.join(timelinesDirectory, "DragonQuest", "assets", "covers")
   },
   "like-a-dragon": {
     path: path.join(timelinesDirectory, "LikeADragon", "timeline-images.js"),
-    globalName: "LIKE_A_DRAGON_TIMELINE_IMAGES"
+    globalName: "LIKE_A_DRAGON_TIMELINE_IMAGES",
+    assetDirectory: path.join(timelinesDirectory, "LikeADragon", "assets", "covers")
   },
   xenoblade: {
     path: path.join(timelinesDirectory, "XenoSeries", "timeline-images.js"),
-    globalName: "XENOBLADE_TIMELINE_IMAGES"
+    globalName: "XENOBLADE_TIMELINE_IMAGES",
+    assetDirectory: path.join(timelinesDirectory, "XenoSeries", "assets", "covers")
   }
 };
 const mimeTypes = {
@@ -39,7 +45,16 @@ const mimeTypes = {
 };
 
 function collectionFromKey(key) {
-  return key.split(":", 1)[0];
+  return typeof key === "string" ? key.split(":", 1)[0] : "";
+}
+
+function isSupportedKey(key) {
+  return Boolean(manifestDefinitions[collectionFromKey(key)]);
+}
+
+function isPathInside(parent, target) {
+  const relative = path.relative(parent, target);
+  return relative === "" || (!relative.startsWith("..") && !path.isAbsolute(relative));
 }
 
 function readManifest(collection) {
@@ -47,8 +62,12 @@ function readManifest(collection) {
   if (!definition || !fs.existsSync(definition.path)) return {};
   const source = fs.readFileSync(definition.path, "utf8");
   const match = source.match(/=\s*([\s\S]*);\s*$/);
-  if (!match) return {};
-  try { return JSON.parse(match[1]); } catch { return {}; }
+  if (!match) throw new Error(`Invalid timeline image manifest: ${definition.path}`);
+  try {
+    return JSON.parse(match[1]);
+  } catch {
+    throw new Error(`Invalid timeline image manifest JSON: ${definition.path}`);
+  }
 }
 
 function readAllManifests() {
@@ -107,14 +126,9 @@ function parseMultipart(buffer, boundary) {
 }
 
 function collectionDirectoryForKey(key) {
-  const collection = collectionFromKey(key);
-  if (collection === "hardware") return path.join(timelinesDirectory, "hardware", "assets", "consoles");
-  if (collection === "pokemon") return path.join(timelinesDirectory, "pokemon", "assets", "covers");
-  if (collection === "final-fantasy") return path.join(timelinesDirectory, "final-fantasy", "assets", "covers");
-  if (collection === "dragon-quest") return path.join(timelinesDirectory, "DragonQuest", "assets", "covers");
-  if (collection === "like-a-dragon") return path.join(timelinesDirectory, "LikeADragon", "assets", "covers");
-  if (collection === "xenoblade") return path.join(timelinesDirectory, "XenoSeries", "assets", "covers");
-  throw new Error("Unsupported timeline collection");
+  const definition = manifestDefinitions[collectionFromKey(key)];
+  if (!definition) throw new Error("Unsupported timeline collection");
+  return definition.assetDirectory;
 }
 
 function indexedFilename(directory, key, extension) {
@@ -132,7 +146,7 @@ function saveUpload(file, key) {
   const extension = path.extname(file.filename).toLowerCase();
   if (!mimeTypes[extension] || extension === ".svg") throw new Error("只支持 PNG、JPG、WEBP 或 GIF 图片");
   const directory = collectionDirectoryForKey(key);
-  if (!directory.startsWith(timelinesDirectory)) throw new Error("无效的图片目录");
+  if (!isPathInside(timelinesDirectory, directory)) throw new Error("无效的图片目录");
   fs.mkdirSync(directory, { recursive: true });
   const filename = indexedFilename(directory, key, extension);
   fs.writeFileSync(path.join(directory, filename), file.content);
@@ -144,7 +158,7 @@ function removeUnreferencedImageFile(image, images) {
   const stillReferenced = Object.values(images).some((entries) => entries.some((entry) => entry.src === image.src));
   if (stillReferenced) return;
   const target = path.resolve(root, image.src);
-  if (target.startsWith(timelinesDirectory) && fs.existsSync(target)) fs.unlinkSync(target);
+  if (isPathInside(timelinesDirectory, target) && fs.existsSync(target)) fs.unlinkSync(target);
 }
 
 async function handleUpload(request, response) {
@@ -152,6 +166,7 @@ async function handleUpload(request, response) {
   if (!boundary) return sendJson(response, 400, { error: "缺少上传边界" });
   const { fields, files } = parseMultipart(await readBody(request), boundary);
   if (!fields.key || !files.length) return sendJson(response, 400, { error: "缺少图片或卡片标识" });
+  if (!isSupportedKey(fields.key)) return sendJson(response, 400, { error: "不支持的时间线卡片标识" });
   const collection = collectionFromKey(fields.key);
   const images = readManifest(collection);
   const current = images[fields.key] || [];
@@ -176,6 +191,7 @@ async function handleUpload(request, response) {
 
 async function handleJsonMutation(request, response, action) {
   const payload = JSON.parse((await readBody(request)).toString("utf8") || "{}");
+  if (!isSupportedKey(payload.key)) return sendJson(response, 400, { error: "不支持的时间线卡片标识" });
   const collection = collectionFromKey(payload.key);
   const images = readManifest(collection);
   const current = images[payload.key] || [];
@@ -190,10 +206,6 @@ async function handleJsonMutation(request, response, action) {
     const target = index + Number(payload.direction);
     if (index >= 0 && target >= 0 && target < current.length) [current[index], current[target]] = [current[target], current[index]];
     images[payload.key] = current;
-  }
-  if (action === "reset") {
-    delete images[payload.key];
-    current.forEach((image) => removeUnreferencedImageFile(image, images));
   }
   writeManifest(collection, images);
   sendJson(response, 200, { images });
@@ -210,7 +222,7 @@ function serveStatic(request, response) {
   const pathname = decodeURIComponent(new URL(request.url, `http://${request.headers.host}`).pathname);
   const relative = pathname === "/" ? "index.html" : pathname.replace(/^\/+/, "");
   const target = path.resolve(root, relative);
-  if (!target.startsWith(root) || !fs.existsSync(target) || fs.statSync(target).isDirectory()) {
+  if (!isPathInside(root, target) || !fs.existsSync(target) || fs.statSync(target).isDirectory()) {
     response.writeHead(404); response.end("Not found"); return;
   }
   response.writeHead(200, { "Content-Type": mimeTypes[path.extname(target).toLowerCase()] || "application/octet-stream", "Cache-Control": "no-store" });
@@ -223,7 +235,6 @@ http.createServer(async (request, response) => {
     if (request.method === "POST" && request.url === "/api/timeline-images/upload") return handleUpload(request, response);
     if (request.method === "POST" && request.url === "/api/timeline-images/remove") return handleJsonMutation(request, response, "remove");
     if (request.method === "POST" && request.url === "/api/timeline-images/move") return handleJsonMutation(request, response, "move");
-    if (request.method === "POST" && request.url === "/api/timeline-images/reset") return handleJsonMutation(request, response, "reset");
     if (request.method === "POST" && request.url === "/api/timeline-images/open-assets") return openAssetsFolder(response);
     serveStatic(request, response);
   } catch (error) {

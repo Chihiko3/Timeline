@@ -305,23 +305,6 @@ input {
   font-size: 12px;
 }
 
-.image-manager-status {
-  flex: 0 0 auto;
-  padding: 2px 6px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.image-manager-status.managed {
-  border-color: #9bb4df;
-  background: #edf4ff;
-  color: #3268b8;
-}
-
 .image-manager-strip {
   display: flex;
   min-height: 82px;
@@ -427,8 +410,7 @@ input {
   gap: 8px;
 }
 
-.image-manager-file-action,
-.image-manager-reset {
+.image-manager-file-action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -443,18 +425,13 @@ input {
   cursor: pointer;
 }
 
-.image-manager-file-action:hover,
-.image-manager-reset:hover {
+.image-manager-file-action:hover {
   border-color: #7194cb;
   color: #17498f;
 }
 
 .image-manager-file-action input {
   display: none;
-}
-
-.image-manager-reset {
-  margin-left: auto;
 }
 
 .image-manager-empty {
@@ -718,13 +695,6 @@ input {
   box-shadow: 0 5px 14px color-mix(in srgb, var(--pokemon-color, #c8333a) 14%, transparent);
 }
 
-.pokemon-detail-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
 .timeline-node-top,
 .pokemon-release-head {
   display: grid;
@@ -874,13 +844,6 @@ body.show-timeline-artwork-bounds .pokemon-release-artwork {
 
 .pokemon-release-artwork-switchable img {
   cursor: pointer;
-}
-
-.final-fantasy-release-logo {
-  right: 4px;
-  bottom: 5px;
-  width: 140px;
-  height: 46px;
 }
 
 .final-fantasy-release-card.timeline-primary-card-has-artwork .pokemon-release-title p,
@@ -1145,24 +1108,11 @@ body.show-timeline-artwork-bounds .pokemon-release-artwork {
   height: 96px;
 }
 
-.pokemon-detail-title {
-  flex-wrap: wrap;
-  padding-bottom: 9px;
-  border-bottom: 1px solid #dbe4f0;
-}
-
-.pokemon-detail-title h3,
 .pokemon-platform-group h4 {
   margin: 0;
   color: #263c5d;
   font-size: 13px;
 }
-
-.pokemon-detail-title span {
-  color: #71819a;
-  font-size: 12px;
-}
-
 
 .pokemon-platform-group {
   margin-top: 11px;
@@ -1208,12 +1158,8 @@ body.show-timeline-artwork-bounds .pokemon-release-artwork {
 
 .pokemon-empty {
   margin: 5px 0 0;
-  color: #223756;
-  font-size: 13px;
-}
-
-.pokemon-empty {
   color: #71819a;
+  font-size: 13px;
 }
 
 .timeline-related-note {
@@ -1223,11 +1169,6 @@ body.show-timeline-artwork-bounds .pokemon-release-artwork {
   color: #52657e;
   font-size: 12px;
   line-height: 1.45;
-}
-
-.pokemon-vertical-timeline {
-  gap: 18px;
-  padding-top: 4px;
 }
 
 .pokemon-branch::after {
@@ -1880,11 +1821,6 @@ body.show-timeline-artwork-bounds .pokemon-release-artwork {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-}
-
-.timeline-chip {
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .results-meta {

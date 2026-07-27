@@ -52,7 +52,6 @@
     replaceImage: (key, imageId, file) => upload(key, [file], imageId),
     removeImage: (key, imageId) => update("/remove", { key, imageId }),
     moveImage: (key, imageId, direction) => update("/move", { key, imageId, direction }),
-    deleteRecord: (key) => update("/reset", { key }),
     openAssetsFolder: () => update("/open-assets", {})
   };
 })();

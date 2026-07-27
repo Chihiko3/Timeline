@@ -56,7 +56,12 @@ GameConsole/
       selection-criteria.js           时间线开头的收录规则
       releases.js                     版本、发售日期与平台资料
       milestones.js                   系列破圈节点及判断依据
+      editorial-reading.js            核心体验、本作变化与研究线索
       decision-chain.js               设计问题、实验、代价与后续选择
+      design-logic.js                 机制底层逻辑
+      series-impact.js                系列长期影响
+      external-impact-research.js     行业影响及验证状态
+      plot-summaries.js               剧情概要与叙事创新
       timeline-images.js              卡片封面清单
       assets/covers/                  游戏封面
       assets/sprites/                 御三家像素图
@@ -64,9 +69,12 @@ GameConsole/
       selection-criteria.js           时间线开头的收录规则
       final-fantasy-releases.js       作品、发售日期与平台资料
       milestones.js                   系列破圈节点及判断依据
+      editorial-reading.js            核心体验、本作变化与研究线索
       decision-chain.js               设计问题、实验、代价与后续选择
-      final-fantasy-covers.js         采集到的封面映射
-      final-fantasy-logos.js          采集到的 Logo 映射
+      design-logic.js                 机制底层逻辑
+      series-impact.js                系列长期影响
+      external-impact-research.js     行业影响及验证状态
+      plot-summaries.js               剧情概要与叙事创新
       timeline-images.js              卡片图片清单
       assets/covers/                  封面与 Logo 文件
     DragonQuest/                      Dragon Quest 时间线
@@ -153,15 +161,13 @@ GM 图片管理仅供本地维护使用。上传的图片会被复制到对应�
 - `local-gm-server.js`：GM 图片管理服务。
 - `download-images.js`：下载主机图片。
 - `fetch-game-localizations.js` / `.ps1`：补充硬件代表游戏的中文名。
-- `fetch-final-fantasy-covers.ps1`：补充 Final Fantasy 封面。
-- `fetch-final-fantasy-logos.ps1`：补充 Final Fantasy 横向 Logo。
 - `fetch-final-fantasy-wiki-artwork.ps1`：从 Final Fantasy Wiki 补充可供 GM 筛选的图片。
 - `fetch-dragon-quest-artwork.js`：从 Dragon Quest Wiki 补充空缺图片；保留已有 GM 图片，并优先筛选封面、日版资源与正式 Logo。
+- `audit-timeline-content.js`：检查所有游戏作品是否拥有完整的系列解读、机制、影响与剧情资料，并拦截空泛占位文本。
 - `audit-release-data.js`：检查所有游戏系列的完整日期、平台年份、渲染顺序，以及决策链的作品 ID、必填字段、唯一审查状态和全作品覆盖率。
-- `seed-timeline-image-manifest.js`：根据现有资源重建全部时间线的图片清单。该脚本会重写清单，通常只在明确需要重建时使用。
 
 ## 新增时间线
 
-新增一个游戏系列或产品线时，应先建立 `timelines/<timeline-id>/`，并至少包含作品/产品数据文件、`timeline-images.js` 和 `assets/`。随后在 `index.html` 注册数据脚本与页面页签，并在 `common/app.js` 中接入该时间线特有的二级、三级详情内容。
+新增一个游戏系列或产品线时，应先建立 `timelines/<timeline-id>/`，并至少包含作品/产品数据文件、`timeline-images.js` 和 `assets/`。随后在 `index.html` 注册数据脚本与页面页签，并在 `common/app.js` 的 `gameSeriesDefinitions()` 中登记数据源、配色、标签和特有补充内容。
 
 一级卡片仍应复用 `common` 的统一时间线样式和布局逻辑。这样可以保证后续增加更多资料库时，页面仍像同一个网站，而不是多个独立页面的拼接。

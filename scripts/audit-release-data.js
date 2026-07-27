@@ -1,76 +1,9 @@
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
+const timelines = require("./timeline-registry");
 
 const root = path.resolve(__dirname, "..");
-const timelines = [
-  {
-    label: "Pokemon",
-    file: "timelines/pokemon/releases.js",
-    globalName: "POKEMON_CORE_RELEASES",
-    decisionFile: "timelines/pokemon/decision-chain.js",
-    decisionGlobalName: "POKEMON_DECISION_CHAINS",
-    reviewGlobalName: "POKEMON_DECISION_CHAIN_REVIEW",
-    editorialFile: "timelines/pokemon/editorial-reading.js",
-    editorialGlobalName: "POKEMON_EDITORIAL_READING",
-    milestoneFile: "timelines/pokemon/milestones.js",
-    milestoneGlobalName: "POKEMON_MILESTONES",
-  },
-  {
-    label: "Final Fantasy",
-    file: "timelines/final-fantasy/final-fantasy-releases.js",
-    globalName: "FINAL_FANTASY_RELEASES",
-    decisionFile: "timelines/final-fantasy/decision-chain.js",
-    decisionGlobalName: "FINAL_FANTASY_DECISION_CHAINS",
-    reviewGlobalName: "FINAL_FANTASY_DECISION_CHAIN_REVIEW",
-    editorialFile: "timelines/final-fantasy/editorial-reading.js",
-    editorialGlobalName: "FINAL_FANTASY_EDITORIAL_READING",
-    editorialSupportFiles: [
-      "timelines/final-fantasy/design-logic.js",
-      "timelines/final-fantasy/series-impact.js",
-      "timelines/final-fantasy/plot-summaries.js",
-      "timelines/final-fantasy/verified-additions.js",
-    ],
-    milestoneFile: "timelines/final-fantasy/milestones.js",
-    milestoneGlobalName: "FINAL_FANTASY_MILESTONES",
-  },
-  {
-    label: "Dragon Quest",
-    file: "timelines/DragonQuest/releases.js",
-    globalName: "DRAGON_QUEST_RELEASES",
-    decisionFile: "timelines/DragonQuest/decision-chain.js",
-    decisionGlobalName: "DRAGON_QUEST_DECISION_CHAINS",
-    reviewGlobalName: "DRAGON_QUEST_DECISION_CHAIN_REVIEW",
-    editorialFile: "timelines/DragonQuest/editorial-reading.js",
-    editorialGlobalName: "DRAGON_QUEST_EDITORIAL_READING",
-    milestoneFile: "timelines/DragonQuest/milestones.js",
-    milestoneGlobalName: "DRAGON_QUEST_MILESTONES",
-  },
-  {
-    label: "Like a Dragon",
-    file: "timelines/LikeADragon/releases.js",
-    globalName: "LIKE_A_DRAGON_RELEASES",
-    decisionFile: "timelines/LikeADragon/decision-chain.js",
-    decisionGlobalName: "LIKE_A_DRAGON_DECISION_CHAINS",
-    reviewGlobalName: "LIKE_A_DRAGON_DECISION_CHAIN_REVIEW",
-    editorialFile: "timelines/LikeADragon/editorial-reading.js",
-    editorialGlobalName: "LIKE_A_DRAGON_EDITORIAL_READING",
-    milestoneFile: "timelines/LikeADragon/milestones.js",
-    milestoneGlobalName: "LIKE_A_DRAGON_MILESTONES",
-  },
-  {
-    label: "Xeno Series",
-    file: "timelines/XenoSeries/releases.js",
-    globalName: "XENOBLADE_RELEASES",
-    decisionFile: "timelines/XenoSeries/decision-chain.js",
-    decisionGlobalName: "XENOBLADE_DECISION_CHAINS",
-    reviewGlobalName: "XENOBLADE_DECISION_CHAIN_REVIEW",
-    editorialFile: "timelines/XenoSeries/editorial-reading.js",
-    editorialGlobalName: "XENOBLADE_EDITORIAL_READING",
-    milestoneFile: "timelines/XenoSeries/milestones.js",
-    milestoneGlobalName: "XENOBLADE_MILESTONES",
-  },
-];
 
 const decisionFields = [
   "problem",
@@ -81,17 +14,24 @@ const decisionFields = [
   "basis",
 ];
 
-function loadData(file, globalName) {
-  return loadDataFiles([file], globalName);
-}
-
-function loadDataFiles(files, globalName) {
+function loadTimelineData(config) {
   const context = { window: {} };
-  for (const file of files) {
+  const files = [
+    config.release[0],
+    config.editorial[0],
+    config.design[0],
+    config.impact[0],
+    config.externalImpact[0],
+    config.plot[0],
+    config.decision[0],
+    config.milestone[0],
+    ...config.overrides
+  ];
+  for (const file of new Set(files)) {
     const source = fs.readFileSync(path.join(root, file), "utf8");
     vm.runInNewContext(source, context, { filename: file });
   }
-  return context.window[globalName];
+  return context.window;
 }
 
 function isValidDate(value) {
@@ -106,17 +46,12 @@ function isValidDate(value) {
 }
 
 function auditTimeline(config) {
-  const releases = loadData(config.file, config.globalName);
-  const decisionChains = loadData(
-    config.decisionFile,
-    config.decisionGlobalName,
-  );
-  const review = loadData(config.decisionFile, config.reviewGlobalName);
-  const editorial = loadDataFiles(
-    [config.file, config.editorialFile, ...(config.editorialSupportFiles || [])],
-    config.editorialGlobalName,
-  );
-  const milestones = loadData(config.milestoneFile, config.milestoneGlobalName);
+  const data = loadTimelineData(config);
+  const releases = data[config.release[1]] || [];
+  const decisionChains = data[config.decision[1]] || {};
+  const review = data[config.decision[2]] || {};
+  const editorial = data[config.editorial[1]] || {};
+  const milestones = data[config.milestone[1]] || {};
   const errors = [];
   const ids = new Set();
 

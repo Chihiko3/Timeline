@@ -1,52 +1,9 @@
 const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
+const timelines = require("./timeline-registry");
 
 const root = path.resolve(__dirname, "..");
-const timelines = [
-  {
-    label: "Pokemon",
-    releases: ["timelines/pokemon/releases.js", "POKEMON_CORE_RELEASES"],
-    editorial: ["timelines/pokemon/editorial-reading.js", "POKEMON_EDITORIAL_READING"],
-    design: ["timelines/pokemon/design-logic.js", "POKEMON_DESIGN_LOGIC"],
-    impact: ["timelines/pokemon/series-impact.js", "POKEMON_SERIES_IMPACT"],
-    plot: ["timelines/pokemon/plot-summaries.js", "POKEMON_PLOT_SUMMARIES"]
-  },
-  {
-    label: "Final Fantasy",
-    releases: ["timelines/final-fantasy/final-fantasy-releases.js", "FINAL_FANTASY_RELEASES"],
-    editorial: ["timelines/final-fantasy/editorial-reading.js", "FINAL_FANTASY_EDITORIAL_READING"],
-    design: ["timelines/final-fantasy/design-logic.js", "FINAL_FANTASY_DESIGN_LOGIC"],
-    impact: ["timelines/final-fantasy/series-impact.js", "FINAL_FANTASY_SERIES_IMPACT"],
-    plot: ["timelines/final-fantasy/plot-summaries.js", "FINAL_FANTASY_PLOT_SUMMARIES"],
-    overrides: "timelines/final-fantasy/verified-additions.js"
-  },
-  {
-    label: "Dragon Quest",
-    releases: ["timelines/DragonQuest/releases.js", "DRAGON_QUEST_RELEASES"],
-    editorial: ["timelines/DragonQuest/editorial-reading.js", "DRAGON_QUEST_EDITORIAL_READING"],
-    design: ["timelines/DragonQuest/design-logic.js", "DRAGON_QUEST_DESIGN_LOGIC"],
-    impact: ["timelines/DragonQuest/series-impact.js", "DRAGON_QUEST_SERIES_IMPACT"],
-    plot: ["timelines/DragonQuest/plot-summaries.js", "DRAGON_QUEST_PLOT_SUMMARIES"],
-    overrides: "timelines/DragonQuest/verified-content.js"
-  },
-  {
-    label: "Like a Dragon",
-    releases: ["timelines/LikeADragon/releases.js", "LIKE_A_DRAGON_RELEASES"],
-    editorial: ["timelines/LikeADragon/editorial-reading.js", "LIKE_A_DRAGON_EDITORIAL_READING"],
-    design: ["timelines/LikeADragon/design-logic.js", "LIKE_A_DRAGON_DESIGN_LOGIC"],
-    impact: ["timelines/LikeADragon/series-impact.js", "LIKE_A_DRAGON_SERIES_IMPACT"],
-    plot: ["timelines/LikeADragon/plot-summaries.js", "LIKE_A_DRAGON_PLOT_SUMMARIES"]
-  },
-  {
-    label: "Xeno Series",
-    releases: ["timelines/XenoSeries/releases.js", "XENOBLADE_RELEASES"],
-    editorial: ["timelines/XenoSeries/editorial-reading.js", "XENOBLADE_EDITORIAL_READING"],
-    design: ["timelines/XenoSeries/design-logic.js", "XENOBLADE_DESIGN_LOGIC"],
-    impact: ["timelines/XenoSeries/series-impact.js", "XENOBLADE_SERIES_IMPACT"],
-    plot: ["timelines/XenoSeries/plot-summaries.js", "XENOBLADE_PLOT_SUMMARIES"]
-  }
-];
 
 const weakPhrases = [
   "当前版本尚未整理",
@@ -57,17 +14,13 @@ const weakPhrases = [
   "具有重要意义"
 ];
 
-function load(file, globalName) {
-  return loadFiles([file], globalName);
-}
-
-function loadFiles(files, globalName) {
+function loadFiles(files) {
   const context = { window: {} };
   for (const file of files) {
     const source = fs.readFileSync(path.join(root, file), "utf8");
     vm.runInNewContext(source, context, { filename: file });
   }
-  return context.window[globalName] || {};
+  return context.window;
 }
 
 function textIsValid(value) {
@@ -104,22 +57,18 @@ function auditMap(ids, label, map, requiredFields, errors, options = {}) {
 
 let hasErrors = false;
 for (const config of timelines) {
-  const releases = load(...config.releases);
+  const files = [
+    config.release[0],
+    config.editorial[0],
+    config.design[0],
+    config.impact[0],
+    config.plot[0],
+    ...config.overrides
+  ];
+  const data = loadFiles([...new Set(files)]);
+  const releases = data[config.release[1]] || [];
   const ids = new Set(releases.map((release) => release.id));
   const errors = [];
-  const releaseFile = config.releases[0];
-  const sharedContentFiles = config.overrides
-    ? [
-        releaseFile,
-        config.editorial[0],
-        config.design[0],
-        config.impact[0],
-        config.plot[0],
-        config.overrides
-      ]
-    : null;
-  const loadContent = ([file, globalName]) =>
-    loadFiles(sharedContentFiles || [releaseFile, file], globalName);
 
   for (const release of releases) {
     if (!textIsValid(release.name) && release.name.length < 2) errors.push(`${release.id}: missing title`);
@@ -128,10 +77,10 @@ for (const config of timelines) {
     if (!Array.isArray(release.later)) errors.push(`${release.id}: later must be an array`);
   }
 
-  auditMap(ids, "editorial", loadContent(config.editorial), ["loop", "change", "note"], errors);
-  auditMap(ids, "design logic", loadContent(config.design), ["$text"], errors);
-  auditMap(ids, "series impact", loadContent(config.impact), ["$text"], errors, { allowNull: true });
-  auditMap(ids, "plot", loadContent(config.plot), ["summary", "innovation"], errors, { nullableFields: ["innovation"] });
+  auditMap(ids, "editorial", data[config.editorial[1]] || {}, ["loop", "change", "note"], errors);
+  auditMap(ids, "design logic", data[config.design[1]] || {}, ["$text"], errors);
+  auditMap(ids, "series impact", data[config.impact[1]] || {}, ["$text"], errors, { allowNull: true });
+  auditMap(ids, "plot", data[config.plot[1]] || {}, ["summary", "innovation"], errors, { nullableFields: ["innovation"] });
 
   console.log(`${config.label}: ${releases.length} releases, ${errors.length} content errors`);
   for (const error of errors) console.error(`  - ${error}`);
