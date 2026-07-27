@@ -586,22 +586,54 @@ input {
   padding: 0;
   place-items: center;
   border: 1px solid currentColor;
-  border-radius: 4px;
+  border-radius: 50%;
   background: #fff;
   font-family: inherit;
-  font-size: 9px;
-  font-weight: 800;
   line-height: 1;
   box-shadow: 0 0 0 2px #fff;
   cursor: help;
+}
+
+.timeline-milestone-marker::before,
+.timeline-milestone-marker::after {
+  position: absolute;
+  content: "";
+  pointer-events: none;
 }
 
 .timeline-milestone-marker-domestic {
   color: #9a671d;
 }
 
+.timeline-milestone-marker-domestic::before {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.timeline-milestone-marker-domestic::after {
+  width: 9px;
+  height: 9px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+}
+
 .timeline-milestone-marker-global {
   color: #356d9f;
+}
+
+.timeline-milestone-marker-global::before {
+  width: 6px;
+  height: 12px;
+  border-right: 1px solid currentColor;
+  border-left: 1px solid currentColor;
+  border-radius: 50%;
+}
+
+.timeline-milestone-marker-global::after {
+  width: 12px;
+  border-top: 1px solid currentColor;
 }
 
 .timeline-milestone-marker-left {

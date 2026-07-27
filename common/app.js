@@ -1503,7 +1503,6 @@ function appendReleaseMilestone(stack, release, side, milestones, seriesLabel) {
       "aria-label",
       `${seriesLabel} ${typeLabel}，${release.name}：${milestone.label}。${milestone.achievement}`
     );
-    marker.textContent = type === "domestic" ? "内" : "全";
 
     const tooltip = document.createElement("span");
     tooltip.className = "timeline-milestone-tooltip";
