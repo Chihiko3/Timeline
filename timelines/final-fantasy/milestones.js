@@ -13,6 +13,14 @@ window.FINAL_FANTASY_MILESTONES = {
       evidence: "Square Enix 历史与年度报告；欧洲首次发行记录；原版全球销量及本地化团队回顾。"
     }
   },
+  "crystal-chronicles": {
+    integration: {
+      eventDate: "2003.04.01",
+      label: "Square／Enix 合并后首作",
+      achievement: "Square 与 Enix 于 2003 年 4 月 1 日合并为 Square Enix；同年 8 月 8 日发行的 Final Fantasy Crystal Chronicles，是本时间线中合并完成后最先发售的 Final Fantasy 作品。这里标记的是作品发行时的公司归属节点；这个时间关系本身不代表原 Square 与原 Enix 的开发团队已在本作中共同设计。",
+      evidence: "Square Enix 官方公司沿革与 2004 年年度报告确认合并于 2003 年 4 月 1 日生效；Square Enix 产品支持页确认本作于 2003 年 8 月 8 日发行。"
+    }
+  },
   "ff14-arr": {
     global: {
       label: "全球长期运营再突破",

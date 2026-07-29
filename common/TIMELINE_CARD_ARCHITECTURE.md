@@ -25,6 +25,12 @@ date and the release relationship are verifiable. Its note must distinguish
 such as "the companies' first product" or "the teams' first fully shared
 design", unless those stronger claims have direct evidence.
 
+Every `integration` marker stores the effective organizational date as
+`eventDate` in `YYYY.MM.DD` format. The release-data audit verifies that the
+marked card is the first timeline entry on or after that date. Timelines without
+a qualifying documented event keep this marker absent rather than substituting
+a publisher change, joint marketing arrangement, or brand-management company.
+
 Milestone markers sit between the card and timeline axis, never inside card
 content. Their hover/focus notes state the milestone type, concrete
 achievement, and evidence used for the editorial judgment. Multiple milestones

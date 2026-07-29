@@ -161,6 +161,27 @@ function auditTimeline(config) {
           errors.push(`${id}: ${type} milestone is missing "${field}"`);
         }
       }
+      if (type === "integration") {
+        if (!isValidDate(milestone.eventDate)) {
+          errors.push(
+            `${id}: integration milestone has invalid eventDate "${milestone.eventDate}"`,
+          );
+        } else {
+          const firstReleaseAfterEvent = renderedOrder.find(
+            (release) => release.date >= milestone.eventDate,
+          );
+          if (!firstReleaseAfterEvent) {
+            errors.push(
+              `${id}: integration event ${milestone.eventDate} has no later release`,
+            );
+          } else if (firstReleaseAfterEvent.id !== id) {
+            errors.push(
+              `${id}: integration event ${milestone.eventDate} belongs on ` +
+                `${firstReleaseAfterEvent.id}, the first release after the event`,
+            );
+          }
+        }
+      }
     }
   }
   for (const type of ["domestic", "global"]) {

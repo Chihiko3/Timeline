@@ -74,7 +74,10 @@ window.XENOBLADE_RELEASES = [
     lineage: "重构：Episode I / II · 重新编排剧本、流程与战斗",
     first: [{ year: 2006, platform: "Nintendo DS" }],
     later: [],
-    sources: ["https://www.bandainamcoent.co.jp/corporate/press/namco/51/51-072.pdf"]
+    sources: [
+      "https://www.bandainamcoent.co.jp/corporate/press/namco/51/51-072.pdf",
+      "https://www.bandainamco.co.jp/en/releases/images/3/26785.pdf"
+    ]
   },
   {
     id: "xenosaga-ep3",
@@ -97,7 +100,11 @@ window.XENOBLADE_RELEASES = [
     chineseName: "异度神剑",
     first: [{ year: 2010, platform: "Wii" }],
     later: [{ year: 2015, platform: "New Nintendo 3DS（Xenoblade Chronicles 3D）" }],
-    sources: ["https://www.nintendo.co.jp/ir/pdf/2011/110128e.pdf"]
+    sources: [
+      "https://www.nintendo.co.jp/ir/pdf/2011/110128e.pdf",
+      "https://www.bandainamco.co.jp/releases/images/3/37686.pdf",
+      "https://www.monolithsoft.co.jp/interview/vol01.html"
+    ]
   },
   {
     id: "xcx",

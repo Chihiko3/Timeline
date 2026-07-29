@@ -15,6 +15,7 @@ window.SPIKE_SERIES_MILESTONES = {
   },
   danganronpa2: {
     integration: {
+      eventDate: "2012.04.01",
       label: "合并后首作",
       achievement: "Spike 与 Chunsoft 于 2012 年 4 月合并成立 Spike Chunsoft；同年 7 月 26 日发售的《超级弹丸论破 2》是本时间线中第一款在合并后推出的作品。它延续的是原 Spike 的《弹丸论破》项目，因此这里标记的是组织归属变化，不表示两家公司原有叙事团队已经在本作中完成设计方法融合。",
       evidence: "Spike Chunsoft 官方公司沿革与公司介绍；《弹丸论破》15 周年官方作品资料所列 PSP 版发行日；日版 PSP 包装上的 Spike Chunsoft 发行标识。"

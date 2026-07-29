@@ -9,7 +9,11 @@ window.LIKE_A_DRAGON_RELEASES = [
     name: "Yakuza",
     chineseName: "如龙",
     first: [{ year: 2005, platform: "PS2" }],
-    later: [{ year: 2012, platform: "PS3" }, { year: 2013, platform: "Wii U" }]
+    later: [{ year: 2012, platform: "PS3" }, { year: 2013, platform: "Wii U" }],
+    sources: [
+      "https://www.segasammy.co.jp/en/corp/history/",
+      "https://www.sega.jp/game/detail/ryu-ga-gotoku-one/"
+    ]
   },
   {
     id: "yakuza-2",

@@ -6,6 +6,14 @@ window.DRAGON_QUEST_MILESTONES = {
       evidence: "Square Enix 年度报告与系列历史资料；系列制作人访谈及日本销售记录。"
     }
   },
+  kenshin: {
+    integration: {
+      eventDate: "2003.04.01",
+      label: "Square／Enix 合并后首作",
+      achievement: "Square 与 Enix 于 2003 年 4 月 1 日合并为 Square Enix；同年 9 月 19 日发行的 Kenshin Dragon Quest，是本时间线中合并完成后最先发售的 Dragon Quest 作品。这里记录的是发行主体进入 Square Enix 时期，不表示原 Square 团队参与了本作设计，也不把它误写成两家公司共同开发的第一作。",
+      evidence: "Square Enix 官方公司沿革与 2004 年年度报告确认合并生效日；Square Enix 官方产品页及 2003 年 7 月新闻稿确认本作于 2003 年 9 月 19 日发行。"
+    }
+  },
   dq8: {
     global: {
       label: "海外品牌重新建立",
