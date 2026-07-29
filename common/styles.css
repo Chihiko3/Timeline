@@ -641,6 +641,26 @@ input {
   border-top: 1px solid currentColor;
 }
 
+.timeline-milestone-marker-integration {
+  color: #586579;
+}
+
+.timeline-milestone-marker-integration::before,
+.timeline-milestone-marker-integration::after {
+  width: 7px;
+  height: 9px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+}
+
+.timeline-milestone-marker-integration::before {
+  transform: translateX(-2px);
+}
+
+.timeline-milestone-marker-integration::after {
+  transform: translateX(2px);
+}
+
 .timeline-milestone-marker-left {
   right: -27px;
 }

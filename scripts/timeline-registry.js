@@ -60,15 +60,15 @@ module.exports = [
     overrides: []
   },
   {
-    label: "Spike Series",
-    release: ["timelines/SpikeSeries/releases.js", "SPIKE_SERIES_RELEASES"],
-    editorial: ["timelines/SpikeSeries/editorial-reading.js", "SPIKE_SERIES_EDITORIAL_READING"],
-    design: ["timelines/SpikeSeries/design-logic.js", "SPIKE_SERIES_DESIGN_LOGIC"],
-    impact: ["timelines/SpikeSeries/series-impact.js", "SPIKE_SERIES_IMPACT"],
-    externalImpact: ["timelines/SpikeSeries/external-impact-research.js", "SPIKE_SERIES_EXTERNAL_IMPACT_RESEARCH"],
-    plot: ["timelines/SpikeSeries/plot-summaries.js", "SPIKE_SERIES_PLOT_SUMMARIES"],
-    decision: ["timelines/SpikeSeries/decision-chain.js", "SPIKE_SERIES_DECISION_CHAINS", "SPIKE_SERIES_DECISION_CHAIN_REVIEW"],
-    milestone: ["timelines/SpikeSeries/milestones.js", "SPIKE_SERIES_MILESTONES"],
+    label: "Spike Chunsoft Narrative",
+    release: ["timelines/SpikeChunsoftNarrative/releases.js", "SPIKE_SERIES_RELEASES"],
+    editorial: ["timelines/SpikeChunsoftNarrative/editorial-reading.js", "SPIKE_SERIES_EDITORIAL_READING"],
+    design: ["timelines/SpikeChunsoftNarrative/design-logic.js", "SPIKE_SERIES_DESIGN_LOGIC"],
+    impact: ["timelines/SpikeChunsoftNarrative/series-impact.js", "SPIKE_SERIES_IMPACT"],
+    externalImpact: ["timelines/SpikeChunsoftNarrative/external-impact-research.js", "SPIKE_SERIES_EXTERNAL_IMPACT_RESEARCH"],
+    plot: ["timelines/SpikeChunsoftNarrative/plot-summaries.js", "SPIKE_SERIES_PLOT_SUMMARIES"],
+    decision: ["timelines/SpikeChunsoftNarrative/decision-chain.js", "SPIKE_SERIES_DECISION_CHAINS", "SPIKE_SERIES_DECISION_CHAIN_REVIEW"],
+    milestone: ["timelines/SpikeChunsoftNarrative/milestones.js", "SPIKE_SERIES_MILESTONES"],
     overrides: []
   }
 ];

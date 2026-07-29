@@ -1499,12 +1499,16 @@ function appendReleaseMilestone(stack, release, side, milestones, seriesLabel) {
   const releaseMilestones = milestones[release.id];
   if (!releaseMilestones) return;
 
-  const entries = ["domestic", "global"]
+  const entries = ["domestic", "global", "integration"]
     .filter((type) => releaseMilestones[type])
     .map((type) => [type, releaseMilestones[type]]);
 
   entries.forEach(([type, milestone], index) => {
-    const typeLabel = type === "domestic" ? "国内里程碑" : "全球化里程碑";
+    const typeLabel = {
+      domestic: "国内里程碑",
+      global: "全球化里程碑",
+      integration: "组织整合节点"
+    }[type];
     const marker = document.createElement("button");
     marker.type = "button";
     marker.className = `timeline-milestone-marker timeline-milestone-marker-${side} timeline-milestone-marker-${type}`;
@@ -1749,7 +1753,7 @@ function gameSeriesDefinitions() {
     },
     {
       id: "spike-series",
-      label: "Spike Series",
+      label: "Spike Chunsoft Narrative",
       releases: spikeSeriesReleases,
       element: elements.spikeSeriesTimeline,
       theme: "spike-series",

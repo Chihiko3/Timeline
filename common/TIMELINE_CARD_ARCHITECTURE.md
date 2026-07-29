@@ -10,12 +10,20 @@ Answers: when did it appear, what is it, and where does it belong?
 Required structure: date, category tag, title, subtitle, short lineage note,
 and a concise hint about the next level. Artwork is optional.
 
-Game-series timelines use two milestone types: `domestic` identifies the work
+Game-series timelines use two recognition milestone types: `domestic` identifies the work
 that established broad recognition in the series' home market, while `global`
 identifies international expansion or a later worldwide breakthrough. Every
 long-running series must contain at least one of each type. A single work may
 carry both milestones, but they remain separate markers with separate
 explanations.
+
+Use an optional `integration` marker when a timeline crosses a documented
+company merger, studio consolidation, or project-team integration. Attach it
+to the first release after that organizational event only when both the event
+date and the release relationship are verifiable. Its note must distinguish
+"first release in this timeline after the integration" from stronger claims
+such as "the companies' first product" or "the teams' first fully shared
+design", unless those stronger claims have direct evidence.
 
 Milestone markers sit between the card and timeline axis, never inside card
 content. Their hover/focus notes state the milestone type, concrete
@@ -81,3 +89,8 @@ Timeline-specific facts and research notes stay inside that timeline folder.
 `common` owns only the rendering rules and shared visual behavior.
 Milestone judgments stay in that timeline's `milestones.js`; the shared marker
 and tooltip behavior stays in `common`.
+
+The timeline folder name must match the current display name using the
+repository's filesystem-safe naming form. Renaming a timeline therefore also
+requires renaming its folder and updating page scripts, the registry, GM media
+paths, downloader paths, and image-manifest sources in the same change.

@@ -78,14 +78,26 @@
 - 高一致性解读：多个可靠资料或长期玩家共识支持的比较，只能写成分析，不能冒充官方设计意图。
 - 证据不足：保留已有事实或明确写待验证，不用“丰富体验”“为后续提供基础”等空泛句补齐字段。
 
-## Spike Series
+## Spike Chunsoft Narrative
 
-- Spike Chunsoft 公司史与代表作：https://www.spike-chunsoft.co.jp/company/about/
-- Spike Chunsoft Games Archive：https://www.spike-chunsoft.com/games/
-- Spike Chunsoft 日本官网：https://www.spike-chunsoft.co.jp/
+- Spike Chunsoft 公司介绍与 2012 年合并关系：https://www.spike-chunsoft.co.jp/company/about/
+- Spike Chunsoft 公司沿革与《弟切草》发行起点：https://www.spike-chunsoft.co.jp/company/outline/
+- Fami通 Chunsoft 30 周年中村光一访谈（确认 FC 版《港口镇》由 Chunsoft 开发）：https://www.famitsu.com/news/201406/08054671.html
+- Fami通《港口镇连续杀人事件》FC 版资料（日期、平台、指令选择与地下迷宫）：https://www.famitsu.com/news/202111/29242223.html
+- 4Gamer 冒险游戏开发史访谈（《港口镇》的直线求解与《弟切草》的横向分支对比）：https://www.4gamer.net/games/074/G007427/20131108107/
+- 《忌火起草》官方 Sound Novel 历史说明：https://www.spike-chunsoft.co.jp/pages/games/imabikiso/whatsoundnovel.html
+- 《真恐怖惊魂夜》官方 Sound Novel 定义：https://www.spike-chunsoft.co.jp/pages/shinkama/about/
+- 《恐怖惊魂夜》30 周年官方页面：https://www.spike-chunsoft.co.jp/pages/kama30th/
+- 《3年B组金八先生》官方作品说明：https://www.spike-chunsoft.co.jp/pages/games/3b/gameinfo.html
+- 《428》官方系统与剧情说明：https://www.spike-chunsoft.co.jp/pages/428/
+- 《极限脱出》官方作品说明：https://www.spike-chunsoft.com/games/zero-escape-nonary-games/
+- 《弹丸论破 V3》官方学级裁判系统说明：https://www.danganronpa.com/v3/sp/system/
 - 《弹丸论破》系列全球累计出货 1,000 万套公告：https://www.spike-chunsoft.com/news/danganronpa-series-surpasses-10-million-units-shipped-worldwide/
-- 《风来的西林》系列全球累计出货 300 万套公告：https://www.spike-chunsoft.co.jp/news/45940/
-- 作品日期与平台另外交叉检查各作品官方站、Nintendo / PlayStation / Steam 商店、Wikipedia 与 GameFAQs 发行记录。
+- 《AI：梦境档案 涅槃肇始》官方页面：https://www.spike-chunsoft.com/games/ai-the-somnium-files-nirvana-initiative/
+- 《超侦探事件簿》官方页面：https://www.spike-chunsoft.com/games/master-detective-archives-rain-code/
+- 《伊达键不眠》官方页面：https://www.spike-chunsoft.com/games/no-sleep-for-kaname-date-from-ai-the-somnium-files/
+- 《终天教团》官方发行与五种玩法说明：https://www.spike-chunsoft.com/news/multi-genre-adventure-game-shuten-order-from-dmm-games-and-kazutaka-kodaka-of-tookyo-games-launches-worldwide/
+- 作品日期、平台与系统细节另外交叉检查各作品官方站、平台商店及 Game Watch、4Gamer、Fami通等同期报道；无法确认的开发意图不写成官方事实。
 
 ## Final Fantasy
 

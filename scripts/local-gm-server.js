@@ -39,9 +39,9 @@ const manifestDefinitions = {
     assetDirectory: path.join(timelinesDirectory, "XenoSeries", "assets", "covers")
   },
   "spike-series": {
-    path: path.join(timelinesDirectory, "SpikeSeries", "timeline-images.js"),
+    path: path.join(timelinesDirectory, "SpikeChunsoftNarrative", "timeline-images.js"),
     globalName: "SPIKE_SERIES_TIMELINE_IMAGES",
-    assetDirectory: path.join(timelinesDirectory, "SpikeSeries", "assets", "covers")
+    assetDirectory: path.join(timelinesDirectory, "SpikeChunsoftNarrative", "assets", "covers")
   }
 };
 const mimeTypes = {

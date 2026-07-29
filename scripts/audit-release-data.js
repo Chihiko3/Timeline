@@ -45,6 +45,10 @@ function isValidDate(value) {
   );
 }
 
+function normalizedTimelineName(value) {
+  return value.replace(/[^a-z0-9]/gi, "").toLowerCase();
+}
+
 function auditTimeline(config) {
   const data = loadTimelineData(config);
   const releases = data[config.release[1]] || [];
@@ -54,6 +58,13 @@ function auditTimeline(config) {
   const milestones = data[config.milestone[1]] || {};
   const errors = [];
   const ids = new Set();
+  const timelineDirectory = config.release[0].split("/")[1] || "";
+
+  if (normalizedTimelineName(timelineDirectory) !== normalizedTimelineName(config.label)) {
+    errors.push(
+      `timeline directory "${timelineDirectory}" does not match display name "${config.label}"`
+    );
+  }
 
   for (const release of releases) {
     if (!isValidDate(release.date)) {
@@ -136,12 +147,12 @@ function auditTimeline(config) {
   if (!milestoneEntries.length) {
     errors.push("timeline has no milestone entry");
   }
-  const milestoneTypeCounts = { domestic: 0, global: 0 };
+  const milestoneTypeCounts = { domestic: 0, global: 0, integration: 0 };
   for (const [id, releaseMilestones] of milestoneEntries) {
     if (!ids.has(id)) {
       errors.push(`${id}: milestone references an unknown release`);
     }
-    for (const type of ["domestic", "global"]) {
+    for (const type of ["domestic", "global", "integration"]) {
       const milestone = releaseMilestones[type];
       if (!milestone) continue;
       milestoneTypeCounts[type] += 1;
