@@ -731,7 +731,7 @@ input {
   transform: translateY(0);
 }
 
-.pokemon-release-card {
+.timeline-primary-card {
   position: relative;
   z-index: 2;
   display: grid;
@@ -742,7 +742,7 @@ input {
   gap: 3px;
   padding: 10px;
   border: 1px solid #cfd9e7;
-  border-left: 9px solid var(--pokemon-color, #c8333a);
+  border-left: 9px solid var(--timeline-accent, #c8333a);
   border-radius: 6px;
   background: #fff;
   color: #14223a;
@@ -751,15 +751,19 @@ input {
   overflow: hidden;
 }
 
-.pokemon-release-card:hover,
-.pokemon-branch.selected .pokemon-release-card {
-  border-color: color-mix(in srgb, var(--pokemon-color, #c8333a) 48%, #ffffff);
-  background: color-mix(in srgb, var(--pokemon-color, #c8333a) 8%, #ffffff);
-  box-shadow: 0 5px 14px color-mix(in srgb, var(--pokemon-color, #c8333a) 14%, transparent);
+.timeline-primary-card:hover,
+.timeline-branch.selected .timeline-primary-card {
+  border-color: color-mix(in srgb, var(--timeline-accent, #c8333a) 48%, #ffffff);
+  background: color-mix(in srgb, var(--timeline-accent, #c8333a) 8%, #ffffff);
+  box-shadow: 0 5px 14px color-mix(in srgb, var(--timeline-accent, #c8333a) 14%, transparent);
 }
 
-.timeline-node-top,
-.pokemon-release-head {
+.timeline-primary-card:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--timeline-accent, #c8333a) 72%, #ffffff);
+  outline-offset: 2px;
+}
+
+.timeline-primary-card-head {
   display: grid;
   grid-template-columns: max-content minmax(0, 1fr);
   gap: 6px;
@@ -768,21 +772,23 @@ input {
   min-width: 0;
 }
 
-.pokemon-release-head time,
-.timeline-node-year {
-  color: var(--pokemon-color, #c52e36);
+.timeline-primary-card-date {
+  color: var(--timeline-accent, #c52e36);
   flex: 0 0 auto;
   font-size: 12px;
   font-weight: 800;
   line-height: 20px;
 }
 
-.pokemon-release-tag {
-  max-width: 70%;
+.timeline-primary-card-tag {
+  min-width: 0;
+  max-width: 100%;
+  justify-self: end;
   overflow: hidden;
-  border: 1px solid var(--pokemon-color, #df99a0);
+  border: 1px solid color-mix(in srgb, var(--timeline-tag-color, var(--timeline-accent, #df99a0)), #ffffff 20%);
   border-radius: 999px;
-  color: var(--pokemon-color, #a62f36);
+  background: color-mix(in srgb, var(--timeline-tag-color, var(--timeline-accent, #df99a0)), #ffffff 88%);
+  color: var(--timeline-tag-color, var(--timeline-accent, #a62f36));
   font-size: 11px;
   font-weight: 800;
   line-height: 18px;
@@ -791,18 +797,8 @@ input {
   white-space: nowrap;
 }
 
-.pokemon-release-tag,
-.timeline-brand-tag {
-  min-width: 0;
-  max-width: 100%;
-  justify-self: end;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 /* Primary-card titles span the full text width; artwork remains in the lower-right corner. */
-.pokemon-release-title {
+.timeline-primary-card-content {
   min-height: 0;
   overflow: hidden;
 }
@@ -818,29 +814,21 @@ input {
   padding: 4px 0;
 }
 
-.pokemon-release-card-has-artwork .pokemon-release-title,
-.timeline-primary-card-has-artwork .pokemon-release-title {
-  padding-right: 0;
-}
-
-.pokemon-release-card-has-artwork .pokemon-release-title p,
-.pokemon-release-card-has-artwork .pokemon-card-lineage,
-.timeline-primary-card-has-artwork .pokemon-release-title p,
-.timeline-primary-card-has-artwork .pokemon-card-lineage {
+.timeline-primary-card-has-artwork .timeline-primary-card-subtitle,
+.timeline-primary-card-has-artwork .timeline-primary-card-lineage {
   padding-right: 144px;
 }
 
 /* Subtitles reserve the artwork area, then truncate rather than wrap. */
-.pokemon-release-card-has-artwork .pokemon-release-title p,
-.timeline-primary-card-has-artwork .pokemon-release-title p {
+.timeline-primary-card-subtitle,
+.timeline-primary-card-lineage {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  -webkit-line-clamp: unset;
 }
 
-.pokemon-release-title strong {
+.timeline-primary-card-title {
   display: block;
   font-size: 14px;
   line-height: 1.25;
@@ -849,31 +837,29 @@ input {
   white-space: nowrap;
 }
 
-.pokemon-release-title p {
+.timeline-primary-card-subtitle {
   margin: 4px 0 0;
   color: #536987;
   font-size: 12px;
   line-height: 1.25;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
 }
 
-.pokemon-release-card small {
+.timeline-primary-card-lineage {
+  margin-top: 2px;
+  color: #536987;
+  font-size: 12px;
+  line-height: 1.3;
+}
+
+.timeline-primary-card-foot {
   display: block;
-  margin-top: 9px;
+  min-width: 0;
+  margin: 0;
   color: #6a7d98;
   font-size: 12px;
-}
-
-.pokemon-release-foot {
-  margin-top: 0;
   overflow: hidden;
-}
-
-.pokemon-release-foot small {
-  margin-top: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .pokemon-release-artwork {
@@ -910,15 +896,6 @@ body.show-timeline-artwork-bounds .pokemon-release-artwork {
   cursor: pointer;
 }
 
-.final-fantasy-release-card.timeline-primary-card-has-artwork .pokemon-release-title p,
-.final-fantasy-release-card.timeline-primary-card-has-artwork .final-fantasy-card-lineage,
-.like-a-dragon-release-card.timeline-primary-card-has-artwork .pokemon-release-title p,
-.like-a-dragon-release-card.timeline-primary-card-has-artwork .final-fantasy-card-lineage,
-.xenoblade-release-card.timeline-primary-card-has-artwork .pokemon-release-title p,
-.xenoblade-release-card.timeline-primary-card-has-artwork .final-fantasy-card-lineage {
-  padding-right: 144px;
-}
-
 .pokemon-cover-preview {
   position: fixed;
   z-index: 60;
@@ -946,28 +923,6 @@ body.show-timeline-artwork-bounds .pokemon-release-artwork {
   width: var(--cover-preview-size, 320px);
   height: var(--cover-preview-size, 320px);
   object-fit: contain;
-}
-
-.pokemon-card-lineage {
-  display: block;
-  margin-top: 2px;
-  color: #536987;
-  font-size: 12px;
-  line-height: 1.3;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.final-fantasy-card-lineage {
-  display: block;
-  margin-top: 2px;
-  color: #536987;
-  font-size: 12px;
-  line-height: 1.3;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .pokemon-release-detail {
@@ -1217,26 +1172,6 @@ body.show-timeline-artwork-bounds .pokemon-release-artwork {
   color: #52657e;
   font-size: 12px;
   line-height: 1.45;
-}
-
-.pokemon-branch::after {
-  background: var(--pokemon-color, var(--red));
-}
-
-.final-fantasy-branch::after {
-  background: var(--final-fantasy-color);
-}
-
-.dragon-quest-branch::after {
-  background: var(--dragon-quest-color);
-}
-
-.like-a-dragon-branch::after {
-  background: var(--like-a-dragon-color);
-}
-
-.spike-series-branch::after {
-  background: var(--spike-series-color);
 }
 
 .pokemon-branch .pokemon-release-stack {
@@ -1530,7 +1465,7 @@ body.show-timeline-artwork-bounds .pokemon-release-artwork {
   height: 7px;
   border: 1px solid #ffffff;
   border-radius: 50%;
-  background: var(--red);
+  background: var(--timeline-accent, var(--red));
   box-shadow: 0 0 0 1px #d8e0ec;
 }
 
@@ -1542,111 +1477,10 @@ body.show-timeline-artwork-bounds .pokemon-release-artwork {
   right: -20px;
 }
 
-.timeline-node {
-  width: 100%;
-  max-width: var(--timeline-card-width);
-  min-width: 0;
-  border: 1px solid var(--line);
-  border-left: 9px solid var(--blue);
-  border-radius: 6px;
-  background: #fbfcff;
-  overflow: hidden;
-}
-
 .timeline-card-anchor {
   position: relative;
   width: min(var(--timeline-card-width), 100%);
   flex: 0 1 var(--timeline-card-width);
-}
-
-.timeline-node.handheld {
-  border-left-color: var(--green);
-}
-
-.timeline-node.hybrid {
-  border-left-color: var(--yellow);
-}
-
-.timeline-node.selected {
-  border-color: #9fb8e8;
-  box-shadow: 0 0 0 2px rgba(50, 104, 184, 0.12);
-}
-
-.timeline-node.handheld.selected {
-  border-color: #90cdb9;
-  box-shadow: 0 0 0 2px rgba(23, 128, 93, 0.12);
-}
-
-.timeline-node.hybrid.selected {
-  border-color: #e3bf63;
-  box-shadow: 0 0 0 2px rgba(214, 154, 33, 0.14);
-}
-
-.timeline-platform-button {
-  position: relative;
-  width: 100%;
-  height: 132px;
-  border: 0;
-  background: transparent;
-  color: var(--ink);
-  cursor: pointer;
-  display: grid;
-  grid-template-rows: 26px minmax(0, 1fr) 14px;
-  gap: 3px;
-  padding: 10px;
-  text-align: left;
-  overflow: hidden;
-}
-
-.timeline-platform-button:hover {
-  background: #eef4ff;
-}
-
-.timeline-node-top {
-  min-height: 20px;
-}
-
-.timeline-node-year {
-  color: var(--red);
-}
-
-.timeline-brand-tag {
-  padding: 0 7px;
-  border: 1px solid color-mix(in srgb, var(--brand-color), #ffffff 20%);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--brand-color), #ffffff 86%);
-  color: var(--brand-color);
-  font-size: 11px;
-  font-weight: 800;
-  line-height: 18px;
-  white-space: nowrap;
-}
-
-.timeline-platform-button strong {
-  font-size: 14px;
-  line-height: 1.25;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.timeline-node.timeline-primary-card-has-artwork .timeline-platform-button strong,
-.timeline-node.timeline-primary-card-has-artwork .timeline-node-meta {
-  padding-right: 144px;
-}
-
-.timeline-hardware-artwork {
-  width: 140px;
-  height: 62px;
-}
-
-.timeline-node-meta {
-  color: var(--muted);
-  font-size: 12px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .timeline-detail-flyout {
@@ -1681,103 +1515,15 @@ body.show-timeline-artwork-bounds .pokemon-release-artwork {
   right: -20px;
 }
 
-.timeline-games-flyout {
-  position: absolute;
-  top: 0;
-  z-index: 5;
-  width: 320px;
-}
-
-.timeline-games-flyout-right {
-  left: calc(100% + 20px);
-}
-
-.timeline-games-flyout-left {
-  right: calc(100% + 20px);
-}
-
-.timeline-games-flyout::before {
-  content: "";
-  position: absolute;
-  top: 20px;
-  width: 20px;
-  height: 2px;
-  background: #aebfd8;
-}
-
-.timeline-games-flyout-right::before {
-  left: -20px;
-}
-
-.timeline-games-flyout-left::before {
-  right: -20px;
-}
-
-.timeline-detail {
-  border: 1px solid var(--line);
-  border-left: 9px solid var(--blue);
-  border-radius: 6px;
-  background: #f8faff;
-  padding: 14px;
-}
-
-.timeline-detail.handheld {
-  border-left-color: var(--green);
-}
-
-.timeline-detail.hybrid {
-  border-left-color: var(--yellow);
-}
-
-.timeline-detail-header {
-  display: flex;
-  justify-content: space-between;
-  gap: 14px;
-  align-items: start;
-}
-
-.timeline-detail h3 {
-  margin: 2px 0 3px;
-  font-size: 20px;
-}
-
-.timeline-detail h4 {
-  margin: 12px 0 8px;
-  font-size: 13px;
-}
-
-.timeline-detail p {
-  margin-bottom: 0;
-  color: var(--muted);
-  line-height: 1.5;
-}
-
-.timeline-detail-note {
-  margin-top: 10px;
-}
-
-.timeline-games-panel {
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: #ffffff;
-  padding: 14px;
-}
-
-.timeline-games-panel h3 {
-  margin: 2px 0 12px;
-  font-size: 18px;
-}
-
 .timeline-games-groups {
   display: grid;
-  gap: 14px;
-  max-height: 520px;
-  overflow: auto;
+  gap: 10px;
 }
 
+.hardware-detail-group h4,
 .timeline-games-group h4 {
   margin: 0 0 6px;
-  color: var(--muted);
+  color: #52657e;
   font-size: 12px;
 }
 
@@ -1815,64 +1561,33 @@ body.show-timeline-artwork-bounds .pokemon-release-artwork {
   color: #303743;
 }
 
-.timeline-variant-grid {
+.hardware-variant-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 8px;
-  max-height: 500px;
-  overflow: auto;
+  gap: 5px;
 }
 
-.timeline-variant-grid-expanded {
-  max-height: none;
-  overflow: visible;
+.hardware-variant-record {
+  align-items: flex-start;
 }
 
-.timeline-variant-card {
-  min-height: 68px;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: #ffffff;
-  padding: 8px;
-  display: grid;
-  gap: 3px;
-  align-content: start;
+.hardware-variant-record > strong {
+  padding-top: 1px;
 }
 
-.timeline-variant-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
+.hardware-variant-content {
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
-.timeline-variant-year {
-  color: var(--red);
-  font-size: 11px;
-  font-weight: 800;
-}
-
-.timeline-variant-card strong {
-  color: var(--ink);
-  font-size: 12px;
-  line-height: 1.25;
-}
-
-.timeline-variant-meta {
-  color: var(--muted);
-  font-size: 11px;
-  text-align: right;
-}
-
-.timeline-variant-card p {
-  margin: 0;
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.35;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+.hardware-variant-content small {
+  display: block;
+  margin-top: 2px;
   overflow: hidden;
+  color: #687b93;
+  font-size: 11px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .results-meta {
@@ -2307,11 +2022,6 @@ summary {
     right: auto;
   }
 
-  .timeline-node {
-    max-width: none;
-    width: 100%;
-  }
-
   .timeline-card-anchor {
     width: 100%;
     flex-basis: 100%;
@@ -2332,9 +2042,6 @@ summary {
   .timeline-detail-flyout,
   .timeline-detail-flyout-left,
   .timeline-detail-flyout-right,
-  .timeline-games-flyout,
-  .timeline-games-flyout-left,
-  .timeline-games-flyout-right,
   .pokemon-starters-panel {
     position: static;
     width: 100%;
@@ -2345,17 +2052,12 @@ summary {
   }
 
   .timeline-detail-flyout::before,
-  .timeline-games-flyout::before,
   .pokemon-starter-card strong {
     font-size: 12px;
   }
 
   .pokemon-starter-card span {
     font-size: 13px;
-  }
-
-  .timeline-detail-header {
-    display: grid;
   }
 
 }

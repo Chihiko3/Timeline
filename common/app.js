@@ -194,12 +194,21 @@ const selectedSeriesReleaseIds = Object.create(null);
 let selectedSeriesOverviewReleaseKey = null;
 const selectedSeriesOverviewTimelineIds = new Set();
 const releaseArtworkIndices = new Map();
+const hardwareArtworkTargets = new WeakMap();
 let releaseArtworkPreview = null;
+let hardwareArtworkObserver = null;
 let gameSeriesDefinitionCache = null;
 let imageManagerCategory = "hardware";
 let imageManagerSearch = "";
 let gmImageManagerOpen = false;
 let imageManagerRefreshTimer = null;
+
+function fetchWithDeadline(url, options = {}) {
+  return fetch(url, {
+    ...options,
+    signal: AbortSignal.timeout(12000)
+  });
+}
 
 function totalGames() {
   return allPlatforms.reduce((sum, platform) => {
@@ -256,6 +265,21 @@ function typeClass(platform) {
   if (TIMELINE_TYPE_GROUPS.hybrid.some((type) => normalized.includes(type))) return "hybrid";
   if (TIMELINE_TYPE_GROUPS.handheld.some((type) => normalized.includes(type))) return "handheld";
   return "home";
+}
+
+function hardwareTimelineAccent(platform) {
+  return {
+    home: "var(--blue)",
+    handheld: "var(--green)",
+    hybrid: "var(--yellow)"
+  }[typeClass(platform)];
+}
+
+function hardwarePrimaryCardLineage(platform) {
+  const lineage = platform.line?.trim();
+  if (!lineage) return "";
+  const normalize = (value) => value.toLocaleLowerCase().replace(/[\s\-_/|]+/g, "");
+  return normalize(lineage) === normalize(platform.name) ? "" : `产品线：${lineage}`;
 }
 
 function displayType(platform) {
@@ -336,7 +360,7 @@ function compactTimelineGap(monthsElapsed) {
 function layoutTimelinePlatforms(platforms, sideAssignments, selectedId, reserveDetailSpace) {
   const cardHeight = 132;
   const cardGap = TIMELINE_LAYOUT.cardGap;
-  const expandedCardHeight = 1300;
+  const expandedCardHeight = 760;
   const layouts = new Map();
   const monthCounts = {};
   const lastBottomBySide = { left: -Infinity, right: -Infinity };
@@ -380,6 +404,19 @@ function layoutTimelinePlatforms(platforms, sideAssignments, selectedId, reserve
 }
 
 function renderTimeline(platforms) {
+  hardwareArtworkObserver?.disconnect();
+  hardwareArtworkObserver = "IntersectionObserver" in window
+    ? new IntersectionObserver((entries) => {
+      entries
+        .filter((entry) => entry.isIntersecting)
+        .forEach((entry) => {
+          hardwareArtworkObserver?.unobserve(entry.target);
+          const platform = hardwareArtworkTargets.get(entry.target);
+          if (platform) hydrateHardwareTimelineArtwork(platform, entry.target);
+        });
+    }, { rootMargin: "600px 0px" })
+    : null;
+
   const availableBrands = archive
     .map((item) => item.brand)
     .filter((brand) => platforms.some((platform) => platform.brand === brand));
@@ -429,14 +466,16 @@ function renderTimeline(platforms) {
     )
     .forEach((platform) => {
       const layout = timelineLayout.layouts.get(platformId(platform));
+      const selected = platformId(platform) === state.selectedTimelineId;
       const branch = document.createElement("div");
-      branch.className = `timeline-branch ${layout.side === "left" ? "timeline-branch-left" : "timeline-branch-right"}`;
+      branch.className = `timeline-branch hardware-branch ${layout.side === "left" ? "timeline-branch-left" : "timeline-branch-right"}${selected ? " selected" : ""}`;
       branch.style.setProperty("--branch-offset", layout.branchOffset);
       branch.style.setProperty("--month-offset", `${layout.top}px`);
+      branch.style.setProperty("--timeline-accent", hardwareTimelineAccent(platform));
       const cardAnchor = document.createElement("div");
       cardAnchor.className = "timeline-card-anchor";
       cardAnchor.append(createTimelineNode(platform));
-      if (platformId(platform) === state.selectedTimelineId) {
+      if (selected) {
         cardAnchor.append(createTimelineDetailFlyout(platform, layout.side));
       }
       branch.append(cardAnchor);
@@ -526,80 +565,113 @@ function createTimelineBrandControls(brands) {
 }
 
 function createTimelineNode(platform) {
-  const node = document.createElement("article");
-  node.className = `timeline-node ${typeClass(platform)}`;
   const id = platformId(platform);
-  if (state.selectedTimelineId === id) node.classList.add("selected");
-
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "timeline-platform-button";
-  button.title = `${platform.year} ${platform.name}`;
-  button.setAttribute("aria-pressed", state.selectedTimelineId === id ? "true" : "false");
-  button.addEventListener("click", (event) => {
+  const variants = variantsForPlatform(platform);
+  const togglePlatform = (event) => {
     event.stopPropagation();
     state.selectedTimelineId = state.selectedTimelineId === id ? null : id;
     renderTimeline(filteredPlatforms());
+  };
+
+  const card = createTimelinePrimaryCard({
+    cardClasses: ["hardware-primary-card"],
+    dateLabel: releaseDateLabel(platform),
+    tagLabel: platform.brand,
+    title: platform.name,
+    subtitle: platform.notes,
+    lineage: hardwarePrimaryCardLineage(platform),
+    footLabel: `${variants.length} 个型号 / 改版`,
+    accent: hardwareTimelineAccent(platform),
+    tagColor: brandColor(platform.brand),
+    artworkKey: `hardware:${id}`,
+    isSelected: state.selectedTimelineId === id,
+    toggle: togglePlatform
   });
-
-  const year = document.createElement("span");
-  year.className = "timeline-node-year";
-  year.textContent = releaseDateLabel(platform);
-
-  const brandTag = document.createElement("span");
-  brandTag.className = "timeline-brand-tag";
-  brandTag.textContent = platform.brand;
-  brandTag.title = platform.brand;
-  brandTag.style.setProperty("--brand-color", brandColor(platform.brand));
-
-  const topRow = document.createElement("div");
-  topRow.className = "timeline-node-top";
-  topRow.append(year, brandTag);
-
-  const name = document.createElement("strong");
-  name.textContent = platform.name;
-  name.title = platform.name;
-
-  const meta = document.createElement("span");
-  meta.className = "timeline-node-meta";
-  const variants = variantsForPlatform(platform);
-  meta.textContent = `${variants.length} 个型号`;
-
-  button.append(topRow, name, meta);
-  const artworkKey = `hardware:${id}`;
-  if (managedImagesFor(artworkKey).length) {
-    node.classList.add("timeline-primary-card-has-artwork");
-    appendReleaseArtwork(button, artworkKey, "timeline-hardware-artwork");
+  if (!managedImagesFor(`hardware:${id}`).length) {
+    hardwareArtworkTargets.set(card, platform);
+    if (hardwareArtworkObserver) hardwareArtworkObserver.observe(card);
+    else queueMicrotask(() => hydrateHardwareTimelineArtwork(platform, card));
   }
-  node.append(button);
+  return card;
+}
 
-  return node;
+async function hydrateHardwareTimelineArtwork(platform, card) {
+  if (!card.isConnected || card.querySelector(".pokemon-release-artwork")) return;
+  const media = await fetchPlatformImage(platform);
+  if (!media || !card.isConnected || card.querySelector(".pokemon-release-artwork")) return;
+  const images = (media.images || [media])
+    .map((image) => [image.src, image.title || platform.name])
+    .filter(([source]) => source);
+  if (!images.length) return;
+  card.classList.add("timeline-primary-card-has-artwork");
+  appendTimelineArtwork(card, `hardware:${platformId(platform)}`, images, "timeline-hardware-artwork");
 }
 
 function createTimelineDetailFlyout(platform, side) {
   const flyout = document.createElement("section");
-  flyout.className = `timeline-detail-flyout timeline-detail-flyout-${side}`;
+  flyout.className = `timeline-detail-flyout timeline-detail-flyout-${side} pokemon-detail-flyout hardware-detail-flyout`;
   flyout.setAttribute("aria-live", "polite");
-  flyout.append(createTimelineDetail(platform), createTimelineGamesFlyout(platform, side));
+  const detail = document.createElement("section");
+  detail.className = "pokemon-release-detail timeline-information-stack";
+  detail.append(createHardwareVariantsCard(platform), createHardwareGamesCard(platform));
+  flyout.append(detail);
   return flyout;
 }
 
-function createTimelineGamesFlyout(platform, side) {
-  const flyout = document.createElement("section");
-  flyout.className = `timeline-games-flyout timeline-games-flyout-${side}`;
+function createHardwareVariantsCard(platform) {
+  const panel = document.createElement("section");
+  panel.className = "hardware-detail-group";
+  const title = document.createElement("h4");
+  const variants = variantsForPlatform(platform)
+    .slice()
+    .sort((a, b) => (a.year || 9999) - (b.year || 9999) || a.name.localeCompare(b.name, "zh-CN"));
+  title.textContent = `型号 / 改版 ${variants.length}`;
+  const list = document.createElement("div");
+  list.className = "hardware-variant-list";
 
-  const panel = document.createElement("div");
-  panel.className = "timeline-games-panel";
-  const title = document.createElement("h3");
-  title.textContent = "游戏";
+  if (!variants.length) {
+    const empty = document.createElement("p");
+    empty.className = "pokemon-empty";
+    empty.textContent = "暂未整理型号。";
+    list.append(empty);
+  } else {
+    variants.forEach((variant) => {
+      const item = document.createElement("article");
+      item.className = "pokemon-platform-card hardware-variant-record";
+      const year = document.createElement("strong");
+      year.textContent = variant.year || "待补";
+      const content = document.createElement("div");
+      content.className = "hardware-variant-content";
+      const name = document.createElement("p");
+      name.textContent = variant.name;
+      name.title = variant.name;
+      const meta = document.createElement("small");
+      const detail = [variant.kind || "硬件型号", variant.note].filter(Boolean).join(" · ");
+      meta.textContent = detail;
+      meta.title = detail;
+      content.append(name, meta);
+      item.append(year, content);
+      list.append(item);
+    });
+  }
+
+  panel.append(title, list);
+  return informationCard([], panel);
+}
+
+function createHardwareGamesCard(platform) {
   const groups = document.createElement("div");
   groups.className = "timeline-games-groups";
   const games = gameDataForPlatform(platform);
   appendTimelineGameGroup(groups, "护航 / 首发", games.launchGames);
   appendTimelineGameGroup(groups, "特色 / 高讨论", games.signatureGames);
-  panel.append(title, groups);
-  flyout.append(panel);
-  return flyout;
+  if (games.note) {
+    const note = document.createElement("p");
+    note.className = "timeline-related-note";
+    note.textContent = games.note;
+    groups.append(note);
+  }
+  return informationCard([], groups);
 }
 
 function appendTimelineGameGroup(container, title, games) {
@@ -639,73 +711,6 @@ function appendTimelineGameGroup(container, title, games) {
   }
 
   container.append(group);
-}
-
-function createTimelineDetail(platform) {
-  const panel = document.createElement("div");
-  panel.className = `timeline-detail ${typeClass(platform)}`;
-
-  const header = document.createElement("div");
-  header.className = "timeline-detail-header";
-
-  const titleGroup = document.createElement("div");
-  const year = document.createElement("span");
-  year.className = "timeline-node-year";
-  year.textContent = releaseDateLabel(platform);
-  const title = document.createElement("h3");
-  title.textContent = platform.name;
-  titleGroup.append(year, title);
-  header.append(titleGroup);
-
-  const note = document.createElement("p");
-  note.className = "timeline-detail-note";
-  note.textContent = platform.notes;
-
-  const variants = variantsForPlatform(platform);
-  if (variants.length) {
-    const variantGrid = document.createElement("div");
-    variantGrid.className = "timeline-variant-grid";
-    if (variants.length <= 5) variantGrid.classList.add("timeline-variant-grid-expanded");
-    variants
-      .slice()
-      .sort((a, b) => (a.year || 9999) - (b.year || 9999) || a.name.localeCompare(b.name, "zh-CN"))
-      .forEach((variant) => {
-        const item = document.createElement("article");
-        item.className = "timeline-variant-card";
-
-        const itemYear = document.createElement("span");
-        itemYear.className = "timeline-variant-year";
-        itemYear.textContent = variant.year || "年份待补";
-
-        const itemTitle = document.createElement("strong");
-        itemTitle.textContent = variant.name;
-
-        const itemMeta = document.createElement("span");
-        itemMeta.className = "timeline-variant-meta";
-        itemMeta.textContent = variant.kind || "硬件型号";
-
-        const itemHeader = document.createElement("div");
-        itemHeader.className = "timeline-variant-header";
-        itemHeader.append(itemYear, itemMeta);
-        item.append(itemHeader, itemTitle);
-
-        if (variant.note) {
-          const itemNote = document.createElement("p");
-          itemNote.textContent = variant.note;
-          item.append(itemNote);
-        }
-
-        variantGrid.append(item);
-      });
-
-    const variantsTitle = document.createElement("h4");
-    variantsTitle.textContent = `型号 / 改版 ${variants.length}`;
-    panel.append(header, note, variantsTitle, variantGrid);
-  } else {
-    panel.append(header, note);
-  }
-
-  return panel;
 }
 
 function platformId(platform) {
@@ -768,7 +773,7 @@ async function fetchPlatformImage(platform) {
     });
 
     try {
-      const response = await fetch(`${WIKI_API}?${params}`);
+      const response = await fetchWithDeadline(`${WIKI_API}?${params}`);
       if (!response.ok) continue;
       const payload = await response.json();
       const pages = Object.values(payload.query?.pages || {});
@@ -822,7 +827,7 @@ async function fetchExactPlatformImage(platform) {
   });
 
   try {
-    const response = await fetch(`${WIKI_API}?${params}`);
+    const response = await fetchWithDeadline(`${WIKI_API}?${params}`);
     if (!response.ok) return null;
     const payload = await response.json();
     const pages = Object.values(payload.query?.pages || {});
@@ -1166,7 +1171,10 @@ function releasePlatformCount(release) {
 function appendReleaseArtwork(card, artworkKey, artworkClass = "") {
   const artworks = managedImagesFor(artworkKey);
   if (!artworks.length) return;
+  appendTimelineArtwork(card, artworkKey, artworks, artworkClass);
+}
 
+function appendTimelineArtwork(card, artworkKey, artworks, artworkClass = "") {
   let artworkIndex = releaseArtworkIndices.get(artworkKey) || 0;
   artworkIndex %= artworks.length;
   const frame = document.createElement("div");
@@ -1483,16 +1491,83 @@ async function updateManagedImage(update) {
   renderImageManager();
 }
 
-function bindReleaseCard(card, isSelected, toggleRelease) {
+function bindTimelinePrimaryCard(card, isSelected, toggleCard) {
   card.tabIndex = 0;
   card.setAttribute("role", "button");
   card.setAttribute("aria-expanded", String(isSelected));
-  card.addEventListener("click", toggleRelease);
+  card.addEventListener("click", toggleCard);
   card.addEventListener("keydown", (event) => {
     if (event.key !== "Enter" && event.key !== " ") return;
     event.preventDefault();
-    toggleRelease();
+    toggleCard(event);
   });
+}
+
+function createTimelinePrimaryCard({
+  cardClasses = [],
+  dateLabel,
+  tagLabel,
+  title,
+  subtitle = "",
+  lineage = "",
+  footLabel,
+  accent,
+  tagColor = accent,
+  artworkKey,
+  isSelected,
+  toggle
+}) {
+  const card = document.createElement("article");
+  card.classList.add("timeline-primary-card", ...cardClasses.filter(Boolean));
+  card.style.setProperty("--timeline-accent", accent);
+  card.style.setProperty("--timeline-tag-color", tagColor);
+
+  const artworkExists = artworkKey && managedImagesFor(artworkKey).length > 0;
+  if (artworkExists) card.classList.add("timeline-primary-card-has-artwork");
+
+  const head = document.createElement("div");
+  head.className = "timeline-primary-card-head";
+  const date = document.createElement("time");
+  date.className = "timeline-primary-card-date";
+  date.textContent = dateLabel;
+  const tag = document.createElement("span");
+  tag.className = "timeline-primary-card-tag";
+  tag.textContent = tagLabel;
+  tag.title = tagLabel;
+  head.append(date, tag);
+
+  const content = document.createElement("div");
+  content.className = "timeline-primary-card-content";
+  const heading = document.createElement("strong");
+  heading.className = "timeline-primary-card-title";
+  heading.textContent = title;
+  heading.title = title;
+  content.append(heading);
+
+  if (subtitle) {
+    const subtitleElement = document.createElement("p");
+    subtitleElement.className = "timeline-primary-card-subtitle";
+    subtitleElement.textContent = subtitle;
+    subtitleElement.title = subtitle;
+    content.append(subtitleElement);
+  }
+
+  if (lineage) {
+    const lineageElement = document.createElement("span");
+    lineageElement.className = "timeline-primary-card-lineage";
+    lineageElement.textContent = lineage;
+    lineageElement.title = lineage;
+    content.append(lineageElement);
+  }
+
+  const foot = document.createElement("small");
+  foot.className = "timeline-primary-card-foot";
+  foot.textContent = footLabel;
+
+  card.append(head, content, foot);
+  if (artworkExists) appendReleaseArtwork(card, artworkKey);
+  bindTimelinePrimaryCard(card, isSelected, toggle);
+  return card;
 }
 
 function appendReleaseMilestone(stack, release, side, milestones, seriesLabel) {
@@ -1538,21 +1613,25 @@ function appendReleaseMilestone(stack, release, side, milestones, seriesLabel) {
 function createSeriesReleaseStack(release, side, isSelected, toggleRelease, definition) {
   const stack = document.createElement("div");
   stack.className = "timeline-card-anchor pokemon-release-stack";
-  const card = document.createElement("article");
-  card.className = `pokemon-release-card${definition.cardClass ? ` ${definition.cardClass}` : ""}`;
   const artworkKey = `${definition.imageCollectionId}:${release.id}`;
-  if (managedImagesFor(artworkKey).length) {
-    card.classList.add(...definition.artworkCardClasses);
-  }
   const releaseLabel = definition.tagFor(release);
   const platformTotal = releasePlatformCount(release);
   const subtitle = definition.subtitleFor(release);
   const cardLineage = definition.cardLineageFor?.(release) || "";
-  card.innerHTML = `<div class="pokemon-release-head"><time>${gameReleaseDateLabel(release)}</time><span class="pokemon-release-tag" title="${releaseLabel}">${releaseLabel}</span></div>
-    <div class="pokemon-release-title"><strong title="${release.name}">${release.name}</strong><p title="${subtitle}">${subtitle}</p>${cardLineage}</div>
-    <div class="pokemon-release-foot"><small>${platformTotal} 个平台</small></div>`;
-  appendReleaseArtwork(card, artworkKey);
-  bindReleaseCard(card, isSelected, toggleRelease);
+  const accent = definition.color(release);
+  const card = createTimelinePrimaryCard({
+    cardClasses: [definition.cardClass],
+    dateLabel: gameReleaseDateLabel(release),
+    tagLabel: releaseLabel,
+    title: release.name,
+    subtitle,
+    lineage: cardLineage,
+    footLabel: `${platformTotal} 个平台`,
+    accent,
+    artworkKey,
+    isSelected,
+    toggle: toggleRelease
+  });
   stack.append(card);
   appendReleaseMilestone(stack, release, side, definition.milestones, definition.label);
 
@@ -1590,7 +1669,6 @@ function createSeriesReleaseStack(release, side, isSelected, toggleRelease, defi
 
 function gameSeriesDefinitions() {
   if (gameSeriesDefinitionCache) return gameSeriesDefinitionCache;
-  const standardArtworkClasses = ["timeline-primary-card-has-artwork"];
   const standardTag = (release) => release.tag || release.category;
   const standardSubtitle = (release) => release.chineseName;
   gameSeriesDefinitionCache = [
@@ -1603,7 +1681,6 @@ function gameSeriesDefinitions() {
       imageCollectionId: "pokemon",
       cardClass: "",
       detailClass: "",
-      artworkCardClasses: ["pokemon-release-card-has-artwork", ...standardArtworkClasses],
       branchClass: "pokemon-branch",
       color: (release) => release.official === false ? "var(--pokemon-fan)" : "var(--pokemon-official)",
       filterColor: "var(--pokemon-official)",
@@ -1612,11 +1689,11 @@ function gameSeriesDefinitions() {
         : release.generation,
       subtitleFor: (release) => pokemonSubtitle(release.chineseName),
       cardLineageFor: (release) => release.remakeOf
-        ? `<span class="pokemon-card-lineage">重制：${pokemonSubtitle(release.remakeOf.chineseName)}</span>`
+        ? `重制：${pokemonSubtitle(release.remakeOf.chineseName)}`
         : release.modOf
-          ? `<span class="pokemon-card-lineage">改版：${pokemonSubtitle(release.modOf)}</span>`
+          ? `改版：${pokemonSubtitle(release.modOf)}`
           : release.editionNote
-            ? `<span class="pokemon-card-lineage" title="${release.editionNote}">${release.editionNote}</span>`
+            ? release.editionNote
             : "",
       milestones: pokemonMilestones,
       criteria: window.POKEMON_TIMELINE_SELECTION_CRITERIA,
@@ -1645,15 +1722,12 @@ function gameSeriesDefinitions() {
       imageCollectionId: "final-fantasy",
       cardClass: "final-fantasy-release-card",
       detailClass: "final-fantasy-detail-flyout",
-      artworkCardClasses: standardArtworkClasses,
       branchClass: "pokemon-branch final-fantasy-branch",
       color: () => "var(--final-fantasy-color)",
       filterColor: "var(--final-fantasy-color)",
       tagFor: finalFantasyDisplayTag,
       subtitleFor: standardSubtitle,
-      cardLineageFor: (release) => release.lineage
-        ? `<span class="final-fantasy-card-lineage" title="${release.lineage}">${release.lineage}</span>`
-        : "",
+      cardLineageFor: (release) => release.lineage || "",
       showDetailLineage: true,
       milestones: finalFantasyMilestones,
       criteria: window.FINAL_FANTASY_TIMELINE_SELECTION_CRITERIA,
@@ -1676,7 +1750,6 @@ function gameSeriesDefinitions() {
       imageCollectionId: "dragon-quest",
       cardClass: "dragon-quest-release-card",
       detailClass: "dragon-quest-detail-flyout",
-      artworkCardClasses: standardArtworkClasses,
       branchClass: "pokemon-branch dragon-quest-branch",
       color: () => "var(--dragon-quest-color)",
       filterColor: "var(--dragon-quest-color)",
@@ -1704,7 +1777,6 @@ function gameSeriesDefinitions() {
       imageCollectionId: "xenoblade",
       cardClass: "xenoblade-release-card",
       detailClass: "xenoblade-detail-flyout",
-      artworkCardClasses: standardArtworkClasses,
       branchClass: "pokemon-branch xenoblade-branch",
       color: () => "var(--xenoblade-color)",
       filterColor: "var(--xenoblade-color)",
@@ -1732,7 +1804,6 @@ function gameSeriesDefinitions() {
       imageCollectionId: "like-a-dragon",
       cardClass: "like-a-dragon-release-card",
       detailClass: "like-a-dragon-detail-flyout",
-      artworkCardClasses: standardArtworkClasses,
       branchClass: "pokemon-branch like-a-dragon-branch",
       color: () => "var(--like-a-dragon-color)",
       filterColor: "var(--like-a-dragon-color)",
@@ -1760,7 +1831,6 @@ function gameSeriesDefinitions() {
       imageCollectionId: "spike-series",
       cardClass: "spike-series-release-card",
       detailClass: "spike-series-detail-flyout",
-      artworkCardClasses: standardArtworkClasses,
       branchClass: "pokemon-branch spike-series-branch",
       color: () => "var(--spike-series-color)",
       filterColor: "var(--spike-series-color)",
@@ -1925,6 +1995,7 @@ function renderGameSeriesTimeline(definition) {
     branch.style.setProperty("--branch-offset", itemLayout.branchOffset);
     branch.style.setProperty("--month-offset", `${itemLayout.top}px`);
     branch.style.setProperty("--pokemon-color", definition.color(release));
+    branch.style.setProperty("--timeline-accent", definition.color(release));
 
     const toggleRelease = () => {
       selectedSeriesReleaseIds[definition.id] = selectedSeriesReleaseIds[definition.id] === release.id

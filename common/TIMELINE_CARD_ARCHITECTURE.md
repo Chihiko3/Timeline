@@ -10,6 +10,16 @@ Answers: when did it appear, what is it, and where does it belong?
 Required structure: date, category tag, title, subtitle, short lineage note,
 and a concise hint about the next level. Artwork is optional.
 
+All timelines render this structure through the shared Level 1 card component
+in `common/app.js`. Timeline folders provide content and theme tokens only.
+Hardware and game-series cards must not fork their DOM hierarchy, keyboard
+interaction, truncation rules, artwork bounds, hover state, or selected state.
+Date precision remains a timeline-level data rule: hardware currently displays
+year and month, while game releases may display a verified full date.
+Managed local artwork is always preferred. Hardware cards with an empty GM
+image record may lazily resolve the timeline's curated source mapping so the
+card does not lose its image while local media is still being collected.
+
 Game-series timelines use two recognition milestone types: `domestic` identifies the work
 that established broad recognition in the series' home market, while `global`
 identifies international expansion or a later worldwide breakthrough. Every
@@ -41,6 +51,11 @@ popularity alone is not sufficient.
 
 Answers: how should a player or developer understand this entry within its
 series?
+
+Every timeline uses one connected detail flyout containing a compact stack of
+`.timeline-information-card` sections. A timeline may vary the information
+inside those sections, but it must not create a second flyout, a different
+container hierarchy, or separate scrolling behavior for later levels.
 
 Show these categories in a compact, high-signal form: series positioning, core
 experience and player motivation, changes from adjacent entries, long-term
@@ -81,6 +96,11 @@ or narrative delivery.
 version/model history, release-specific changes, and other comparable records.
 Keep labels compact and preserve the full value in a hover tip when a row must
 truncate.
+
+For the hardware timeline, model/revision history is the first information
+card and launch/signature games are the next information card in the same
+flyout. These hardware-specific records follow the same density, borders,
+spacing, scrolling, connector, and responsive rules as game-series details.
 
 ## Level 4: Timeline-Specific Supplement Card
 

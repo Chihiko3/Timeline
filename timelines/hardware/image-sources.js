@@ -11,7 +11,16 @@ window.CONSOLE_IMAGE_SOURCES = {
       }
     ]
   },
-  "Atari-Atari-Home-Pong-1975": { title: "Home Pong" },
+  "Atari-Atari-Home-Pong-1975": {
+    title: "Home Pong",
+    images: [
+      {
+        src: "https://commons.wikimedia.org/wiki/Special:Redirect/file/AtariPong%20%28transparent%29.png?width=960",
+        page: "https://commons.wikimedia.org/wiki/File:AtariPong_(transparent).png",
+        title: "Atari Home Pong console"
+      }
+    ]
+  },
   "Atari-Atari-2600-VCS-1977": { title: "Atari 2600" },
   "Atari-Atari-5200-1982": { title: "Atari 5200" },
   "Atari-Atari-7800-1986": { title: "Atari 7800" },
@@ -158,14 +167,41 @@ window.CONSOLE_IMAGE_SOURCES = {
     ]
   },
   "NEC-Hudson-PC-Engine-TurboGrafx-16-1987": { title: "TurboGrafx-16" },
-  "NEC-Hudson-PC-Engine-CD-ROM2-TurboGrafx-CD-1988": { title: "TurboGrafx-CD" },
-  "NEC-Hudson-PC-Engine-SuperGrafx-1989": { title: "PC Engine SuperGrafx" },
+  "NEC-Hudson-PC-Engine-CD-ROM2-TurboGrafx-CD-1988": {
+    title: "TurboGrafx-CD",
+    images: [
+      {
+        src: "https://commons.wikimedia.org/wiki/Special:Redirect/file/PC%20Engine%20CD-ROM2%20Interface%20Unit.jpg?width=960",
+        page: "https://commons.wikimedia.org/wiki/File:PC_Engine_CD-ROM2_Interface_Unit.jpg",
+        title: "PC Engine CD-ROM2 Interface Unit"
+      }
+    ]
+  },
+  "NEC-Hudson-PC-Engine-SuperGrafx-1989": {
+    title: "PC Engine SuperGrafx",
+    images: [
+      {
+        src: "https://commons.wikimedia.org/wiki/Special:Redirect/file/SuperGrafx-Console-Set.png?width=960",
+        page: "https://commons.wikimedia.org/wiki/File:SuperGrafx-Console-Set.png",
+        title: "PC Engine SuperGrafx console set"
+      }
+    ]
+  },
   "NEC-Hudson-TurboExpress-PC-Engine-GT-1990": { title: "TurboExpress" },
   "NEC-Hudson-PC-FX-1994": { title: "PC-FX" },
   "SNK-Neo-Geo-AES-1990": { title: "Neo Geo (system)" },
   "SNK-Neo-Geo-CD-1994": { title: "Neo Geo CD" },
   "SNK-Neo-Geo-Pocket-1998": { title: "Neo Geo Pocket" },
-  "SNK-Neo-Geo-Pocket-Color-1999": { title: "Neo Geo Pocket Color" },
+  "SNK-Neo-Geo-Pocket-Color-1999": {
+    title: "Neo Geo Pocket Color",
+    images: [
+      {
+        src: "https://commons.wikimedia.org/wiki/Special:Redirect/file/Neo-Geo-Pocket-Color-Blue-Left.png?width=960",
+        page: "https://commons.wikimedia.org/wiki/File:Neo-Geo-Pocket-Color-Blue-Left.png",
+        title: "Neo Geo Pocket Color"
+      }
+    ]
+  },
   "Mattel-Coleco-Fairchild-Fairchild-Channel-F-1976": { title: "Fairchild Channel F" },
   "Mattel-Coleco-Fairchild-Mattel-Intellivision-1979": { title: "Intellivision" },
   "Mattel-Coleco-Fairchild-ColecoVision-1982": { title: "ColecoVision" },
@@ -177,7 +213,16 @@ window.CONSOLE_IMAGE_SOURCES = {
   "Tiger-Watara-Game-com-1997": { title: "Game.com" },
   "Apple-Bandai-Casio-Bandai-Playdia-1994": { title: "Bandai Playdia" },
   "Apple-Bandai-Casio-Casio-Loopy-1995": { title: "Casio Loopy" },
-  "Apple-Bandai-Casio-Apple-Pippin-1996": { title: "Apple Pippin" },
+  "Apple-Bandai-Casio-Apple-Pippin-1996": {
+    title: "Apple Pippin",
+    images: [
+      {
+        src: "https://commons.wikimedia.org/wiki/Special:Redirect/file/Pippin-Atmark-Console-Set.jpg?width=960",
+        page: "https://commons.wikimedia.org/wiki/File:Pippin-Atmark-Console-Set.jpg",
+        title: "Apple Pippin Atmark console set"
+      }
+    ]
+  },
   "Bandai-WonderSwan-1999": {
     title: "WonderSwan",
     images: [
