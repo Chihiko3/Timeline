@@ -5,15 +5,9 @@ const SHOW_HARDWARE_CARD_GRID = false;
 
 const state = {
   selectedTimelineId: null,
-  timelineBrandVisibility: {},
-  imageQueue: new Set()
+  timelineBrandVisibility: {}
 };
 
-const IMAGE_CACHE_PREFIX = "console-image-v3:";
-const IMAGE_NOT_FOUND = "__not_found__";
-const WIKI_API = "https://en.wikipedia.org/w/api.php";
-const localImages = window.CONSOLE_IMAGES || {};
-const imageSources = window.CONSOLE_IMAGE_SOURCES || {};
 // Every timeline sorts by its data source's earliest worldwide public retail release date.
 const releaseDates = window.CONSOLE_RELEASE_DATES || {};
 const platformVariants = window.CONSOLE_PLATFORM_VARIANTS || {};
@@ -194,21 +188,12 @@ const selectedSeriesReleaseIds = Object.create(null);
 let selectedSeriesOverviewReleaseKey = null;
 const selectedSeriesOverviewTimelineIds = new Set();
 const releaseArtworkIndices = new Map();
-const hardwareArtworkTargets = new WeakMap();
 let releaseArtworkPreview = null;
-let hardwareArtworkObserver = null;
 let gameSeriesDefinitionCache = null;
 let imageManagerCategory = "hardware";
 let imageManagerSearch = "";
 let gmImageManagerOpen = false;
 let imageManagerRefreshTimer = null;
-
-function fetchWithDeadline(url, options = {}) {
-  return fetch(url, {
-    ...options,
-    signal: AbortSignal.timeout(12000)
-  });
-}
 
 function totalGames() {
   return allPlatforms.reduce((sum, platform) => {
@@ -227,14 +212,16 @@ function gameDataForPlatform(platform) {
     return {
       launchGames: curated.launchGames || [],
       signatureGames: curated.signatureGames || platform.games,
-      note: curated.note || ""
+      note: curated.note || "",
+      launchEmptyLabel: curated.launchEmptyLabel || ""
     };
   }
 
   return {
     launchGames: [],
     signatureGames: platform.games,
-    note: ""
+    note: "",
+    launchEmptyLabel: ""
   };
 }
 
@@ -297,7 +284,7 @@ function releaseMonth(platform) {
 
 function releaseDateLabel(platform) {
   const month = platform.month || platform.releaseMonth || releaseDates[platformId(platform)]?.month;
-  return `${platform.year}.${month ? String(month).padStart(2, "0") : "--"}`;
+  return month ? `${platform.year}.${String(month).padStart(2, "0")}` : String(platform.year);
 }
 
 function releaseMonthIndex(platform) {
@@ -404,19 +391,6 @@ function layoutTimelinePlatforms(platforms, sideAssignments, selectedId, reserve
 }
 
 function renderTimeline(platforms) {
-  hardwareArtworkObserver?.disconnect();
-  hardwareArtworkObserver = "IntersectionObserver" in window
-    ? new IntersectionObserver((entries) => {
-      entries
-        .filter((entry) => entry.isIntersecting)
-        .forEach((entry) => {
-          hardwareArtworkObserver?.unobserve(entry.target);
-          const platform = hardwareArtworkTargets.get(entry.target);
-          if (platform) hydrateHardwareTimelineArtwork(platform, entry.target);
-        });
-    }, { rootMargin: "600px 0px" })
-    : null;
-
   const availableBrands = archive
     .map((item) => item.brand)
     .filter((brand) => platforms.some((platform) => platform.brand === brand));
@@ -573,7 +547,7 @@ function createTimelineNode(platform) {
     renderTimeline(filteredPlatforms());
   };
 
-  const card = createTimelinePrimaryCard({
+  return createTimelinePrimaryCard({
     cardClasses: ["hardware-primary-card"],
     dateLabel: releaseDateLabel(platform),
     tagLabel: platform.brand,
@@ -587,24 +561,6 @@ function createTimelineNode(platform) {
     isSelected: state.selectedTimelineId === id,
     toggle: togglePlatform
   });
-  if (!managedImagesFor(`hardware:${id}`).length) {
-    hardwareArtworkTargets.set(card, platform);
-    if (hardwareArtworkObserver) hardwareArtworkObserver.observe(card);
-    else queueMicrotask(() => hydrateHardwareTimelineArtwork(platform, card));
-  }
-  return card;
-}
-
-async function hydrateHardwareTimelineArtwork(platform, card) {
-  if (!card.isConnected || card.querySelector(".pokemon-release-artwork")) return;
-  const media = await fetchPlatformImage(platform);
-  if (!media || !card.isConnected || card.querySelector(".pokemon-release-artwork")) return;
-  const images = (media.images || [media])
-    .map((image) => [image.src, image.title || platform.name])
-    .filter(([source]) => source);
-  if (!images.length) return;
-  card.classList.add("timeline-primary-card-has-artwork");
-  appendTimelineArtwork(card, `hardware:${platformId(platform)}`, images, "timeline-hardware-artwork");
 }
 
 function createTimelineDetailFlyout(platform, side) {
@@ -663,7 +619,7 @@ function createHardwareGamesCard(platform) {
   const groups = document.createElement("div");
   groups.className = "timeline-games-groups";
   const games = gameDataForPlatform(platform);
-  appendTimelineGameGroup(groups, "护航 / 首发", games.launchGames);
+  appendTimelineGameGroup(groups, "护航 / 首发", games.launchGames, games.launchEmptyLabel);
   appendTimelineGameGroup(groups, "特色 / 高讨论", games.signatureGames);
   if (games.note) {
     const note = document.createElement("p");
@@ -674,7 +630,7 @@ function createHardwareGamesCard(platform) {
   return informationCard([], groups);
 }
 
-function appendTimelineGameGroup(container, title, games) {
+function appendTimelineGameGroup(container, title, games, emptyLabel = "暂未整理。") {
   const group = document.createElement("section");
   group.className = "timeline-games-group";
   const heading = document.createElement("h4");
@@ -683,7 +639,7 @@ function appendTimelineGameGroup(container, title, games) {
 
   if (!games.length) {
     const empty = document.createElement("p");
-    empty.textContent = "暂未整理。";
+    empty.textContent = emptyLabel;
     group.append(empty);
   } else {
     const list = document.createElement("ol");
@@ -721,126 +677,10 @@ function variantsForPlatform(platform) {
   return platformVariants[platformId(platform)] || [];
 }
 
-function imageKey(platform) {
-  return `${IMAGE_CACHE_PREFIX}${platformId(platform)}`;
-}
-
-function imageQueries(platform) {
-  const names = platform.name
-    .split("/")
-    .map((name) => name.trim())
-    .filter(Boolean);
-  return [
-    `${platform.name} video game console`,
-    ...names.map((name) => `${name} console`),
-    `${platform.brand} ${platform.name}`,
-    platform.name
-  ];
-}
-
 async function fetchPlatformImage(platform) {
   const managedKey = `hardware:${platformId(platform)}`;
-  if (managedTimelineImages[managedKey]?.length) return { images: managedTimelineImages[managedKey], title: platform.name };
-  const manualImage = manualImageForPlatform(platform);
-  if (manualImage) return manualImage;
-
-  const localImage = localImages[platformId(platform)];
-  if (localImage) return localImage;
-
-  const cacheKey = imageKey(platform);
-  const cached = localStorage.getItem(cacheKey);
-  if (cached === IMAGE_NOT_FOUND) return null;
-  if (cached) return JSON.parse(cached);
-
-  const exactImage = await fetchExactPlatformImage(platform);
-  if (exactImage) {
-    localStorage.setItem(cacheKey, JSON.stringify(exactImage));
-    return exactImage;
-  }
-
-  for (const query of imageQueries(platform)) {
-    const params = new URLSearchParams({
-      action: "query",
-      generator: "search",
-      gsrsearch: query,
-      gsrlimit: "3",
-      prop: "pageimages|info",
-      piprop: "thumbnail",
-      pithumbsize: "640",
-      inprop: "url",
-      format: "json",
-      origin: "*"
-    });
-
-    try {
-      const response = await fetchWithDeadline(`${WIKI_API}?${params}`);
-      if (!response.ok) continue;
-      const payload = await response.json();
-      const pages = Object.values(payload.query?.pages || {});
-      const match = pages.find((page) => page.thumbnail?.source);
-      if (match) {
-        const result = {
-          src: match.thumbnail.source,
-          page: match.fullurl,
-          title: match.title
-        };
-        localStorage.setItem(cacheKey, JSON.stringify(result));
-        return result;
-      }
-    } catch (error) {
-      return null;
-    }
-  }
-
-  localStorage.setItem(cacheKey, IMAGE_NOT_FOUND);
-  return null;
-}
-
-function manualImageForPlatform(platform) {
-  const source = imageSources[platformId(platform)];
-  if (source?.images?.length) {
-    return {
-      images: source.images,
-      title: source.title || platform.name
-    };
-  }
-  if (source?.src) {
-    return source;
-  }
-  return null;
-}
-
-async function fetchExactPlatformImage(platform) {
-  const title = imageSources[platformId(platform)]?.title;
-  if (!title) return null;
-
-  const params = new URLSearchParams({
-    action: "query",
-    titles: title,
-    prop: "pageimages|info",
-    piprop: "thumbnail",
-    pithumbsize: "640",
-    redirects: "1",
-    inprop: "url",
-    format: "json",
-    origin: "*"
-  });
-
-  try {
-    const response = await fetchWithDeadline(`${WIKI_API}?${params}`);
-    if (!response.ok) return null;
-    const payload = await response.json();
-    const pages = Object.values(payload.query?.pages || {});
-    const match = pages.find((page) => page.thumbnail?.source);
-    if (!match) return null;
-    return {
-      src: match.thumbnail.source,
-      page: match.fullurl,
-      title: match.title
-    };
-  } catch (error) {
-    return null;
-  }
+  const images = managedTimelineImages[managedKey] || [];
+  return images.length ? { images, title: platform.name } : null;
 }
 
 async function hydratePlatformImage(platform, card) {

@@ -9,14 +9,46 @@ const imageSourcesPath = path.join(hardwareDirectory, "image-sources.js");
 const manifestPath = path.join(hardwareDirectory, "timeline-images.js");
 const outputDirectory = path.join(hardwareDirectory, "assets", "consoles");
 const wikiApi = "https://en.wikipedia.org/w/api.php";
-const headers = { "User-Agent": "GameArchiveLocal/1.0 (personal research archive)" };
-const requestTimeoutMs = 12000;
+const headers = {
+  "User-Agent": "GameArchiveLocal/1.0 (personal research archive; hardware image migration)",
+  "Accept": "application/json,image/avif,image/webp,image/png,image/jpeg,image/gif,*/*;q=0.8"
+};
+const requestTimeoutMs = 20000;
+const requestIntervalMs = 1000;
+const maximumAttempts = 4;
+let lastRequestAt = 0;
 
-function fetchWithTimeout(url, options = {}) {
-  return fetch(url, {
-    ...options,
-    signal: AbortSignal.timeout(requestTimeoutMs)
-  });
+function sleep(milliseconds) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+
+function retryDelay(response, attempt) {
+  const retryAfter = Number(response?.headers.get("retry-after"));
+  if (Number.isFinite(retryAfter) && retryAfter > 0) return retryAfter * 1000;
+  return Math.min(30000, 2000 * (2 ** attempt));
+}
+
+async function fetchWithRetry(url, options = {}) {
+  let lastError = null;
+  for (let attempt = 0; attempt < maximumAttempts; attempt += 1) {
+    const waitForSlot = Math.max(0, requestIntervalMs - (Date.now() - lastRequestAt));
+    if (waitForSlot) await sleep(waitForSlot);
+    lastRequestAt = Date.now();
+
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: AbortSignal.timeout(requestTimeoutMs)
+      });
+      if (response.ok || (response.status < 500 && response.status !== 429)) return response;
+      lastError = new Error(`HTTP ${response.status}`);
+      if (attempt < maximumAttempts - 1) await sleep(retryDelay(response, attempt));
+    } catch (error) {
+      lastError = error;
+      if (attempt < maximumAttempts - 1) await sleep(retryDelay(null, attempt));
+    }
+  }
+  throw lastError || new Error("request failed");
 }
 
 function loadGlobals(files) {
@@ -75,7 +107,7 @@ async function wikiPageImage(title) {
     format: "json",
     origin: "*"
   });
-  const response = await fetchWithTimeout(`${wikiApi}?${params}`, { headers });
+  const response = await fetchWithRetry(`${wikiApi}?${params}`, { headers });
   if (!response.ok) return null;
   const payload = await response.json();
   const page = Object.values(payload.query?.pages || {}).find((item) => item.thumbnail?.source);
@@ -99,7 +131,7 @@ async function wikiSearchImage(query) {
     format: "json",
     origin: "*"
   });
-  const response = await fetchWithTimeout(`${wikiApi}?${params}`, { headers });
+  const response = await fetchWithRetry(`${wikiApi}?${params}`, { headers });
   if (!response.ok) return null;
   const payload = await response.json();
   const page = Object.values(payload.query?.pages || {}).find((item) => item.thumbnail?.source);
@@ -125,11 +157,13 @@ async function candidatesFor(platform) {
 }
 
 async function saveCandidate(platform, candidate, index) {
-  const response = await fetchWithTimeout(candidate.src, { headers });
+  const response = await fetchWithRetry(candidate.src, { headers });
   if (!response.ok) throw new Error(`image ${response.status}`);
   const buffer = Buffer.from(await response.arrayBuffer());
-  if (!buffer.length) throw new Error("empty image");
-  const extension = extensionFor(candidate.src, response.headers.get("content-type") || "");
+  const contentType = response.headers.get("content-type") || "";
+  if (!contentType.startsWith("image/")) throw new Error(`unexpected content type ${contentType || "unknown"}`);
+  if (buffer.length < 1024) throw new Error("image payload is too small");
+  const extension = extensionFor(response.url || candidate.src, contentType);
   const id = platformId(platform);
   const filename = `${id}-${String(index + 1).padStart(2, "0")}${extension}`;
   fs.writeFileSync(path.join(outputDirectory, filename), buffer);
@@ -157,7 +191,6 @@ async function main() {
   const manifest = { ...existingManifest };
   let saved = 0;
   let missed = 0;
-  let consecutiveFailures = 0;
 
   for (const platform of platforms) {
     const key = manifestKey(platform);
@@ -175,7 +208,6 @@ async function main() {
       manifest[key] = images;
       if (images.length) {
         saved += images.length;
-        consecutiveFailures = 0;
         console.log(`saved ${platform.name} (${images.length})`);
       } else {
         missed += 1;
@@ -184,13 +216,7 @@ async function main() {
     } catch (error) {
       missed += 1;
       manifest[key] = [];
-      consecutiveFailures += 1;
       console.log(`fail  ${platform.name} (${error.message})`);
-      if (consecutiveFailures >= 3) {
-        console.log("stop  image host is currently unreachable");
-        writeManifest(manifest);
-        break;
-      }
     }
 
     writeManifest(manifest);

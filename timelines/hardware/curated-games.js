@@ -38,26 +38,28 @@ window.CONSOLE_CURATED_GAMES = {
   },
   "Nintendo-Color-TV-Game-1977": {
     launchGames: ["Color TV-Game 6"],
-    signatureGames: ["Color TV-Game 6", "Color TV-Game 15", "Color TV Racing 112", "Computer TV Game"]
+    signatureGames: ["Color TV-Game 6", "Color TV-Game 15", "Color TV Racing 112", "Computer TV Game"],
+    note: "专用机没有独立软件；这里列出的是内置玩法与后续硬件机型。"
   },
   "Nintendo-Game-Watch-1980": {
     launchGames: ["Ball", "Flagman", "Vermin", "Fire"],
-    signatureGames: ["Ball", "Octopus", "Parachute", "Chef", "Donkey Kong", "Mario Bros.", "Zelda", "Oil Panic"]
+    signatureGames: ["Ball", "Octopus", "Parachute", "Chef", "Donkey Kong", "Mario Bros.", "Zelda", "Oil Panic"],
+    note: "每款 Game & Watch 都是自带固定游戏的独立硬件，并非同一主机上的可更换软件。"
   },
   "Nintendo-Famicom-NES-1983": {
-    launchGames: ["Donkey Kong", "Donkey Kong Jr.", "Popeye", "Super Mario Bros.", "Duck Hunt", "Excitebike"],
+    launchGames: ["Donkey Kong", "Donkey Kong Jr.", "Popeye"],
     signatureGames: ["Super Mario Bros.", "The Legend of Zelda", "Metroid", "Mega Man 2", "Castlevania III", "Contra", "Dragon Quest III", "Final Fantasy", "Kirby's Adventure", "Punch-Out!!", "Ninja Gaiden", "Mother"]
   },
   "Nintendo-Family-Computer-Disk-System-1986": {
-    launchGames: ["The Legend of Zelda", "Golf Japan Course", "Soccer", "Baseball"],
+    launchGames: ["The Legend of Zelda", "Super Mario Bros.", "Tennis", "Baseball", "Golf", "Soccer", "Mahjong"],
     signatureGames: ["The Legend of Zelda", "Metroid", "Kid Icarus", "Castlevania", "Yume Kojo: Doki Doki Panic", "Famicom Tantei Club", "Otocky", "Nazo no Murasame Jo"]
   },
   "Nintendo-Game-Boy-1989": {
-    launchGames: ["Tetris", "Super Mario Land", "Alleyway", "Baseball", "Yakuman"],
+    launchGames: ["Super Mario Land", "Alleyway", "Baseball", "Yakuman"],
     signatureGames: ["Tetris", "Pokemon Red / Green / Blue", "The Legend of Zelda: Link's Awakening", "Super Mario Land 2", "Kirby's Dream Land", "Metroid II", "Wario Land", "Pokemon Yellow"]
   },
   "Nintendo-Super-Famicom-SNES-1990": {
-    launchGames: ["Super Mario World", "F-Zero", "Pilotwings", "SimCity"],
+    launchGames: ["Super Mario World", "F-Zero"],
     signatureGames: ["Super Mario World", "The Legend of Zelda: A Link to the Past", "Super Metroid", "Chrono Trigger", "Final Fantasy VI", "Super Mario Kart", "Donkey Kong Country", "EarthBound", "Yoshi's Island", "Street Fighter II Turbo"]
   },
   "Nintendo-Virtual-Boy-1995": {
@@ -77,15 +79,15 @@ window.CONSOLE_CURATED_GAMES = {
     signatureGames: ["Pokemon Gold / Silver", "Pokemon Crystal", "The Legend of Zelda: Oracle of Ages", "The Legend of Zelda: Oracle of Seasons", "Wario Land 3", "Shantae", "Metal Gear: Ghost Babel"]
   },
   "Nintendo-Game-Boy-Advance-2001": {
-    launchGames: ["Super Mario Advance", "F-Zero: Maximum Velocity", "Castlevania: Circle of the Moon", "Tony Hawk's Pro Skater 2"],
+    launchGames: ["Super Mario Advance", "F-Zero: Maximum Velocity", "Castlevania: Circle of the Moon", "Kuru Kuru Kururin"],
     signatureGames: ["Metroid Fusion", "The Legend of Zelda: The Minish Cap", "Advance Wars", "Fire Emblem", "Pokemon Ruby / Sapphire", "Castlevania: Aria of Sorrow", "Mario & Luigi: Superstar Saga", "WarioWare, Inc.", "Golden Sun", "Mother 3"]
   },
   "Nintendo-GameCube-2001": {
-    launchGames: ["Luigi's Mansion", "Wave Race: Blue Storm", "Super Monkey Ball", "Star Wars Rogue Squadron II"],
+    launchGames: ["Luigi's Mansion", "Wave Race: Blue Storm", "Super Monkey Ball"],
     signatureGames: ["Super Smash Bros. Melee", "Metroid Prime", "The Legend of Zelda: The Wind Waker", "Resident Evil 4", "Pikmin 2", "Super Mario Sunshine", "Mario Kart: Double Dash!!", "Paper Mario: The Thousand-Year Door", "Eternal Darkness", "F-Zero GX"]
   },
   "Nintendo-Nintendo-DS-2004": {
-    launchGames: ["Super Mario 64 DS", "WarioWare: Touched!", "Feel the Magic: XY/XX", "Asphalt Urban GT"],
+    launchGames: ["Super Mario 64 DS", "Spider-Man 2", "Madden NFL 2005", "The Urbz: Sims in the City", "Feel the Magic: XY/XX"],
     signatureGames: ["New Super Mario Bros.", "Mario Kart DS", "Pokemon Diamond / Pearl", "Brain Age", "Nintendogs", "Animal Crossing: Wild World", "Professor Layton and the Curious Village", "Phoenix Wright: Ace Attorney", "The World Ends with You", "Dragon Quest IX"]
   },
   "Nintendo-Wii-2006": {
@@ -93,7 +95,7 @@ window.CONSOLE_CURATED_GAMES = {
     signatureGames: ["Wii Sports", "Super Mario Galaxy", "Mario Kart Wii", "Super Smash Bros. Brawl", "Wii Fit", "New Super Mario Bros. Wii", "Xenoblade Chronicles", "Donkey Kong Country Returns", "Metroid Prime 3"]
   },
   "Nintendo-Nintendo-3DS-2011": {
-    launchGames: ["Pilotwings Resort", "Nintendogs + Cats", "Steel Diver", "Super Street Fighter IV 3D Edition", "Ridge Racer 3D"],
+    launchGames: ["Nintendogs + Cats", "Super Street Fighter IV 3D Edition", "Ridge Racer 3D", "Samurai Warriors: Chronicles", "Professor Layton and the Miracle Mask"],
     signatureGames: ["The Legend of Zelda: A Link Between Worlds", "Super Mario 3D Land", "Mario Kart 7", "Animal Crossing: New Leaf", "Fire Emblem Awakening", "Pokemon X / Y", "Monster Hunter 4 Ultimate", "Kid Icarus: Uprising", "Bravely Default"]
   },
   "Nintendo-Wii-U-2012": {
@@ -112,56 +114,58 @@ window.CONSOLE_CURATED_GAMES = {
     launchGames: ["Borderline", "Safari Hunting", "N-Sub"],
     signatureGames: ["Girl's Garden", "Congo Bongo", "Monaco GP", "Zaxxon", "Flicky", "The Castle", "Choplifter"]
   },
-  "Sega-Master-System-1985": {
-    launchGames: ["Hang-On", "Safari Hunt", "Teddy Boy", "F-16 Fighting Falcon"],
+  "Sega-Sega-Mark-III-Master-System-1985": {
+    launchGames: ["Hang-On", "Teddy Boy Blues"],
     signatureGames: ["Alex Kidd in Miracle World", "Phantasy Star", "Wonder Boy III", "Sonic the Hedgehog", "Shinobi", "R-Type", "Fantasy Zone", "Castle of Illusion", "Golden Axe Warrior"]
   },
   "Sega-Mega-Drive-Genesis-1988": {
-    launchGames: ["Altered Beast", "Space Harrier II", "Super Thunder Blade", "Last Battle", "Tommy Lasorda Baseball"],
+    launchGames: ["Space Harrier II", "Super Thunder Blade"],
     signatureGames: ["Sonic the Hedgehog 2", "Streets of Rage 2", "Gunstar Heroes", "Phantasy Star IV", "Shining Force II", "Thunder Force IV", "Contra: Hard Corps", "Castlevania: Bloodlines", "Sonic 3 & Knuckles"]
   },
   "Sega-Game-Gear-1990": {
-    launchGames: ["Columns", "Super Monaco GP", "Pengo", "G-LOC: Air Battle"],
+    launchGames: ["Columns", "Super Monaco GP", "Pengo"],
     signatureGames: ["Sonic the Hedgehog", "Sonic Triple Trouble", "Shinobi", "Columns", "Defenders of Oasis", "Land of Illusion", "GG Aleste", "Tails Adventure"]
   },
   "Sega-Sega-CD-Mega-CD-1991": {
-    launchGames: ["Sol-Feace", "Cobra Command", "Sewer Shark"],
+    launchGames: ["Heavy Nova", "Sol-Feace"],
     signatureGames: ["Sonic CD", "Snatcher", "Lunar: The Silver Star", "Lunar: Eternal Blue", "Popful Mail", "Final Fight CD", "Shining Force CD", "Silpheed"]
   },
   "Sega-Sega-Pico-1993": {
-    launchGames: ["Sonic the Hedgehog's Gameworld", "Tails and the Music Maker"],
-    signatureGames: ["Sonic the Hedgehog's Gameworld", "Tails and the Music Maker", "Ecco Jr. and the Great Ocean Treasure Hunt", "Magic Crayons", "A Year at Pooh Corner"]
+    launchGames: [],
+    signatureGames: ["Sonic the Hedgehog's Gameworld", "Tails and the Music Maker", "Ecco Jr. and the Great Ocean Treasure Hunt", "Magic Crayons", "A Year at Pooh Corner"],
+    launchEmptyLabel: "可靠同期清单待考证。",
+    note: "1993 年日本首发软件清单缺乏足够一致的同期记录，因此不把后续代表作误标为首发。"
   },
   "Sega-Sega-32X-1994": {
-    launchGames: ["Virtua Racing Deluxe", "Star Wars Arcade", "Doom", "Space Harrier"],
+    launchGames: ["Virtua Racing Deluxe", "Star Wars Arcade", "Doom"],
     signatureGames: ["Virtua Racing Deluxe", "Star Wars Arcade", "Doom", "Knuckles' Chaotix", "After Burner Complete", "Kolibri", "Tempo"]
   },
   "Sega-Sega-Saturn-1994": {
-    launchGames: ["Virtua Fighter", "Panzer Dragoon", "Clockwork Knight", "Daytona USA"],
+    launchGames: ["Virtua Fighter", "Wan Chai Connection", "Myst", "Mahjong Gokuu Tenjiku", "Tama"],
     signatureGames: ["NiGHTS into Dreams", "Panzer Dragoon Saga", "Virtua Fighter 2", "Sega Rally Championship", "Radiant Silvergun", "Guardian Heroes", "Dragon Force", "Shining Force III", "Saturn Bomberman"]
   },
   "Sega-Dreamcast-1998": {
-    launchGames: ["Sonic Adventure", "Virtua Fighter 3tb", "Pen Pen TriIcelon", "Godzilla Generations", "Power Stone", "Soulcalibur"],
+    launchGames: ["Virtua Fighter 3tb", "Pen Pen TriIcelon", "Godzilla Generations", "July"],
     signatureGames: ["Shenmue", "Soulcalibur", "Jet Set Radio", "Skies of Arcadia", "Phantasy Star Online", "Crazy Taxi", "Sonic Adventure", "Resident Evil Code: Veronica", "Power Stone 2", "Marvel vs. Capcom 2"]
   },
   "Sony-PlayStation-PlayStation-1994": {
-    launchGames: ["Ridge Racer", "Battle Arena Toshinden", "Jumping Flash!", "Rayman", "Wipeout"],
+    launchGames: ["Crime Crackers", "Ridge Racer", "Gokujou Parodius Da! Deluxe Pack", "A.IV Evolution", "Tama", "Mahjong Gokuu Tenjiku", "Mahjong Station Mazin", "Nekketsu Oyako"],
     signatureGames: ["Final Fantasy VII", "Metal Gear Solid", "Resident Evil 2", "Gran Turismo", "Castlevania: Symphony of the Night", "Tekken 3", "Silent Hill", "Crash Bandicoot", "Tomb Raider"]
   },
   "Sony-PlayStation-PlayStation-2-2000": {
-    launchGames: ["Tekken Tag Tournament", "Ridge Racer V", "Street Fighter EX3", "SSX", "TimeSplitters"],
+    launchGames: ["Stepping Selection", "Ridge Racer V", "Street Fighter EX3", "Kessen", "A-Train 6", "Eternal Ring", "DrumMania", "Mahjong Taikai III", "Kakinoki Shogi IV", "Morita Shogi"],
     signatureGames: ["Grand Theft Auto: San Andreas", "Metal Gear Solid 3", "Shadow of the Colossus", "God of War II", "Final Fantasy X", "Kingdom Hearts II", "Devil May Cry 3", "Silent Hill 2", "Okami", "Gran Turismo 4"]
   },
   "Sony-PlayStation-PlayStation-Portable-2004": {
-    launchGames: ["Ridge Racers", "Lumines", "Wipeout Pure", "Ape Escape: On the Loose", "Metal Gear Acid"],
+    launchGames: ["Vampire Chronicle: The Chaos Tower", "Mahjong Taikai", "Mahjong Fight Club", "Minna no Golf Portable", "Ridge Racers", "Armored Core: Formula Front"],
     signatureGames: ["Monster Hunter Portable 3rd", "God of War: Chains of Olympus", "Crisis Core: Final Fantasy VII", "Grand Theft Auto: Liberty City Stories", "Persona 3 Portable", "Lumines", "Metal Gear Solid: Peace Walker", "Patapon", "LocoRoco"]
   },
   "Sony-PlayStation-PlayStation-3-2006": {
-    launchGames: ["Resistance: Fall of Man", "MotorStorm", "Ridge Racer 7", "Genji: Days of the Blade", "Mobile Suit Gundam: Crossfire"],
+    launchGames: ["Resistance: Fall of Man", "Ridge Racer 7", "Genji: Days of the Blade", "Mobile Suit Gundam: Crossfire", "Mahjong Fight Club"],
     signatureGames: ["The Last of Us", "Uncharted 2", "Metal Gear Solid 4", "Demon's Souls", "LittleBigPlanet", "God of War III", "Journey", "Gran Turismo 5", "Valkyria Chronicles"]
   },
   "Sony-PlayStation-PlayStation-Vita-2011": {
-    launchGames: ["Uncharted: Golden Abyss", "Wipeout 2048", "Hot Shots Golf: World Invitational", "Lumines: Electronic Symphony", "Touch My Katamari"],
+    launchGames: ["Uncharted: Golden Abyss", "Hot Shots Golf: World Invitational", "Ultimate Marvel vs. Capcom 3", "Dynasty Warriors Next", "Army Corps of Hell", "Touch My Katamari"],
     signatureGames: ["Persona 4 Golden", "Gravity Rush", "Tearaway", "Killzone: Mercenary", "Soul Sacrifice", "Dragon's Crown", "Danganronpa", "Ys: Memories of Celceta", "Odin Sphere Leifthrasir"]
   },
   "Sony-PlayStation-PlayStation-4-2013": {
@@ -173,8 +177,9 @@ window.CONSOLE_CURATED_GAMES = {
     signatureGames: ["Astro's Playroom", "Demon's Souls", "Ratchet & Clank: Rift Apart", "Returnal", "Marvel's Spider-Man 2", "Final Fantasy XVI", "Final Fantasy VII Rebirth", "God of War Ragnarok", "Astro Bot"]
   },
   "Sony-PlayStation-PlayStation-Portal-2023": {
-    launchGames: ["Remote Play library from PS5"],
+    launchGames: [],
     signatureGames: ["Marvel's Spider-Man 2", "God of War Ragnarok", "Final Fantasy XVI", "Gran Turismo 7", "Astro Bot"],
+    launchEmptyLabel: "非独立游戏平台。",
     note: "这是远程游玩设备，不是独立游戏平台。"
   },
   "Microsoft-Xbox-Xbox-2001": {
@@ -194,8 +199,8 @@ window.CONSOLE_CURATED_GAMES = {
     signatureGames: ["Halo Infinite", "Forza Horizon 5", "Microsoft Flight Simulator", "Starfield", "Hi-Fi Rush", "Pentiment", "Forza Motorsport", "Psychonauts 2", "Senua's Saga: Hellblade II"]
   },
   "NEC-Hudson-PC-Engine-TurboGrafx-16-1987": {
-    launchGames: ["Bikkuriman World", "Shanghai", "The Kung Fu"],
-    signatureGames: ["Bonk's Adventure", "R-Type", "Ys Book I & II", "Blazing Lazers", "Soldier Blade", "Castlevania: Rondo of Blood", "Bomberman '94", "Devil's Crush", "Military Madness"]
+    launchGames: ["Bikkuriman World", "Shanghai"],
+    signatureGames: ["Bonk's Adventure", "R-Type", "Blazing Lazers", "Soldier Blade", "Bomberman '94", "Devil's Crush", "Military Madness", "Ninja Spirit", "Neutopia", "The Kung Fu"]
   },
   "NEC-Hudson-PC-Engine-CD-ROM2-TurboGrafx-CD-1988": {
     launchGames: ["No.Ri.Ko", "Fighting Street", "Bikkuriman Daijikai"],
@@ -206,8 +211,10 @@ window.CONSOLE_CURATED_GAMES = {
     signatureGames: ["Daimakaimura", "1941: Counter Attack", "Aldynes", "Madou King Granzort", "Battle Ace"]
   },
   "NEC-Hudson-TurboExpress-PC-Engine-GT-1990": {
-    launchGames: ["Bonk's Adventure", "R-Type", "Blazing Lazers"],
-    signatureGames: ["Bonk's Adventure", "R-Type", "Blazing Lazers", "Bomberman", "Ninja Spirit", "Dragon's Curse", "Neutopia", "Devil's Crush"]
+    launchGames: [],
+    signatureGames: ["Bonk's Adventure", "R-Type", "Blazing Lazers", "Bomberman", "Ninja Spirit", "Dragon's Curse", "Neutopia", "Devil's Crush"],
+    launchEmptyLabel: "无独立首发阵容。",
+    note: "这台掌机直接使用既有 HuCard，并不存在独立于 PC Engine 软件库的封闭首发阵容。"
   },
   "NEC-Hudson-PC-FX-1994": {
     launchGames: ["Battle Heat", "Team Innocent"],
@@ -222,11 +229,11 @@ window.CONSOLE_CURATED_GAMES = {
     signatureGames: ["The King of Fighters '98", "Samurai Shodown RPG", "Metal Slug", "Fatal Fury 3", "Art of Fighting 3", "Last Blade", "Pulstar", "Neo Turf Masters"]
   },
   "SNK-Neo-Geo-Pocket-1998": {
-    launchGames: ["King of Fighters R-1", "Samurai Shodown!", "Neo Geo Cup '98"],
+    launchGames: ["King of Fighters R-1", "Neo Geo Cup '98", "Baseball Stars", "Pocket Tennis", "Puzzle Link", "Melon-chan's Growth Diary"],
     signatureGames: ["King of Fighters R-1", "Samurai Shodown!", "Neo Geo Cup '98", "Melon-chan's Growth Diary", "Baseball Stars", "Pocket Tennis"]
   },
   "SNK-Neo-Geo-Pocket-Color-1999": {
-    launchGames: ["King of Fighters R-2", "Neo Geo Cup '98 Plus Color", "Baseball Stars Color"],
+    launchGames: ["King of Fighters R-2", "Puzzle Link Color", "Shogi no Tatsujin Color", "Baseball Stars Color", "Pocket Tennis Color", "Neo Dragon's Wild", "Neo Cherry Master Color", "Neo Mystery Bonus"],
     signatureGames: ["SNK vs. Capcom: Match of the Millennium", "Metal Slug: 1st Mission", "Metal Slug: 2nd Mission", "Sonic Pocket Adventure", "Card Fighters' Clash", "Samurai Shodown! 2"]
   },
   "Mattel-Coleco-Fairchild-Fairchild-Channel-F-1976": {
@@ -278,11 +285,11 @@ window.CONSOLE_CURATED_GAMES = {
     signatureGames: ["Racing Days", "Super Marathon", "Gundam Tactics: Mobility Fleet 0079", "Power Rangers Zeo vs. The Machine Empire", "Mr. Potato Head Saves Veggie Valley"]
   },
   "Bandai-WonderSwan-1999": {
-    launchGames: ["Gunpey", "Chocobo's Dungeon for WonderSwan", "Tetris"],
-    signatureGames: ["Gunpey", "Final Fantasy", "Final Fantasy II", "Makaitoushi SaGa", "Digimon Adventure", "Beatmania for WonderSwan"]
+    launchGames: ["Gunpey", "Densha de Go!", "Shin Nihon Pro Wrestling: Toukon Retsuden", "Chocobo's Dungeon for WonderSwan"],
+    signatureGames: ["Gunpey", "Chocobo's Dungeon for WonderSwan", "Digimon Adventure", "Beatmania for WonderSwan", "Kaze no Klonoa: Moonlight Museum", "Terrors"]
   },
   "Bandai-WonderSwan-Color-2000": {
-    launchGames: ["Final Fantasy", "Guilty Gear Petit", "Digimon Tamers"],
+    launchGames: ["Final Fantasy", "Gunpey EX", "Lime Rider Kerorican", "Dokodemo Hamster 3"],
     signatureGames: ["Final Fantasy IV", "Romancing SaGa", "Front Mission", "Blue Wing Blitz", "Judgement Silversword", "Riviera", "Wild Card"]
   },
   "3DO-Panasonic-3DO-Interactive-Multiplayer-1993": {
@@ -294,11 +301,14 @@ window.CONSOLE_CURATED_GAMES = {
     signatureGames: ["Pathway to Glory", "Tony Hawk's Pro Skater", "SonicN", "The Elder Scrolls Travels: Shadowkey", "Ashen", "Pocket Kingdom", "High Seize"]
   },
   "Valve-PC-Handheld-Steam-Deck-2022": {
-    launchGames: ["Aperture Desk Job", "Elden Ring", "Hades", "Vampire Survivors", "The Witcher 3"],
-    signatureGames: ["Elden Ring", "Baldur's Gate 3", "Hades", "Stardew Valley", "Vampire Survivors", "Dave the Diver", "Cyberpunk 2077", "Persona 5 Royal", "Disco Elysium", "Balatro"]
+    launchGames: ["Aperture Desk Job"],
+    signatureGames: ["Elden Ring", "Baldur's Gate 3", "Hades", "Stardew Valley", "Vampire Survivors", "Dave the Diver", "Cyberpunk 2077", "Persona 5 Royal", "Disco Elysium", "Balatro"],
+    note: "Steam Deck 是开放的 PC 平台，没有封闭首发阵容；这里只把 Valve 用于展示设备特性的《Aperture Desk Job》列为首发代表。"
   },
   "Valve-PC-Handheld-ROG-Ally-2023": {
-    launchGames: ["Forza Horizon 5", "Cyberpunk 2077", "Diablo IV", "Street Fighter 6"],
-    signatureGames: ["Forza Horizon 5", "Cyberpunk 2077", "Elden Ring", "Baldur's Gate 3", "Diablo IV", "Starfield", "Persona 3 Reload", "Street Fighter 6"]
+    launchGames: [],
+    signatureGames: ["Forza Horizon 5", "Cyberpunk 2077", "Elden Ring", "Baldur's Gate 3", "Diablo IV", "Starfield", "Persona 3 Reload", "Street Fighter 6"],
+    launchEmptyLabel: "无独立首发阵容。",
+    note: "ROG Ally 是 Windows PC 掌机，没有平台独占首发阵容；下列仅列代表性适配与高讨论游戏。"
   }
 };

@@ -80,7 +80,7 @@ window.CONSOLE_ARCHIVE = [
         type: "Handheld",
         generation: "Handheld",
         line: "Lynx",
-        notes: "彩色掌机和横竖屏切换很超前，但续航、体积和软件生态弱。",
+        notes: "首批量产彩色 LCD 掌机之一，支持硬件缩放、旋转和左右手翻转操作；体积、耗电与软件规模限制了普及。",
         games: ["California Games", "Blue Lightning", "Chip's Challenge", "Gates of Zendocon", "Todd's Adventures in Slime World", "Rygar", "Rampart", "Klax", "Warbirds", "RoadBlasters", "Toki", "Xenophobe"]
       },
       {
@@ -105,7 +105,7 @@ window.CONSOLE_ARCHIVE = [
         type: "Dedicated",
         generation: "Gen 1",
         line: "Color TV-Game",
-        notes: "任天堂进入电视游戏硬件市场的起点。",
+        notes: "任天堂进入电视游戏硬件市场的起点；这是内置玩法的专用机系列，并不存在可另购的软件卡带。",
         games: ["Color TV-Game 6", "Color TV-Game 15", "Color TV Racing 112", "Computer TV Game"]
       },
       {
@@ -114,7 +114,7 @@ window.CONSOLE_ARCHIVE = [
         type: "Handheld",
         generation: "LCD",
         line: "Game & Watch",
-        notes: "液晶掌机产品线，十字键设计从这里走向标准化。",
+        notes: "长期 LCD 专用掌机产品线；1982 年《Donkey Kong》机型引入的十字键设计成为后续游戏手柄标准。",
         games: ["Ball", "Flagman", "Fire", "Octopus", "Parachute", "Chef", "Donkey Kong", "Mario Bros.", "Zelda", "Oil Panic", "Mickey Mouse", "Green House"]
       },
       {
@@ -123,7 +123,7 @@ window.CONSOLE_ARCHIVE = [
         type: "Home",
         generation: "Gen 3",
         line: "Family Computer",
-        notes: "重建家用机市场秩序，确立授权、品控、第一方驱动的商业模型。",
+        notes: "Famicom 在日本建立第一方与授权第三方共同扩张的软件生态；海外 NES 又以许可、锁区芯片与零售品控重建北美渠道信任。",
         games: ["Super Mario Bros.", "The Legend of Zelda", "Metroid", "Mega Man 2", "Castlevania III", "Contra", "Dragon Quest III", "Final Fantasy", "Kirby's Adventure", "Punch-Out!!", "DuckTales", "Ninja Gaiden", "Mother", "Tetris", "Excitebike", "Kid Icarus", "Bubble Bobble", "Tecmo Super Bowl", "Bionic Commando", "River City Ransom"]
       },
       {
@@ -258,7 +258,7 @@ window.CONSOLE_ARCHIVE = [
         type: "Hybrid",
         generation: "Gen 9",
         line: "Switch",
-        notes: "Switch 路线的后继硬件；本地资料库先记录平台，游戏库后续按实际购买和关注补齐。",
+        notes: "延续混合主机形态并兼容多数 Switch 软件，引入磁吸 Joy-Con 2、鼠标操作与更高性能的掌机显示和底座输出。",
         games: ["Mario Kart World", "Donkey Kong Bananza", "Nintendo Switch 2 Welcome Tour", "Cyberpunk 2077: Ultimate Edition", "Street Fighter 6", "The Legend of Zelda: Breath of the Wild - Switch 2 Edition", "The Legend of Zelda: Tears of the Kingdom - Switch 2 Edition"]
       }
     ]
@@ -278,12 +278,12 @@ window.CONSOLE_ARCHIVE = [
         games: ["Girl's Garden", "Congo Bongo", "Monaco GP", "Zaxxon", "Flicky", "The Castle", "Choplifter", "Champion Boxing", "N-Sub", "Safari Hunting"]
       },
       {
-        name: "Master System",
+        name: "Sega Mark III / Master System",
         year: 1985,
         type: "Home",
         generation: "Gen 3",
         line: "Master System",
-        notes: "在欧美和巴西有长尾市场，画面表现优于 NES 但生态弱于任天堂。",
+        notes: "1985 年先以日本 Sega Mark III 发售，1986 年起用重新设计的 Master System 进入海外；欧洲和巴西形成长尾市场，但全球软件生态弱于 NES。",
         games: ["Alex Kidd in Miracle World", "Phantasy Star", "Wonder Boy III", "Sonic the Hedgehog", "Shinobi", "R-Type", "Fantasy Zone", "Castle of Illusion", "Golden Axe Warrior", "Zillion", "Power Strike", "Ys: The Vanished Omens", "Out Run", "After Burner", "Golvellius"]
       },
       {
@@ -292,7 +292,7 @@ window.CONSOLE_ARCHIVE = [
         type: "Home",
         generation: "Gen 4",
         line: "Mega Drive",
-        notes: "用速度、街机移植和更成熟的市场营销挑战任天堂。",
+        notes: "以街机移植和强调速度感的品牌形象进入 16 位竞争；北美 Genesis 的市场营销与 Sonic 共同把 Sega 推到主机市场高峰。",
         games: ["Sonic the Hedgehog 2", "Streets of Rage 2", "Gunstar Heroes", "Phantasy Star IV", "Shining Force II", "Thunder Force IV", "Contra: Hard Corps", "Castlevania: Bloodlines", "Comix Zone", "ToeJam & Earl", "MUSHA", "Rocket Knight Adventures", "Beyond Oasis", "Ristar", "Golden Axe", "Ecco the Dolphin", "Road Rash II", "Alien Soldier", "Herzog Zwei", "Sonic 3 & Knuckles"]
       },
       {
@@ -337,7 +337,7 @@ window.CONSOLE_ARCHIVE = [
         type: "Home",
         generation: "Gen 5",
         line: "Saturn",
-        notes: "2D 和街机移植很强，复杂多处理器架构影响第三方开发。",
+        notes: "双 CPU、双 VDP 架构擅长 2D 与街机移植，但并行开发复杂度和对透明效果的限制增加了第三方跨平台成本。",
         games: ["NiGHTS into Dreams", "Panzer Dragoon Saga", "Virtua Fighter 2", "Sega Rally Championship", "Radiant Silvergun", "Guardian Heroes", "Dragon Force", "Shining Force III", "Saturn Bomberman", "Burning Rangers", "Daytona USA", "Virtua Cop 2", "Fighters Megamix", "Astal", "Clockwork Knight", "Grandia", "Soukyugurentai", "Layer Section", "Die Hard Arcade", "Street Fighter Alpha 2"]
       },
       {
@@ -362,7 +362,7 @@ window.CONSOLE_ARCHIVE = [
         type: "Home",
         generation: "Gen 5",
         line: "PlayStation",
-        notes: "CD-ROM、3D 视觉、低授权门槛和成熟发行体系改变主机格局。",
+        notes: "CD 的低复制成本、成熟开发工具、面向成年用户的品牌营销和广泛第三方支持改变了主机市场格局。",
         games: ["Final Fantasy VII", "Metal Gear Solid", "Resident Evil 2", "Gran Turismo", "Castlevania: Symphony of the Night", "Tekken 3", "Silent Hill", "Tony Hawk's Pro Skater 2", "Crash Bandicoot", "Spyro the Dragon", "Wipeout", "Tomb Raider", "Ridge Racer Type 4", "Suikoden II", "Vagrant Story", "Xenogears", "Chrono Cross", "PaRappa the Rapper", "Ape Escape", "Twisted Metal 2"]
       },
       {
@@ -416,7 +416,7 @@ window.CONSOLE_ARCHIVE = [
         type: "Home",
         generation: "Gen 9",
         line: "PlayStation",
-        notes: "SSD、DualSense 和跨世代开发并行，逐步过渡到纯本世代作品。",
+        notes: "定制 SSD 与 I/O 缩短读取并改变关卡数据组织，DualSense 提供触觉反馈；生命周期早期与 PS4 跨世代并行。",
         games: ["Astro's Playroom", "Demon's Souls", "Ratchet & Clank: Rift Apart", "Returnal", "Marvel's Spider-Man 2", "Final Fantasy XVI", "Final Fantasy VII Rebirth", "Horizon Forbidden West", "God of War Ragnarok", "Gran Turismo 7", "Baldur's Gate 3", "Elden Ring", "Resident Evil 4", "Helldivers 2", "Stellar Blade", "Death Stranding 2", "Astro Bot", "Silent Hill 2", "Dragon's Dogma 2", "Alan Wake 2"]
       },
       {
@@ -484,8 +484,8 @@ window.CONSOLE_ARCHIVE = [
         type: "Home",
         generation: "Gen 4",
         line: "PC Engine",
-        notes: "8 位 CPU 加强图形芯片，体积极小，在日本市场表现强劲。",
-        games: ["Bonk's Adventure", "R-Type", "Ys Book I & II", "Blazing Lazers", "Soldier Blade", "Castlevania: Rondo of Blood", "Bomberman '94", "Ninja Spirit", "Devil's Crush", "Military Madness", "Splatterhouse", "Alien Crush", "Gate of Thunder", "Lords of Thunder", "Dungeon Explorer", "Air Zonk", "Neutopia", "Final Soldier", "Dragon's Curse", "Cadash"]
+        notes: "8 位 CPU 配合双 16 位图形处理器，机身体积极小；HuCard 与后续 CD 扩展共同支撑了它在日本的长期竞争力。",
+        games: ["Bonk's Adventure", "R-Type", "Blazing Lazers", "Soldier Blade", "Bomberman '94", "Ninja Spirit", "Devil's Crush", "Military Madness", "Splatterhouse", "Alien Crush", "Dungeon Explorer", "Air Zonk", "Neutopia", "Final Soldier", "Dragon's Curse", "Cadash"]
       },
       {
         name: "PC Engine CD-ROM2 / TurboGrafx-CD",
@@ -520,7 +520,7 @@ window.CONSOLE_ARCHIVE = [
         type: "Home",
         generation: "Gen 5",
         line: "PC-FX",
-        notes: "强化动画播放但缺少 3D 能力，战略错位明显。",
+        notes: "以高质量 2D 与全动态影像播放为重点，却没有面向实时 3D 多边形的专用能力，在第五世代竞争中受到明显限制。",
         games: ["Team Innocent", "Battle Heat", "Kishin Douji Zenki FX", "Blue Breaker", "Farland Story FX", "Chip-chan Kick!", "Power Dolls FX", "Der Langrisser FX"]
       }
     ]
@@ -536,7 +536,7 @@ window.CONSOLE_ARCHIVE = [
         type: "Home",
         generation: "Gen 4",
         line: "Neo Geo",
-        notes: "街机 MVS 的家用版本，卡带容量和价格都极高。",
+        notes: "1990 年先以 Neo Geo Rental System 进入家庭租赁，1991 年转为一般零售；与街机 MVS 共享核心规格，但家用与街机卡带不能直接互换。",
         games: ["Metal Slug", "The King of Fighters '98", "Samurai Shodown II", "Garou: Mark of the Wolves", "Fatal Fury Special", "Art of Fighting 2", "Magician Lord", "Pulstar", "Blazing Star", "Last Blade 2", "Neo Turf Masters", "Aero Fighters 2", "Twinkle Star Sprites", "Shock Troopers", "Baseball Stars 2"]
       },
       {
@@ -672,7 +672,7 @@ window.CONSOLE_ARCHIVE = [
         type: "Handheld",
         generation: "Handheld",
         line: "Game.com",
-        notes: "带触摸屏和联网概念的早期掌机实验，商业失败但硬件概念超前。",
+        notes: "早期触摸屏掌机，可借外接调制解调器访问网页和电子邮件，但游戏本身没有形成成熟的在线服务。",
         games: ["Lights Out", "Sonic Jam", "Resident Evil 2", "Duke Nukem 3D", "Mortal Kombat Trilogy", "Fighters Megamix", "Wheel of Fortune"]
       }
     ]
@@ -697,7 +697,7 @@ window.CONSOLE_ARCHIVE = [
         type: "Home",
         generation: "Gen 5",
         line: "Loopy",
-        notes: "带贴纸打印功能的日本家用机，定位女性和创作玩法，是硬件差异化案例。",
+        notes: "明确面向女童市场的日本家用机，内置彩色贴纸打印机，把角色装扮与实体输出结合为差异化卖点。",
         games: ["Wan Wan Aijou Monogatari", "Anime Land", "HARIHARI Seal Paradise", "Bow-wow Puppy Love Story", "Dream Change"]
       },
       {
@@ -723,7 +723,7 @@ window.CONSOLE_ARCHIVE = [
         generation: "Handheld",
         line: "WonderSwan",
         notes: "横竖屏双向操作设计，低价低功耗，主要面向日本市场。",
-        games: ["Gunpey", "Final Fantasy", "Final Fantasy II", "Makaitoushi SaGa", "Chocobo's Dungeon", "Digimon Adventure", "Beatmania for WonderSwan", "Terrors", "Buffers Evolution", "Mobile Suit Gundam"]
+        games: ["Gunpey", "Chocobo's Dungeon for WonderSwan", "Digimon Adventure", "Beatmania for WonderSwan", "Terrors", "Buffers Evolution", "Mobile Suit Gundam", "Kaze no Klonoa: Moonlight Museum", "Engacho!", "Pocket Fighter"]
       },
       {
         name: "WonderSwan Color",
@@ -747,7 +747,7 @@ window.CONSOLE_ARCHIVE = [
         type: "Home",
         generation: "Gen 5",
         line: "3DO",
-        notes: "多厂商授权生产，首发价高，软件阵容混杂但有一些代表作。",
+        notes: "3DO 公司制定统一规格并向多家电器厂商授权生产，依靠软件版税而非硬件利润；首发高价和定位模糊削弱了平台扩张。",
         games: ["The Need for Speed", "Road Rash", "Star Control II", "Super Street Fighter II Turbo", "Gex", "Return Fire", "Lucienne's Quest", "D", "Crash 'n Burn", "Wing Commander III", "Alone in the Dark", "Samurai Shodown"]
       }
     ]

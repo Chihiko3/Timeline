@@ -1,4 +1,5 @@
-// Each month is the earliest confirmed public retail release month worldwide.
+// Each month is the earliest confirmed public availability worldwide.
+// A null month means that reliable sources only agree on the release year.
 window.CONSOLE_RELEASE_DATES = {
   "Magnavox-Philips-Magnavox-Odyssey-1972": { month: 9 },
   "Magnavox-Philips-Odyssey-2-Philips-Videopac-G7000-1978": { month: 12 },
@@ -28,7 +29,7 @@ window.CONSOLE_RELEASE_DATES = {
   "Nintendo-Nintendo-Switch-2017": { month: 3 },
   "Nintendo-Nintendo-Switch-2-2025": { month: 6 },
   "Sega-SG-1000-1983": { month: 7 },
-  "Sega-Master-System-1985": { month: 10 },
+  "Sega-Sega-Mark-III-Master-System-1985": { month: 10 },
   "Sega-Mega-Drive-Genesis-1988": { month: 10 },
   "Sega-Game-Gear-1990": { month: 10 },
   "Sega-Sega-CD-Mega-CD-1991": { month: 12 },
@@ -50,7 +51,7 @@ window.CONSOLE_RELEASE_DATES = {
   "Microsoft-Xbox-Xbox-Series-X-S-2020": { month: 11 },
   "NEC-Hudson-PC-Engine-TurboGrafx-16-1987": { month: 10 },
   "NEC-Hudson-PC-Engine-CD-ROM2-TurboGrafx-CD-1988": { month: 12 },
-  "NEC-Hudson-PC-Engine-SuperGrafx-1989": { month: 11 },
+  "NEC-Hudson-PC-Engine-SuperGrafx-1989": { month: 12 },
   "NEC-Hudson-TurboExpress-PC-Engine-GT-1990": { month: 12 },
   "NEC-Hudson-PC-FX-1994": { month: 12 },
   "SNK-Neo-Geo-AES-1990": { month: 4 },
@@ -59,12 +60,12 @@ window.CONSOLE_RELEASE_DATES = {
   "SNK-Neo-Geo-Pocket-Color-1999": { month: 3 },
   "Mattel-Coleco-Fairchild-Fairchild-Channel-F-1976": { month: 11 },
   "Mattel-Coleco-Fairchild-Mattel-Intellivision-1979": { month: 12 },
-  "Mattel-Coleco-Fairchild-ColecoVision-1982": { month: 8 },
+  "Mattel-Coleco-Fairchild-ColecoVision-1982": { month: 7 },
   "GCE-Milton-Bradley-Microvision-1979": { month: 11 },
   "GCE-Milton-Bradley-Vectrex-1982": { month: 11 },
   "Epoch-Cassette-Vision-1981": { month: 7 },
-  "Epoch-Super-Cassette-Vision-1984": { month: 8 },
-  "Tiger-Watara-Watara-Supervision-1992": { month: 1 },
+  "Epoch-Super-Cassette-Vision-1984": { month: 7 },
+  "Tiger-Watara-Watara-Supervision-1992": { month: null, precision: "year" },
   "Tiger-Watara-Game-com-1997": { month: 9 },
   "Apple-Bandai-Casio-Bandai-Playdia-1994": { month: 9 },
   "Apple-Bandai-Casio-Casio-Loopy-1995": { month: 10 },

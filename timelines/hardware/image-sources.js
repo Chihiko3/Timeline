@@ -105,7 +105,7 @@ window.CONSOLE_IMAGE_SOURCES = {
     ]
   },
   "Sega-SG-1000-1983": { title: "SG-1000" },
-  "Sega-Master-System-1985": { title: "Master System" },
+  "Sega-Sega-Mark-III-Master-System-1985": { title: "Sega Mark III" },
   "Sega-Mega-Drive-Genesis-1988": { title: "Sega Genesis" },
   "Sega-Game-Gear-1990": { title: "Game Gear" },
   "Sega-Sega-CD-Mega-CD-1991": { title: "Sega CD" },

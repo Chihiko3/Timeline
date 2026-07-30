@@ -57,8 +57,7 @@ window.CONSOLE_PLATFORM_VARIANTS = {
     { name: "Family Computer", year: 1983, kind: "日本初代", note: "红白机，手柄固定在机身。" },
     { name: "Nintendo Entertainment System", year: 1985, kind: "海外型号", note: "前插式卡带仓，面向北美等市场。" },
     { name: "AV Famicom / New Famicom", year: 1993, kind: "后期改版", note: "分离手柄并提供 AV 输出。" },
-    { name: "NES-101 Top Loader", year: 1993, kind: "北美后期改版", note: "上插式卡带设计。" },
-    { name: "Famicom Disk System", year: 1986, kind: "磁碟扩展", note: "使用 Disk Card，承载早期 Zelda、Metroid 等作品。" }
+    { name: "NES-101 Top Loader", year: 1993, kind: "北美后期改版", note: "上插式卡带设计。" }
   ],
   "Nintendo-Family-Computer-Disk-System-1986": [
     { name: "Family Computer Disk System", year: 1986, kind: "磁碟扩展", note: "连接在 Famicom 下方使用。" },
@@ -81,7 +80,6 @@ window.CONSOLE_PLATFORM_VARIANTS = {
   ],
   "Nintendo-Nintendo-64-1996": [
     { name: "Nintendo 64", year: 1996, kind: "主型号", note: "卡带 3D 主机。" },
-    { name: "Nintendo 64DD", year: 1999, kind: "磁碟扩展", note: "日本限定磁碟与网络服务扩展。" },
     { name: "iQue Player", year: 2003, kind: "中国大陆衍生机", note: "把 N64 软件集成到手柄形态中。" }
   ],
   "Nintendo-Nintendo-64DD-1999": [
@@ -137,12 +135,12 @@ window.CONSOLE_PLATFORM_VARIANTS = {
     { name: "SC-3000", year: 1983, kind: "电脑型", note: "内置键盘，和 SG-1000 软件谱系关系密切；不是 SG-3000。" },
     { name: "SG-1000", year: 1983, kind: "游戏机初代", note: "Sega 第一台家用游戏机。" },
     { name: "SG-1000 II", year: 1984, kind: "改版", note: "手柄可拆，支持 Sega My Card 需 Card Catcher。" },
-    { name: "Sega Mark III", year: 1985, kind: "第三迭代", note: "强化图形能力，是 Master System 的基础，并兼容 SG-1000 游戏。" },
     { name: "SF-7000", year: 1983, kind: "电脑扩展", note: "为 SC-3000 提供软驱、打印接口和内存扩展。" }
   ],
-  "Sega-Master-System-1985": [
-    { name: "Sega Mark III", year: 1985, kind: "日本前身", note: "日本市场先行版本。" },
+  "Sega-Sega-Mark-III-Master-System-1985": [
+    { name: "Sega Mark III", year: 1985, kind: "日本初代", note: "SG-1000 谱系的第三次硬件迭代，也是 Master System 的基础。" },
     { name: "Master System", year: 1986, kind: "海外重新设计", note: "面向国际市场的外观和品牌。" },
+    { name: "Japanese Master System", year: 1987, kind: "日本改版", note: "采用海外外观并内置 FM 音源和 3D 眼镜接口。" },
     { name: "Master System II", year: 1990, kind: "低成本改版", note: "小型化，通常取消卡片插槽和部分功能。" },
     { name: "TecToy Master System variants", year: 1989, kind: "巴西长寿型号", note: "巴西市场存在大量 TecToy 授权改版。" }
   ],
@@ -256,14 +254,18 @@ window.CONSOLE_PLATFORM_VARIANTS = {
     { name: "PC Engine", year: 1987, kind: "日本初代", note: "极小白色主机，HuCard。" },
     { name: "TurboGrafx-16", year: 1989, kind: "北美型号", note: "更大黑色外壳。" },
     { name: "PC Engine CoreGrafx", year: 1989, kind: "AV 改版", note: "提供 AV 输出。" },
-    { name: "PC Engine SuperGrafx", year: 1989, kind: "增强机型", note: "图形增强，但专用游戏很少。" },
-    { name: "PC Engine Duo", year: 1991, kind: "CD 一体机", note: "整合 HuCard 与 CD-ROM2。" },
-    { name: "TurboDuo", year: 1992, kind: "北美 CD 一体机", note: "北美 Duo 型号。" }
+    { name: "PC Engine Shuttle", year: 1989, kind: "低成本改版", note: "取消后部扩展总线，不能直接连接 CD-ROM2。" },
+    { name: "PC Engine CoreGrafx II", year: 1991, kind: "后期配色改版", note: "恢复初代 CPU，主要变化是外观配色。" },
+    { name: "PC Engine LT", year: 1991, kind: "便携电视型", note: "内置翻盖 LCD 的高价 HuCard 主机。" }
   ],
   "NEC-Hudson-PC-Engine-CD-ROM2-TurboGrafx-CD-1988": [
     { name: "CD-ROM2 System", year: 1988, kind: "日本初代 CD 扩展", note: "Interface Unit 加 CD-ROM2 组合。" },
     { name: "TurboGrafx-CD", year: 1989, kind: "北美 CD 扩展", note: "TurboGrafx-16 对应 CD-ROM 扩展。" },
     { name: "Super CD-ROM2", year: 1991, kind: "强化 CD 扩展", note: "内置 Super System Card 功能。" },
+    { name: "PC Engine Duo", year: 1991, kind: "日本 CD 一体机", note: "整合 HuCard 与 Super CD-ROM2。" },
+    { name: "TurboDuo", year: 1992, kind: "北美 CD 一体机", note: "北美市场的一体化型号。" },
+    { name: "PC Engine Duo-R", year: 1993, kind: "低成本一体机", note: "移除耳机接口和电池功能等非必要设计。" },
+    { name: "PC Engine Duo-RX", year: 1994, kind: "后期一体机", note: "附带六键手柄的最后期型号。" },
     { name: "Arcade Card", year: 1994, kind: "RAM 扩展", note: "支持更大容量街机移植。" }
   ],
   "NEC-Hudson-PC-Engine-SuperGrafx-1989": [
@@ -280,9 +282,8 @@ window.CONSOLE_PLATFORM_VARIANTS = {
     { name: "PC-FXGA", year: 1995, kind: "PC 扩展卡", note: "面向开发/PC 环境的板卡。" }
   ],
   "SNK-Neo-Geo-AES-1990": [
-    { name: "Neo Geo MVS", year: 1990, kind: "街机系统", note: "家用 AES 的街机基础。" },
-    { name: "Neo Geo AES", year: 1990, kind: "家用主机", note: "与 MVS 软件形态不同但内容高度一致。" },
-    { name: "Neo Geo X", year: 2012, kind: "复刻掌机", note: "授权复刻设备，不是原始 AES。" }
+    { name: "Neo Geo Rental System", year: 1990, kind: "家庭租赁阶段", note: "面向家庭的租赁方案，使用后来的 AES 硬件形态。" },
+    { name: "Neo Geo AES", year: 1991, kind: "一般零售", note: "转入公开零售；与 MVS 规格接近，但卡带接口不同。" }
   ],
   "SNK-Neo-Geo-CD-1994": [
     { name: "Neo Geo CD Front Loader", year: 1994, kind: "初期型号", note: "前置托盘。" },
@@ -293,7 +294,6 @@ window.CONSOLE_PLATFORM_VARIANTS = {
     { name: "Neo Geo Pocket", year: 1998, kind: "黑白初代", note: "很快被彩色型号取代。" }
   ],
   "SNK-Neo-Geo-Pocket-Color-1999": [
-    { name: "Neo Geo Pocket", year: 1998, kind: "黑白前身", note: "寿命很短。" },
     { name: "Neo Geo Pocket Color", year: 1999, kind: "彩色型号", note: "主要软件集中于彩色版本。" },
     { name: "New Neo Geo Pocket Color", year: 1999, kind: "小型改版", note: "机身设计调整。" }
   ],
@@ -304,7 +304,8 @@ window.CONSOLE_PLATFORM_VARIANTS = {
   "Mattel-Coleco-Fairchild-Mattel-Intellivision-1979": [
     { name: "Intellivision Master Component", year: 1979, kind: "初代", note: "Mattel 主型号。" },
     { name: "Intellivision II", year: 1983, kind: "小型化", note: "外观和手柄接口调整。" },
-    { name: "Intellivision III / Super Pro System", year: 1985, kind: "后期版本", note: "后续兼容主机版本。" },
+    { name: "INTV System III", year: 1985, kind: "后期兼容机", note: "INTV Corporation 重新发行的兼容型号。" },
+    { name: "INTV Super Pro System", year: 1987, kind: "最后期型号", note: "System III 的重新包装版本。" },
     { name: "Sears Super Video Arcade", year: 1981, kind: "渠道版本", note: "Sears 授权销售版本。" }
   ],
   "Mattel-Coleco-Fairchild-ColecoVision-1982": [
@@ -347,8 +348,7 @@ window.CONSOLE_PLATFORM_VARIANTS = {
     { name: "Pippin @World", year: 1996, kind: "北美型号", note: "面向北美的版本。" }
   ],
   "Bandai-WonderSwan-1999": [
-    { name: "WonderSwan", year: 1999, kind: "黑白初代", note: "横竖屏双向操作。" },
-    { name: "SwanCrystal", year: 2002, kind: "显示改进", note: "虽然属于彩色后期线，但常和 WonderSwan 家族一起研究。" }
+    { name: "WonderSwan", year: 1999, kind: "黑白初代", note: "横竖屏双向操作。" }
   ],
   "Bandai-WonderSwan-Color-2000": [
     { name: "WonderSwan Color", year: 2000, kind: "彩色型号", note: "兼容黑白游戏。" },

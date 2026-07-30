@@ -1,1 +1,0 @@
-window.CONSOLE_IMAGES = {};
