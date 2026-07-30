@@ -234,15 +234,27 @@ function serveStatic(request, response) {
   fs.createReadStream(target).pipe(response);
 }
 
-http.createServer(async (request, response) => {
-  try {
-    if (request.method === "GET" && request.url === "/api/timeline-images") return sendJson(response, 200, { images: readAllManifests() });
-    if (request.method === "POST" && request.url === "/api/timeline-images/upload") return handleUpload(request, response);
-    if (request.method === "POST" && request.url === "/api/timeline-images/remove") return handleJsonMutation(request, response, "remove");
-    if (request.method === "POST" && request.url === "/api/timeline-images/move") return handleJsonMutation(request, response, "move");
-    if (request.method === "POST" && request.url === "/api/timeline-images/open-assets") return openAssetsFolder(response);
-    serveStatic(request, response);
-  } catch (error) {
-    sendJson(response, 500, { error: error.message || "本地图片服务错误" });
-  }
-}).listen(port, "127.0.0.1", () => console.log(`GM server: http://127.0.0.1:${port}`));
+function createGmServer() {
+  return http.createServer(async (request, response) => {
+    try {
+      if (request.method === "GET" && request.url === "/api/timeline-images") return sendJson(response, 200, { images: readAllManifests() });
+      if (request.method === "POST" && request.url === "/api/timeline-images/upload") return handleUpload(request, response);
+      if (request.method === "POST" && request.url === "/api/timeline-images/remove") return handleJsonMutation(request, response, "remove");
+      if (request.method === "POST" && request.url === "/api/timeline-images/move") return handleJsonMutation(request, response, "move");
+      if (request.method === "POST" && request.url === "/api/timeline-images/open-assets") return openAssetsFolder(response);
+      serveStatic(request, response);
+    } catch (error) {
+      sendJson(response, 500, { error: error.message || "本地图片服务错误" });
+    }
+  });
+}
+
+if (require.main === module) {
+  createGmServer().listen(port, "127.0.0.1", () => console.log(`GM server: http://127.0.0.1:${port}`));
+}
+
+module.exports = {
+  createGmServer,
+  manifestDefinitions,
+  readAllManifests
+};

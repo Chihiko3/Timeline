@@ -179,6 +179,11 @@ GM 图片管理仅供本地维护使用。上传的图片会被复制到对应�
 - `fetch-spike-series-artwork.ps1`：为 Spike Chunsoft Narrative 空缺卡片检索候选封面；资源站限流时允许保留空缺，之后通过 GM 工具继续补充。
 - `audit-timeline-content.js`：检查所有游戏作品是否拥有完整的系列解读、机制、影响与剧情资料，并拦截空泛占位文本。
 - `audit-release-data.js`：检查所有游戏系列的完整日期、平台年份、渲染顺序，以及决策链的作品 ID、必填字段、唯一审查状态和全作品覆盖率。
+- `validate-static-site.js`：不启动服务器，检查 JavaScript 语法、入口资源、所有时间线图片清单、仓库相对路径、文件存在性与图片文件有效性。
+
+## 安全验证
+
+日常修改默认运行 `node scripts/validate-static-site.js` 和对应的数据审计，不启动后台服务器。只有修改 GM HTTP 接口本身时才需要临时 HTTP 测试；该测试必须在单个前台进程内使用系统分配的临时端口，并在 `finally` 中关闭。`start-gm-server.cmd` 只用于维护者主动操作 GM 工具，不用于自动验证。
 
 ## 新增时间线
 
