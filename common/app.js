@@ -13,6 +13,7 @@ const releaseDates = window.CONSOLE_RELEASE_DATES || {};
 const platformVariants = window.CONSOLE_PLATFORM_VARIANTS || {};
 const curatedGames = window.CONSOLE_CURATED_GAMES || {};
 const gameLocalizations = window.CONSOLE_GAME_LOCALIZATIONS || {};
+const hardwareCardCopy = window.HARDWARE_CARD_COPY || {};
 const pokemonReleases = window.POKEMON_CORE_RELEASES || [];
 const finalFantasyReleases = window.FINAL_FANTASY_RELEASES || [];
 const dragonQuestReleases = window.DRAGON_QUEST_RELEASES || [];
@@ -262,11 +263,11 @@ function hardwareTimelineAccent(platform) {
   }[typeClass(platform)];
 }
 
-function hardwarePrimaryCardLineage(platform) {
-  const lineage = platform.line?.trim();
-  if (!lineage) return "";
-  const normalize = (value) => value.toLocaleLowerCase().replace(/[\s\-_/|]+/g, "");
-  return normalize(lineage) === normalize(platform.name) ? "" : `产品线：${lineage}`;
+function hardwarePrimaryCardCopy(platform) {
+  return hardwareCardCopy[platformId(platform)] || {
+    status: platform.notes,
+    feature: ""
+  };
 }
 
 function displayType(platform) {
@@ -541,6 +542,7 @@ function createTimelineBrandControls(brands) {
 function createTimelineNode(platform) {
   const id = platformId(platform);
   const variants = variantsForPlatform(platform);
+  const cardCopy = hardwarePrimaryCardCopy(platform);
   const togglePlatform = (event) => {
     event.stopPropagation();
     state.selectedTimelineId = state.selectedTimelineId === id ? null : id;
@@ -552,8 +554,8 @@ function createTimelineNode(platform) {
     dateLabel: releaseDateLabel(platform),
     tagLabel: platform.brand,
     title: platform.name,
-    subtitle: platform.notes,
-    lineage: hardwarePrimaryCardLineage(platform),
+    subtitle: cardCopy.status,
+    lineage: cardCopy.feature,
     footLabel: `${variants.length} 个型号 / 改版`,
     accent: hardwareTimelineAccent(platform),
     tagColor: brandColor(platform.brand),
@@ -569,9 +571,15 @@ function createTimelineDetailFlyout(platform, side) {
   flyout.setAttribute("aria-live", "polite");
   const detail = document.createElement("section");
   detail.className = "pokemon-release-detail timeline-information-stack";
-  detail.append(createHardwareVariantsCard(platform), createHardwareGamesCard(platform));
+  detail.append(createHardwareIdentityCard(platform), createHardwareVariantsCard(platform), createHardwareGamesCard(platform));
   flyout.append(detail);
   return flyout;
+}
+
+function createHardwareIdentityCard(platform) {
+  return informationCard([
+    { label: "产品线", value: platform.line }
+  ]);
 }
 
 function createHardwareVariantsCard(platform) {

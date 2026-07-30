@@ -5,6 +5,7 @@ const vm = require("vm");
 const root = path.resolve(__dirname, "..");
 const files = [
   "timelines/hardware/data.js",
+  "timelines/hardware/card-copy.js",
   "timelines/hardware/release-dates.js",
   "timelines/hardware/platform-variants.js",
   "timelines/hardware/curated-games.js",
@@ -23,6 +24,7 @@ const archive = data.CONSOLE_ARCHIVE || [];
 const releaseDates = data.CONSOLE_RELEASE_DATES || {};
 const variants = data.CONSOLE_PLATFORM_VARIANTS || {};
 const curatedGames = data.CONSOLE_CURATED_GAMES || {};
+const cardCopy = data.HARDWARE_CARD_COPY || {};
 const imageSources = data.CONSOLE_IMAGE_SOURCES || {};
 const timelineImages = data.HARDWARE_TIMELINE_IMAGES || {};
 const errors = [];
@@ -69,6 +71,12 @@ for (const platform of platforms) {
   }
   if (!Number.isInteger(platform.year)) errors.push(`${id}: invalid release year`);
   if (platform.notes.trim().length < 18) errors.push(`${id}: hardware note is too thin`);
+  if (!cardCopy[id]) {
+    errors.push(`${id}: missing primary-card copy`);
+  } else {
+    if (!isNonEmptyText(cardCopy[id].status)) errors.push(`${id}: missing primary-card historical status`);
+    if (!isNonEmptyText(cardCopy[id].feature)) errors.push(`${id}: missing primary-card feature`);
+  }
   if (!Array.isArray(platform.games) || !platform.games.length) {
     errors.push(`${id}: missing representative games`);
   }
@@ -139,6 +147,10 @@ for (const platform of platforms) {
   }
 
   platformNameOwners.set(normalizedName(platform.name), id);
+}
+
+for (const id of Object.keys(cardCopy)) {
+  if (!ids.has(id)) errors.push(`${id}: primary-card copy references an unknown platform`);
 }
 
 for (const [id, platformVariants] of Object.entries(variants)) {

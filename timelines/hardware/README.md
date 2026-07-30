@@ -3,6 +3,7 @@
 This folder owns all console timeline content:
 
 - `data.js`: hardware chronology and platform records
+- `card-copy.js`: concise historical status and key feature shown on primary cards
 - `platform-variants.js`: models, revisions, and related hardware
 - `curated-games.js` and `game-localizations.js`: launch and notable games
 - `timeline-images.js`: GM-managed image records for hardware cards
