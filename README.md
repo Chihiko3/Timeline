@@ -1,192 +1,70 @@
 # Game Archive
 
-一个面向个人长期维护的本地游戏资料库。当前网站以统一的纵向时间线整理游戏硬件与游戏系列，重点是方便查阅、补充和管理资料，而不是面向公开用户的内容平台。
+以时间为主轴，整理游戏硬件与长期游戏系列的发展脉络。
 
-## 当前内容
+[在线浏览](https://chihiko3.github.io/GameConsole/) | [提交问题](https://github.com/Chihiko3/GameConsole/issues) | [参与完善](https://github.com/Chihiko3/GameConsole/pulls)
 
-### 游戏主机资料库
+## 这是什么
 
-- 按最早公开发售时间排列游戏主机、掌机、混合机与 PC 掌机。
-- 收录厂商、硬件型号、改版、代表性首发游戏与特色高讨论游戏。
-- 点击时间线一级卡片可查看型号/改版、护航作与代表作等补充资料。
+游戏的发展很少是一条整齐的直线。一部正传之间可能穿插外传、重制、续作和平台迁移；一个硬件品牌也会同时推进家用机、掌机、扩展设备与改版型号。单独查看某一部作品的 Wiki 很容易获得细节，却不容易看清整个系列为什么分叉、哪些尝试被延续，以及哪些作品真正改变了后续方向。
 
-### 游戏系列资料库
+Game Archive 尝试把这些分散的信息重新放回时间顺序中。它既可以作为玩家快速查阅作品顺序和平台信息的资料库，也希望为游戏策划、开发者和研究者提供更深入的系列演进线索。
 
-- **总览**：提供所有已注册游戏时间线的筛选器。默认不显示任何系列；用户勾选后，将所选系列的一级卡片按全球最早发售日期合并到同一条时间线，并复用各系列原有的卡片内容、图片与展开详情。
-- **Pokemon**：官方作品与代表性同人/ROM 改版，包含首发及后续登陆平台、御三家、重制/改版关系和封面图。
-- **Final Fantasy**：不含跨界作品的最终幻想相关作品，包含正传、续作、战略版、水晶编年史、陆行鸟等分支，以及首发及后续登陆平台和封面/Logo 图。
-- **Dragon Quest**：整理正传、重制、怪兽篇、不思议迷宫、创世小玩家等官方产品线，并追踪各分支的机制演进。
-- **Xeno Series**：以创作谱系串联 Xenogears、Xenosaga 与 Xenoblade，区分版权与世界观边界，并整理发行平台、机制演进和剧情解读。
-- **Like a Dragon**：整理正传、时代剧、黑豹、审判、重制与重要外传，重点记录高密度城市、动作／回合制系统和多主角叙事的演进。
-- **Spike Chunsoft Narrative**：聚焦 Spike 与 Chunsoft 相关叙事游戏的设计谱系，从《弟切草》《恐怖惊魂夜》追踪到《街》《428》，并区分《极限脱出》《弹丸论破》《AI：梦境档案》《超侦探事件簿》《终天教团》等并行或后继分支；不再把同公司但无关的 RPG、Roguelike 与动作系列混入。
+## 你可以看到什么
 
-新增游戏时间线时，应追加到 `common/app.js` 的 `gameSeriesDefinitions()` 末尾。注册后的系列会自动进入总览筛选器和 GM 图片分类，但不会默认勾选；除非另有要求，不调整已有时间线的创建顺序。
+- **统一时间线**：将硬件或系列作品按全球范围内最早的公开发售时间排列。
+- **分层阅读**：一级卡片用于快速识别作品；展开后可继续查看平台记录、核心体验、机制变化、系列影响、剧情与其他补充资料。
+- **系列总览**：自由勾选多个游戏系列，将它们合并到同一条时间线上比较同期作品。
+- **历史节点**：标记系列在本土市场、全球市场以及团队整合后的重要里程碑。
+- **版本关系**：区分正传、外传、重制、增强版、续作、ROM 改版和平台迁移。
+- **图片资料**：卡片展示硬件图片、游戏封面或标志；配置多张图片时可循环查看，并在悬浮时放大预览。
 
-所有时间线的一级卡片遵循同一套规则：左上角日期、右上角分类标签、标题、副标题、补充文本、二级菜单提示，以及可选的右下角图片区域。不同时间线的二级、三级详情内容可以不同。
+## 当前收录
 
-每条游戏系列时间线还会在卡片与时间线中轴之间标出“里程碑”，并明确区分“国内里程碑”与“全球化里程碑”。国内节点使用同心圆原点意象，全球化节点使用经纬线地球意象；标记不占用一级卡片内容，悬浮或键盘聚焦后会说明具体成就与判断依据，同一作品可以同时拥有两个独立标记。
+### 游戏主机
 
-二至四级信息的固定职责见 [common/TIMELINE_CARD_ARCHITECTURE.md](common/TIMELINE_CARD_ARCHITECTURE.md)：二级用于快速理解作品，三级追踪设计决策、剧情与客观记录，四级保存该时间线独有的补充信息。
+从 Magnavox Odyssey、Atari、任天堂与 Sega 的早期硬件开始，延伸到 PlayStation、Xbox、Nintendo Switch、Steam Deck 等现代平台。除主机本体外，也记录掌机、混合主机、PC 掌机、扩展设备、型号改版、代表性首发游戏和特色作品。
 
-## 研究目标
+### 游戏系列
 
-时间是入口，不是结论。项目先让玩家快速确认“这是什么、何时出现、属于哪条分支”，再帮助研究者理解作品面对了什么设计问题、提出了什么假设、做了什么实验、付出了什么代价，以及后续为何继续、放弃或回到另一条路线。
+- **Pokémon**：核心系列、重制与增强版本，以及具有代表性的同人游戏和 ROM 改版。
+- **Final Fantasy**：正传、续作、战略版、水晶编年史、陆行鸟及其他属于最终幻想产品谱系的作品。
+- **Dragon Quest**：正传、重制、怪兽篇、不思议迷宫、创世小玩家等主要分支。
+- **Xeno Series**：沿创作谱系串联 Xenogears、Xenosaga 与 Xenoblade，同时区分版权和世界观边界。
+- **Like a Dragon**：正传、时代剧、黑豹、审判、重制与重要外传。
+- **Spike Chunsoft Narrative**：聚焦从《弟切草》《恐怖惊魂夜》到《街》《428》，以及《极限脱出》《弹丸论破》《AI：梦境档案》等叙事游戏谱系。
 
-设计决策链采用统一结构：`设计问题 → 设计假设 → 本作实验 → 结果与代价 → 后续选择 → 判断依据`。可验证事实与编辑研究推断必须在“判断依据”中区分，避免把合理解释伪装成官方结论。
+项目仍在持续扩展。新的游戏系列会在资料达到可用程度后加入。
 
-每部游戏都必须经过决策链判断，并且只能处于一种状态：独立研究、比较推断或证据不足。比较推断会明确声明它不是开发团队的官方动机；证据不足会直接列出缺失材料，不使用通用句子伪造完整结论。审计脚本会阻止“尚未判断”的作品进入完成状态。
+## 阅读方式
 
-## 项目结构
+1. 在页面顶部选择 **游戏主机** 或 **游戏系列**。
+2. 进入具体系列，沿纵向时间线浏览作品顺序。
+3. 点击一级卡片，查看该作品的深入解读、平台记录和特有资料。
+4. 在 **总览** 中勾选多个系列，比较它们在同一时期的发展。
+5. 将鼠标移到卡片图片上，查看更清晰的封面、硬件图片或系列标志。
 
-```text
-GameConsole/
-  index.html                         网站入口
-  common/                            所有时间线共用的逻辑与样式
-    app.js                            页面框架、统一时间线排布、卡片交互
-    styles.css                        统一视觉样式、尺寸、间距和响应式规则
-    timeline-image-store.js           GM 图片管理接口
-  timelines/
-    hardware/                         游戏主机时间线
-      data.js                         硬件与厂商资料
-      platform-variants.js            型号、改版、扩展与衍生硬件
-      curated-games.js                护航/主推与特色/高讨论游戏
-      game-localizations.js           游戏中文名资料
-      timeline-images.js              主机卡片图片清单
-      assets/consoles/                主机图片
-    pokemon/                          Pokemon 时间线
-      selection-criteria.js           时间线开头的收录规则
-      releases.js                     版本、发售日期与平台资料
-      milestones.js                   国内与全球化里程碑及判断依据
-      editorial-reading.js            核心体验、本作变化与研究线索
-      decision-chain.js               设计问题、实验、代价与后续选择
-      design-logic.js                 机制底层逻辑
-      series-impact.js                系列长期影响
-      external-impact-research.js     行业影响及验证状态
-      plot-summaries.js               剧情概要与叙事创新
-      timeline-images.js              卡片封面清单
-      assets/covers/                  游戏封面
-      assets/sprites/                 御三家像素图
-    final-fantasy/                    Final Fantasy 时间线
-      selection-criteria.js           时间线开头的收录规则
-      final-fantasy-releases.js       作品、发售日期与平台资料
-      milestones.js                   国内与全球化里程碑及判断依据
-      editorial-reading.js            核心体验、本作变化与研究线索
-      decision-chain.js               设计问题、实验、代价与后续选择
-      design-logic.js                 机制底层逻辑
-      series-impact.js                系列长期影响
-      external-impact-research.js     行业影响及验证状态
-      plot-summaries.js               剧情概要与叙事创新
-      timeline-images.js              卡片图片清单
-      assets/covers/                  封面与 Logo 文件
-    DragonQuest/                      Dragon Quest 时间线
-      selection-criteria.js           时间线开头的收录规则
-      releases.js                     正传、重制与各衍生分支资料
-      milestones.js                   国内与全球化里程碑及判断依据
-      editorial-reading.js            核心体验、本作变化与研究线索
-      decision-chain.js               设计问题、实验、代价与后续选择
-      design-logic.js                 机制底层逻辑
-      series-impact.js                系列长期影响
-      external-impact-research.js     行业影响及验证状态
-      plot-summaries.js               剧情概要与叙事创新
-      timeline-images.js              卡片图片清单
-      assets/covers/                  Dragon Quest 作品图片
-    XenoSeries/                       Xeno Series 创作谱系时间线
-      selection-criteria.js           时间线开头的收录规则
-      releases.js                     作品、发售日期与平台资料
-      milestones.js                   国内与全球化里程碑及判断依据
-      editorial-reading.js            核心体验、本作变化与研究线索
-      decision-chain.js               设计问题、实验、代价与后续选择
-      design-logic.js                 机制底层逻辑
-      series-impact.js                系列长期影响
-      external-impact-research.js     行业影响及验证状态
-      plot-summaries.js               剧情概要与叙事创新
-      timeline-images.js              卡片图片清单
-      assets/covers/                  Xeno Series 全部作品图片
-    LikeADragon/                      Like a Dragon 时间线
-      selection-criteria.js           时间线开头的收录规则
-      releases.js                     正传、衍生、重制与平台资料
-      milestones.js                   国内与全球化里程碑及判断依据
-      editorial-reading.js            核心体验、本作变化与研究线索
-      decision-chain.js               设计决策链审查状态
-      design-logic.js                 机制底层逻辑
-      series-impact.js                系列长期影响
-      external-impact-research.js     可验证的行业影响
-      plot-summaries.js               剧情概要与叙事创新
-      timeline-images.js              卡片图片清单
-      assets/covers/                  官方宣传图与日版封面
-    SpikeChunsoftNarrative/           Spike Chunsoft 叙事游戏设计谱系
-      selection-criteria.js           时间线开头的收录规则
-      releases.js                     作品、全球最早发售日期与平台资料
-      milestones.js                   国内与全球化里程碑及判断依据
-      editorial-reading.js            核心体验、本作变化与编辑研究底稿
-      decision-chain.js               设计决策链审查状态
-      design-logic.js                 机制底层逻辑
-      series-impact.js                叙事设计谱系影响
-      external-impact-research.js     可验证的行业影响
-      plot-summaries.js               剧情概要与叙事创新
-      timeline-images.js              卡片图片清单
-      assets/covers/                  叙事游戏作品图片
-  scripts/                            本地服务、资源采集与维护脚本
-  start-gm-server.cmd                 启动本地 GM 图片管理服务
+## 资料方法
+
+时间线优先采用作品或硬件在全球范围内最早的公开发售日期。日期、平台、版本关系和硬件信息会尽量通过官方网站、发行商资料、可靠 Wiki、游戏数据库、历史资料站与其他可追溯来源交叉确认。
+
+网站中的“核心体验”“机制变化”“系列影响”等内容属于编辑研究：可验证事实与分析判断应当保持区别，不把合理推断冒充为官方设计意图。对于仍存在争议或缺少可靠资料的内容，项目会保留继续修正的空间。
+
+## 本地浏览
+
+这是一个不需要构建工具的静态网站。克隆仓库后直接打开根目录的 `index.html` 即可浏览：
+
+```bash
+git clone https://github.com/Chihiko3/GameConsole.git
+cd GameConsole
 ```
 
-每条时间线都拥有自己的数据、图片清单和资源目录；不要再把某条时间线的资源放到其他时间线目录或根目录。通用的页面结构、时间线尺寸和交互逻辑只放在 `common/`。
+## 参与完善
 
-## 日常使用
+欢迎通过 Issue 或 Pull Request 补充遗漏、纠正日期和平台信息、改进系列解读，或提供更准确的图片。提交事实性修改时，请尽量附上可核对的来源，并说明修改的是哪个系列和作品。
 
-### 浏览资料库
+这个项目希望同时保留两种阅读深度：普通玩家可以快速知道“先玩什么、在哪个平台玩”，策划和研究者则可以继续追踪“这一作改变了什么、为什么值得研究、它如何影响后续作品”。
 
-直接打开 `index.html` 即可浏览本地资料库。若需要使用 GM 图片管理、上传图片或删除图片，请使用下面的本地服务方式打开。
+## 许可与素材
 
-### 使用 GM 图片管理
-
-1. 双击 `start-gm-server.cmd`。
-2. 保持弹出的命令窗口运行。
-3. 在浏览器打开 `http://127.0.0.1:5173/?gm=images`。
-4. 在 GM 页面选择对应时间线和卡片，添加、替换、排序或删除图片。
-
-GM 图片管理仅供本地维护使用。上传的图片会被复制到对应时间线的 `assets` 目录；删除图片会同时删除清单记录和未被其他卡片引用的本地文件。
-
-## 图片规则
-
-- 时间线图片的唯一清单是各时间线目录下的 `timeline-images.js`。
-- 一张卡片配置一张图时，卡片只展示该图；配置多张图时，卡片支持循环切换，悬浮时展示全部图片。
-- 图片应放在所属时间线的资源目录中：主机放入 `hardware/assets/consoles`，Pokemon 放入 `pokemon/assets/covers`，Final Fantasy 放入 `final-fantasy/assets/covers`，Dragon Quest 放入 `DragonQuest/assets/covers`，Like a Dragon 放入 `LikeADragon/assets/covers`，Xeno Series 放入 `XenoSeries/assets/covers`，Spike Chunsoft Narrative 放入 `SpikeChunsoftNarrative/assets/covers`。
-- 主动采集日本游戏图片时，优先使用其最早发行平台的日本地区封面；没有独立实体封面的内容可使用日本官网主视觉，并在图片名称中注明。
-- 搜索图片时必须并行使用作品的英文名、中文名和日文原名，不得只依赖单一语言或单一标题写法；必要时同时搜索副标题、平台名、地区版本名和日文商品编号。
-- 搜索范围可包括官方网站、发行商与平台商店、游戏数据库、专题 Wiki、日文资料站、粉丝资料站、旧游戏商店和媒体图库。找到内容可靠、图片质量较高的系列专题站后，应继续检查该站是否覆盖同系列的其他作品。
-- 非官方来源的图片必须核对作品、版本、平台和地区，避免把攻略本、同名作品、后续移植版或无关宣传图误认成目标版本。无法唯一确认时只作为候选图追加，由 GM 工具筛选，不直接覆盖现有图片。
-- 自动采集和批量整理只可替换 `seed-` 开头的预置图片，不得覆盖通过 GM 工具添加或替换的图片。
-- 新增或调整图片优先使用 GM 图片管理工具，避免手动改清单与文件路径产生不一致。
-
-## 资料维护约定
-
-- 时间线日期使用作品或硬件在全球范围内**最早公开发售**的日期；若日期无法可靠确认，可按资料需要只显示到年月。
-- 一级卡片是全站统一组件。涉及一级卡片的尺寸、字体、间距、图片区域、悬浮和展开逻辑的修改，应同步考虑所有时间线。
-- 二级、三级卡片为具体时间线的详情层，可根据资料类型单独设计。
-- 分类标签用于帮助识别作品归属和类型。例如 Final Fantasy 使用“正传 · RPG”“战略版 · 战棋”“水晶编年史 · 动作冒险”等格式。
-- 游戏与硬件资料可从官方资料、可靠 Wiki、模拟器资料站、游戏数据库等来源交叉验证后补充。
-
-## 维护脚本
-
-`scripts/` 中的脚本用于批量采集与维护。常用脚本包括：
-
-- `local-gm-server.js`：GM 图片管理服务。
-- `download-images.js`：下载主机图片。
-- `fetch-game-localizations.js` / `.ps1`：补充硬件代表游戏的中文名。
-- `fetch-final-fantasy-wiki-artwork.ps1`：从 Final Fantasy Wiki 补充可供 GM 筛选的图片。
-- `fetch-dragon-quest-artwork.js`：从 Dragon Quest Wiki 补充空缺图片；保留已有 GM 图片，并优先筛选封面、日版资源与正式 Logo。
-- `fetch-spike-series-artwork.ps1`：为 Spike Chunsoft Narrative 空缺卡片检索候选封面；资源站限流时允许保留空缺，之后通过 GM 工具继续补充。
-- `audit-timeline-content.js`：检查所有游戏作品是否拥有完整的系列解读、机制、影响与剧情资料，并拦截空泛占位文本。
-- `audit-release-data.js`：检查所有游戏系列的完整日期、平台年份、渲染顺序，以及决策链的作品 ID、必填字段、唯一审查状态和全作品覆盖率。
-- `validate-static-site.js`：不启动服务器，检查 JavaScript 语法、入口资源、所有时间线图片清单、仓库相对路径、文件存在性与图片文件有效性。
-
-## 安全验证
-
-日常修改默认运行 `node scripts/validate-static-site.js` 和对应的数据审计，不启动后台服务器。只有修改 GM HTTP 接口本身时才需要临时 HTTP 测试；该测试必须在单个前台进程内使用系统分配的临时端口，并在 `finally` 中关闭。`start-gm-server.cmd` 只用于维护者主动操作 GM 工具，不用于自动验证。
-
-## 新增时间线
-
-新增一个游戏系列或产品线时，应先建立 `timelines/<timeline-id>/`，并至少包含作品/产品数据文件、`timeline-images.js` 和 `assets/`。随后在 `index.html` 注册数据脚本与页面页签，并在 `common/app.js` 的 `gameSeriesDefinitions()` 中登记数据源、配色、标签和特有补充内容。
-
-一级卡片仍应复用 `common` 的统一时间线样式和布局逻辑。这样可以保证后续增加更多资料库时，页面仍像同一个网站，而不是多个独立页面的拼接。
+项目代码采用 [MIT License](LICENSE)。游戏名称、商标、封面、Logo、硬件照片及其他第三方素材的权利归各自权利人所有；这些素材在本项目中用于历史整理、资料索引与研究展示。
