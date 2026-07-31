@@ -31,6 +31,10 @@ body {
   font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", Arial, sans-serif;
 }
 
+html[data-language="en"] body {
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
 button,
 input {
   font: inherit;
@@ -69,6 +73,78 @@ h1 {
   margin-bottom: 0;
   font-size: 36px;
   line-height: 1.05;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.language-switch {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid #cbd2dd;
+  background: #ffffff;
+}
+
+.language-switch button {
+  min-width: 76px;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 0;
+  border-right: 1px solid #cbd2dd;
+  background: transparent;
+  color: #596476;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.language-switch button:last-child {
+  border-right: 0;
+}
+
+.language-switch button:hover,
+.language-switch button:focus-visible {
+  background: #f0f3f7;
+  color: #20242c;
+}
+
+.language-switch button.active {
+  background: #20242c;
+  color: #ffffff;
+}
+
+.translation-warning {
+  display: none;
+}
+
+html[data-language="en"] .translation-warning {
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  min-height: 48px;
+  padding: 10px 32px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-bottom: 1px solid #e0a4a4;
+  border-left: 5px solid #b4232c;
+  background: #fff2f1;
+  color: #6f1d24;
+  box-shadow: 0 4px 12px rgba(88, 25, 30, 0.08);
+}
+
+.translation-warning strong {
+  flex: 0 0 auto;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.translation-warning span {
+  font-size: 12px;
+  line-height: 1.45;
 }
 
 .timeline-artwork-debug {
@@ -1926,6 +2002,10 @@ summary {
     flex-direction: column;
   }
 
+  .topbar-actions {
+    justify-content: space-between;
+  }
+
 }
 
 @media (max-width: 560px) {
@@ -1933,6 +2013,14 @@ summary {
   .content {
     padding-left: 16px;
     padding-right: 16px;
+  }
+
+  html[data-language="en"] .translation-warning {
+    position: static;
+    padding: 10px 16px;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
   }
 
   .platform-grid {

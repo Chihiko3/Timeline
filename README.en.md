@@ -4,7 +4,9 @@
 
 A chronological archive of video game hardware and long-running game series.
 
-[Browse the archive](https://chihiko3.github.io/GameConsole/) | [Report an issue](https://github.com/Chihiko3/GameConsole/issues) | [Contribute](https://github.com/Chihiko3/GameConsole/pulls)
+[Browse the archive in English](https://chihiko3.github.io/GameConsole/?lang=en) | [Report an issue](https://github.com/Chihiko3/GameConsole/issues) | [Contribute](https://github.com/Chihiko3/GameConsole/pulls)
+
+Use the language control at the top of the site to switch between Simplified Chinese and English. Interface copy, category labels, and series terminology have received a manual terminology pass, while long-form prose remains machine-assisted and is still being reviewed entry by entry. English mode displays a prominent unproofread warning until that review is complete.
 
 ## What is this?
 
@@ -15,6 +17,7 @@ Game Archive brings this scattered information back into chronological context. 
 ## What can you explore?
 
 - **Unified timelines:** Hardware and game releases are ordered by their earliest known public release anywhere in the world.
+- **Chinese and English interface:** Both languages use the same timeline data and interactions. The current English version is explicitly marked as unproofread.
 - **Layered reading:** Primary cards identify each release at a glance. Expanded panels provide platform records, core experiences, mechanical changes, series impact, plot summaries, and timeline-specific details.
 - **Series overview:** Select multiple game series and compare their releases on one combined timeline.
 - **Historical milestones:** Identify important domestic breakthroughs, global breakthroughs, and the first releases following major team or company integrations.
@@ -66,6 +69,8 @@ cd GameConsole
 ## Contributing
 
 Issues and pull requests are welcome. You can help fill gaps, correct release dates or platform information, improve a series analysis, or provide a more accurate image. For factual corrections, please include a source whenever possible and identify the affected series and release.
+
+When using an AI assistant to add a timeline or modify the project, provide [`AI_PROJECT_GUIDE.en.md`](AI_PROJECT_GUIDE.en.md) first. It records the repository structure, full timeline-integration checklist, and shared rules that must remain intact.
 
 The project is intended to support two levels of reading. Players should be able to answer “What comes first, and where can I play it?” while designers and researchers can continue into “What changed in this release, why is it worth studying, and how did it shape what followed?”
 

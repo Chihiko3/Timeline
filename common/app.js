@@ -2,6 +2,7 @@ const archive = window.CONSOLE_ARCHIVE;
 const SHOW_DESIGN_DECISION_CHAINS = false;
 const SHOW_RESEARCH_PROMPTS = false;
 const SHOW_HARDWARE_CARD_GRID = false;
+const isEnglish = window.APP_LANGUAGE === "en";
 
 const state = {
   selectedTimelineId: null,
@@ -235,7 +236,7 @@ function gameLocalizationFor(game) {
 }
 
 function displayChineseGameTitle(title) {
-  return title && !/[A-Za-z]/.test(title) ? title : null;
+  return !isEnglish && title && !/[A-Za-z]/.test(title) ? title : null;
 }
 
 function filteredPlatforms() {
@@ -244,7 +245,7 @@ function filteredPlatforms() {
       (a, b) =>
         a.year - b.year ||
         releaseMonth(a) - releaseMonth(b) ||
-        a.brand.localeCompare(b.brand, "zh-CN")
+        a.brand.localeCompare(b.brand, isEnglish ? "en" : "zh-CN")
     );
 }
 
@@ -890,7 +891,7 @@ function platformDisplayName(platform) {
 }
 
 function pokemonSubtitle(chineseName) {
-  return chineseName.replace(/^\u5b9d\u53ef\u68a6[\uff1a:\s]*/, "");
+  return chineseName.replace(/^(?:\u5b9d\u53ef\u68a6|Pokémon)[\uff1a:\s]*/i, "");
 }
 
 function informationCard(fields, extra = null) {
@@ -1427,18 +1428,26 @@ function appendReleaseMilestone(stack, release, side, milestones, seriesLabel) {
     .map((type) => [type, releaseMilestones[type]]);
 
   entries.forEach(([type, milestone], index) => {
-    const typeLabel = {
-      domestic: "国内里程碑",
-      global: "全球化里程碑",
-      integration: "组织整合节点"
-    }[type];
+    const typeLabel = isEnglish
+      ? {
+          domestic: "Home-market Breakthrough",
+          global: "Global Breakthrough",
+          integration: "Post-integration Release"
+        }[type]
+      : {
+          domestic: "国内里程碑",
+          global: "全球化里程碑",
+          integration: "组织整合节点"
+        }[type];
     const marker = document.createElement("button");
     marker.type = "button";
     marker.className = `timeline-milestone-marker timeline-milestone-marker-${side} timeline-milestone-marker-${type}`;
     marker.style.setProperty("--milestone-index", index);
     marker.setAttribute(
       "aria-label",
-      `${seriesLabel} ${typeLabel}，${release.name}：${milestone.label}。${milestone.achievement}`
+      isEnglish
+        ? `${seriesLabel} ${typeLabel}, ${release.name}. ${milestone.achievement}`
+        : `${seriesLabel} ${typeLabel}，${release.name}：${milestone.label}。${milestone.achievement}`
     );
 
     const tooltip = document.createElement("span");
@@ -1446,11 +1455,11 @@ function appendReleaseMilestone(stack, release, side, milestones, seriesLabel) {
     tooltip.setAttribute("role", "tooltip");
 
     const label = document.createElement("strong");
-    label.textContent = `${typeLabel} · ${milestone.label}`;
+    label.textContent = isEnglish ? typeLabel : `${typeLabel} · ${milestone.label}`;
     const achievement = document.createElement("span");
     achievement.textContent = milestone.achievement;
     const evidence = document.createElement("small");
-    evidence.textContent = `判断依据：${milestone.evidence}`;
+    evidence.textContent = isEnglish ? `Evidence: ${milestone.evidence}` : `判断依据：${milestone.evidence}`;
 
     tooltip.append(label, achievement, evidence);
     marker.append(tooltip);
@@ -1464,7 +1473,7 @@ function createSeriesReleaseStack(release, side, isSelected, toggleRelease, defi
   const artworkKey = `${definition.imageCollectionId}:${release.id}`;
   const releaseLabel = definition.tagFor(release);
   const platformTotal = releasePlatformCount(release);
-  const subtitle = definition.subtitleFor(release);
+  const subtitle = isEnglish ? null : definition.subtitleFor(release);
   const cardLineage = definition.cardLineageFor?.(release) || "";
   const accent = definition.color(release);
   const card = createTimelinePrimaryCard({
@@ -1892,7 +1901,9 @@ function createTimelineSelectionNote(criteria, theme) {
 
 function pokemonStartersForRelease(release) {
   if (release.official === false) return [];
-  return POKEMON_STARTER_OVERRIDES[release.id] || POKEMON_STARTERS_BY_GENERATION[release.generation.split("・")[0]] || [];
+  const generationNumber = String(release.generation || "").match(/\d+/)?.[0];
+  const generationKey = generationNumber ? `世代 ${generationNumber}` : release.generation.split("・")[0];
+  return POKEMON_STARTER_OVERRIDES[release.id] || POKEMON_STARTERS_BY_GENERATION[generationKey] || [];
 }
 
 function createPokemonStartersPanel(release) {
@@ -1917,12 +1928,12 @@ function createPokemonStartersPanel(release) {
     item.className = "pokemon-starter-card";
     const names = document.createElement("div");
     names.className = "pokemon-starter-names";
-    names.innerHTML = `<strong>${englishName}</strong><span>${chineseName}</span>`;
+    names.innerHTML = `<strong>${englishName}</strong>${isEnglish ? "" : `<span>${chineseName}</span>`}`;
     const sprite = document.createElement("img");
     sprite.className = "pokemon-starter-sprite";
     const spriteId = POKEMON_SPRITE_IDS[englishName];
     sprite.src = spriteId ? `timelines/pokemon/assets/sprites/${spriteId}.png` : "";
-    sprite.alt = `${englishName} 像素图`;
+    sprite.alt = isEnglish ? `${englishName} pixel sprite` : `${englishName} 像素图`;
     sprite.loading = "lazy";
     item.append(names);
     item.append(sprite);

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>游戏资料库</title>
     <meta name="description" content="本地使用的游戏资料库。">
+    <script src="common/language.js"></script>
     <link rel="stylesheet" href="common/styles.css">
   </head>
   <body>
@@ -13,11 +14,22 @@
         <p class="eyebrow">Game TimeLine</p>
         <h1>游戏时间线</h1>
       </div>
-      <label class="timeline-artwork-debug" for="timelineArtworkDebug" hidden>
-        <input id="timelineArtworkDebug" type="checkbox">
-        <span>显示图片区域</span>
-      </label>
+      <div class="topbar-actions">
+        <nav class="language-switch" aria-label="Language">
+          <button type="button" data-app-language="zh-CN">中文</button>
+          <button type="button" data-app-language="en">English</button>
+        </nav>
+        <label class="timeline-artwork-debug" for="timelineArtworkDebug" hidden>
+          <input id="timelineArtworkDebug" type="checkbox">
+          <span>显示图片区域</span>
+        </label>
+      </div>
     </header>
+
+    <aside class="translation-warning" role="status" aria-live="polite">
+      <strong>Unproofread English translation</strong>
+      <span>This AI-generated draft has not been reviewed by a fluent editor. Terminology and phrasing may contain errors.</span>
+    </aside>
 
     <main class="app-shell">
       <section class="content">
@@ -176,6 +188,9 @@
     <script src="timelines/SpikeChunsoftNarrative/external-impact-research.js"></script>
     <script src="timelines/SpikeChunsoftNarrative/plot-summaries.js"></script>
     <script src="timelines/SpikeChunsoftNarrative/timeline-images.js"></script>
+    <script src="common/localization-en-reviewed.js"></script>
+    <script src="common/localization-en-data.js"></script>
+    <script src="common/localization-en.js"></script>
     <script src="common/timeline-image-store.js"></script>
     <script src="common/app.js"></script>
   </body>
