@@ -82,6 +82,10 @@ h1 {
   user-select: none;
 }
 
+.timeline-artwork-debug[hidden] {
+  display: none;
+}
+
 .timeline-artwork-debug input {
   width: 14px;
   height: 14px;

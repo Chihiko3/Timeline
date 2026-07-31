@@ -1,6 +1,10 @@
 (() => {
   const apiRoot = "/api/timeline-images";
 
+  function hasLocalGmApi() {
+    return location.protocol === "http:" && ["127.0.0.1", "localhost"].includes(location.hostname);
+  }
+
   function fallbackImages() {
     return {
       ...(window.HARDWARE_TIMELINE_IMAGES || {}),
@@ -20,6 +24,7 @@
   }
 
   async function loadAll() {
+    if (!hasLocalGmApi()) return fallbackImages();
     try {
       const payload = await api();
       return {
