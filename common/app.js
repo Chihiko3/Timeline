@@ -2172,7 +2172,8 @@ function restoreArchiveLocation(libraryTabs, seriesTabs) {
 
   if (location === "series-overview") {
     activateTab(libraryTabs, "libraryTab", libraryTabs.find((button) => button.dataset.libraryTab === "series-library-panel"));
-    activateTab(seriesTabs, "seriesTab", seriesTabs.find((button) => button.dataset.seriesTab === "series-overview-panel"));
+    activateTab(seriesTabs, "seriesTab", seriesTabs.find((button) => button.dataset.seriesTab === "pokemon-library-panel"));
+    saveArchiveLocation();
   }
 
 }

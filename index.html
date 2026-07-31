@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#181a1d">
     <title>游戏资料库</title>
     <meta name="description" content="本地使用的游戏资料库。">
     <script src="common/language.js"></script>
@@ -11,8 +12,8 @@
   <body>
     <header class="topbar">
       <div>
-        <p class="eyebrow">Game TimeLine</p>
-        <h1>游戏时间线</h1>
+        <p class="eyebrow">Timeline</p>
+        <h1>时间线</h1>
       </div>
       <div class="topbar-actions">
         <nav class="language-switch" aria-label="Language">
@@ -41,7 +42,7 @@
         <section id="console-library-panel" class="library-tab-panel" role="tabpanel">
           <section class="insight-panel">
             <div>
-              <p class="eyebrow"> Game Console Timeline</p>
+              <p class="eyebrow">Game Console Timeline</p>
               <h2>游戏主机时间线</h2>
             </div>
           </section>
@@ -53,8 +54,8 @@
 
         <section id="series-library-panel" class="library-tab-panel" role="tabpanel" hidden>
           <nav class="series-tabs" aria-label="游戏系列资料库页面" role="tablist">
-            <button class="series-tab active" type="button" role="tab" aria-selected="true" aria-controls="series-overview-panel" data-series-tab="series-overview-panel">总览</button>
-            <button class="series-tab" type="button" role="tab" aria-selected="false" aria-controls="pokemon-library-panel" data-series-tab="pokemon-library-panel">Pokémon</button>
+            <button class="series-tab" type="button" role="tab" aria-selected="false" aria-controls="series-overview-panel" data-series-tab="series-overview-panel" hidden>总览</button>
+            <button class="series-tab active" type="button" role="tab" aria-selected="true" aria-controls="pokemon-library-panel" data-series-tab="pokemon-library-panel">Pokémon</button>
             <button class="series-tab" type="button" role="tab" aria-selected="false" aria-controls="final-fantasy-library-panel" data-series-tab="final-fantasy-library-panel">Final Fantasy</button>
             <button class="series-tab" type="button" role="tab" aria-selected="false" aria-controls="dragon-quest-library-panel" data-series-tab="dragon-quest-library-panel">Dragon Quest</button>
             <button class="series-tab" type="button" role="tab" aria-selected="false" aria-controls="xenoblade-library-panel" data-series-tab="xenoblade-library-panel">Xeno Series</button>
@@ -62,8 +63,8 @@
             <button class="series-tab" type="button" role="tab" aria-selected="false" aria-controls="spike-series-library-panel" data-series-tab="spike-series-library-panel">Spike Chunsoft Narrative</button>
           </nav>
 
-          <section id="series-overview-panel" class="series-tab-panel series-overview-timeline" role="tabpanel" aria-label="游戏系列总览时间线"></section>
-          <section id="pokemon-library-panel" class="series-tab-panel" role="tabpanel" hidden>
+          <section id="series-overview-panel" class="series-tab-panel series-overview-timeline" role="tabpanel" aria-label="游戏系列总览时间线" hidden></section>
+          <section id="pokemon-library-panel" class="series-tab-panel" role="tabpanel">
             <div id="pokemonTimeline" class="pokemon-timeline" aria-label="Pokemon核心系列时间线"></div>
           </section>
           <section id="final-fantasy-library-panel" class="series-tab-panel" role="tabpanel" hidden>

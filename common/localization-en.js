@@ -5,7 +5,7 @@
   const ui = {
     "游戏资料库": "Game Archive",
     "本地使用的游戏资料库。": "A chronological archive of video game hardware and long-running game series.",
-    "游戏时间线": "Game Timeline",
+    "时间线": "Timeline",
     "显示图片区域": "Show artwork bounds",
     "资料库页面": "Archive sections",
     "游戏主机": "Video Game Hardware",
