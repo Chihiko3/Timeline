@@ -1,5 +1,7 @@
 # Game Archive
 
+**简体中文** | [English](README.en.md)
+
 以时间为主轴，整理游戏硬件与长期游戏系列的发展脉络。
 
 [在线浏览](https://chihiko3.github.io/GameConsole/) | [提交问题](https://github.com/Chihiko3/GameConsole/issues) | [参与完善](https://github.com/Chihiko3/GameConsole/pulls)
