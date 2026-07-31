@@ -52,6 +52,8 @@ Timelines use the earliest known public release date for a game or hardware prod
 
 Sections such as “Core Experience,” “Mechanical Changes,” and “Series Impact” are editorial research. Verifiable facts and analytical interpretation should remain distinct, and a reasonable inference should not be presented as an official design intention. Disputed or weakly documented subjects remain open to correction as better evidence becomes available.
 
+[Read the full research and verification policy](RESEARCH_SOURCES.en.md)
+
 ## Browse locally
 
 This is a static website with no build step. Clone the repository and open the root `index.html` file directly:
