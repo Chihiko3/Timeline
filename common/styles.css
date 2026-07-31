@@ -161,8 +161,7 @@ h1 {
 }
 
 html[data-language="en"] .translation-warning {
-  position: sticky;
-  top: 0;
+  position: static;
   z-index: 90;
   min-height: 48px;
   padding: 10px 32px;
@@ -240,7 +239,7 @@ input {
 }
 
 .content {
-  padding: 26px 40px 56px;
+  padding: 10px 40px 56px;
 }
 
 .library-tabs {
@@ -248,7 +247,7 @@ input {
   align-items: center;
   gap: 32px;
   min-height: 46px;
-  margin-bottom: 30px;
+  margin-bottom: 16px;
   border-bottom: 1px solid var(--line);
 }
 
@@ -845,8 +844,10 @@ input {
 
 .timeline-milestone-tooltip strong {
   color: var(--ink);
-  font-family: var(--font-serif);
-  font-size: 12px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.45;
 }
 
 .timeline-milestone-tooltip span {
