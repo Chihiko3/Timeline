@@ -4,7 +4,7 @@
 
 以时间为主轴，整理游戏硬件与长期游戏系列的发展脉络。
 
-[在线浏览](https://chihiko3.github.io/GameConsole/) | [提交问题](https://github.com/Chihiko3/GameConsole/issues) | [参与完善](https://github.com/Chihiko3/GameConsole/pulls)
+[在线浏览](https://chihiko3.github.io/Timeline/?lang=zh-CN#console) | [提交问题](https://github.com/Chihiko3/GameConsole/issues) | [参与完善](https://github.com/Chihiko3/GameConsole/pulls)
 
 页面顶部可以切换简体中文与 English。当前英文版已人工整理界面、分类标签和系列专有术语，长篇正文仍由机器辅助并处于逐条复核阶段；英文模式会持续显示醒目的“未校对”标记，直至完成正式审校。
 
